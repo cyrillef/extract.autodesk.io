@@ -1,0 +1,53 @@
+/*
+//
+// Copyright (c) Autodesk, Inc. All rights reserved
+//
+// Large Model Viewer Extractor
+// by Cyrille Fauvel - Autodesk Developer Network (ADN)
+// January 2015
+//
+// Permission to use, copy, modify, and distribute this software in
+// object code form for any purpose and without fee is hereby granted,
+// provided that the above copyright notice appears in all copies and
+// that both that copyright notice and the limited warranty and
+// restricted rights notice below appear in all supporting
+// documentation.
+//
+// AUTODESK PROVIDES THIS PROGRAM "AS IS" AND WITH ALL FAULTS.
+// AUTODESK SPECIFICALLY DISCLAIMS ANY IMPLIED WARRANTY OF
+// MERCHANTABILITY OR FITNESS FOR A PARTICULAR USE.  AUTODESK, INC.
+// DOES NOT WARRANT THAT THE OPERATION OF THE PROGRAM WILL BE
+// UNINTERRUPTED OR ERROR FREE.
+//
+*/
+.w { padding: 16px; position: absolute; z-index: 4; border: 1px solid #2e6f9a; box-shadow: 2px 2px 19px #e0e0e0;
+	-o-box-shadow: 2px 2px 19px #e0e0e0; -webkit-box-shadow: 2px 2px 19px #e0e0e0; -moz-box-shadow: 2px 2px 19px #e0e0e0;
+	-moz-border-radius: 8px; border-radius: 8px; opacity: 0.8; cursor: move; background-color: white; font-size: 11px;
+	-webkit-transition: background-color 0.25s ease-in; -moz-transition: background-color 0.25s ease-in;
+	transition: background-color 0.25s ease-in; }
+.w:hover { background-color: #5c96bc; color: white; }
+.aLabel { -webkit-transition: background-color 0.25s ease-in; -moz-transition: background-color 0.25s ease-in;
+	transition: background-color 0.25s ease-in; }
+.aLabel.jsplumb-hover,
+.jsplumb-source-hover,
+.jsplumb-target-hover { background-color: #1e8151; color: white; }
+.aLabel { background-color: white; opacity: 0.8; padding: 0.3em; border-radius: 0.5em; border: 1px solid #346789; cursor: pointer; }
+.ep { position: absolute; bottom: 37%; right: 5px; 	width: 1em; height: 1em; background-color: orange; cursor: pointer;
+	box-shadow: 0 0 2px black; -webkit-transition: -webkit-box-shadow 0.25s ease-in; -moz-transition: -moz-box-shadow 0.25s ease-in;
+	transition: box-shadow 0.25s ease-in; }
+.ep:hover { box-shadow: 0 0 6px black; }
+.statemachine .jsplumb-endpoint { z-index: 3; }
+#opened { left: 10em; top: 5em; }
+#phone1 { left: 35em; top: 12em; width: 7em; }
+#inperson { left: 12em; top: 23em; }
+#phone2 { left: 28em; top: 24em; }
+#rejected { left: 10em; top: 35em; }
+.dragHover { border: 2px solid orange; }
+path,
+.jsplumb-endpoint { cursor:pointer; }
+
+.jtk-main { background-color: transparent; margin-left: auto; margin-right: auto;
+	max-width: 1500px; position: relative; }
+.jtk-canvas { height: 550px; max-height: 700px; border: 1px solid #CCC; background-color: white; }
+.canvas-wide { margin-left: 0; }
+#dependencyEditor div.row { margin: 0 7px 0 7px; }

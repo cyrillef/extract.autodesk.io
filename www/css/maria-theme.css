@@ -1,0 +1,1907 @@
+/*!
+ * Maria Theme
+ */
+
+/* Form */
+label {
+	display: inline-block;
+	max-width: 100%;
+	margin-bottom: 5px;
+	font-weight: normal;
+	font-size: 16px;
+	color: #333;
+}
+
+.form-horizontal .control-label {
+	padding-top: 7px;
+	margin-bottom: 10px;
+	text-align: left;
+	font-weight: normal;
+}
+
+.content-form .form-control-wrapper {
+	margin-bottom: 0;
+}
+
+.form-control {
+	display: block;
+	width: 100%;
+	height: 30px;
+	padding: 6px 12px;
+	font-size: 14px;
+	line-height: 1.42857143em;
+	color: #333;
+	background-color: #fff;
+	background-image: none;
+	border: 2px solid #ccc;
+	border-radius: 0;
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	-ms-box-shadow: none;
+	box-shadow: none;
+}
+
+.form-control:focus {
+	border-color: #66afe9;
+	outline: 0;
+	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
+	-moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
+	-ms-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
+	box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, .6);
+}
+
+@media (max-width: 768px) {
+	.form-control {
+		font-size: 13px;
+	}
+}
+
+.content-form .btn-default {
+	margin: 0 0 0 0;
+}
+
+.form-control.form-help-text {
+	font-style: italic;
+	color: #999;
+}
+
+.form-control.form-error-text {
+	border: 2px solid #ff5722;
+}
+
+.form-group.check-group {
+	margin: 0 0 20px;
+	background: #f4f4f4;
+	padding: 20px 0;
+}
+
+.error-text {
+	color: #ff5722;
+	margin-left: -10px;
+}
+
+@media (max-width: 1199px) {
+	.error-text {
+		margin: 10px 0 0 0;
+	}
+}
+
+.text-warning {
+	color: #ff5722;
+}
+
+.label-primary {
+	background-color: #00Bc8D;
+}
+
+.mandatory-label {
+	color: #0696d7;
+	font-weight: 600;
+	font-size: 16px;
+	margin-right: 2px;
+}
+
+/*Form*/
+.form-horizontal .app-control-label,
+.app-control-label {
+	padding-top: 7px;
+	margin-bottom: 10px;
+	text-align: left;
+	font-weight: 600;
+}
+
+.content-form .row-content h5 {
+	color: #333;
+	font-size: 16px;
+	font-weight: 600;
+	margin-top: 0;
+}
+
+.radio label, .checkbox label {
+	padding-left: 0;
+	margin-bottom: 0;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+@media (max-width: 768px) {
+	label {
+		font-size: 15px;
+	}
+}
+
+@media (max-width: 485px) {
+	label {
+		font-size: 14px;
+	}
+}
+
+/*Special Buttons*/
+.btn.btn-next,
+.btn.btn-question-mark,
+.btn.btn-circle {
+	border-radius: 100%;
+	padding: 0;
+	text-align: center;
+	font-size: 25px;
+	font-weight: 500;
+	height: 40px;
+	width: 40px;
+}
+
+.btn.btn-next {
+	background: #fff;
+	border: 2px solid #0696d7;
+	color: #0696d7;
+}
+
+.btn.btn-next:hover {
+	background: #0696d7;
+	border-radius: 100%;
+	border: 2px solid #0696d7;
+	padding: 0;
+	text-align: center;
+	font-size: 25px;
+	color: #fff;
+	font-weight: 500;
+}
+
+.btn.btn-question-mark,
+.btn.btn-question-mark:hover {
+	background: #ff5722;
+	border: 2px solid #ff5722;
+	height: 30px;
+	width: 30px;
+	font-size: 18px;
+	color: #fff;
+	margin-left: 10px;
+}
+
+.app-btn.btn-circle .bg-icon {
+	margin: 0;
+}
+
+.app-btn-play {
+	background: #fff;
+	border: 2px solid #0696d7;
+	border-radius: 100%;
+	height: 40px;
+	width: 40px;
+	color: #0696d7;
+	margin: 0;
+	position: absolute;
+	top: 35%;
+	left: 40%;
+	padding: 9px 5px;
+}
+
+.app-btn-play:hover {
+	background: #fff;
+	border: 2px solid #1858a8;
+	height: 40px;
+	width: 40px;
+	color: #1858a8;
+}
+
+.app-btn-play .bg-icon {
+	margin: 0;
+}
+
+/* Dropdown */
+.dropdown-menu {
+	position: absolute !important;
+	top: 100%;
+	left: 0;
+	z-index: 1000;
+	display: none;
+	float: left;
+	min-width: 160px;
+	padding: 0;
+	margin: 0;
+	font-size: 14px;
+	text-align: left;
+	list-style: none;
+	background-color: #fff !important;
+	-webkit-background-clip: padding-box;
+	background-clip: padding-box;
+	border-top: 5px solid #1858a8 !important;
+	border-left: 0;
+	border-right: 0;
+	border-bottom: 0;
+	border-radius: 0;
+	-webkit-box-shadow: 0 5px 5px 0 rgba(102, 102, 102, 0.5) !important;
+	-moz-box-shadow: 0 5px 5px 0 rgba(102, 102, 102, 0.5) !important;
+	-ms-box-shadow: 0 5px 5px 0 rgba(102, 102, 102, 0.5) !important;
+	box-shadow: 0 5px 5px 0 rgba(102, 102, 102, 0.5) !important;
+	opacity: 0.95;
+}
+
+.navbar-nav.navbar-right .dropdown-menu > li {
+	margin: 0;
+}
+
+.dropdown-menu > li > a {
+	display: block;
+	padding: 0.625em 20px !important;
+	clear: both;
+	font-weight: normal;
+	line-height: 1.42857143em !important;
+	color: #333 !important;
+	white-space: nowrap;
+	margin: 0.625em 0;
+}
+
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus {
+	color: #0696d7 !important;
+	background: #eeeeee !important;
+}
+
+.dropdown-menu > .active > a,
+.dropdown-menu > .active > a:hover,
+.dropdown-menu > .active > a:focus {
+	color: #0696d7 !important;
+	background: #eeeeee !important;
+}
+
+.navbar-nav-mobile .navbar-nav li.open .dropdown-menu,
+.navbar-nav li.open .dropdown-menu,
+.navbar-nav li:hover .dropdown-menu {
+	display: block;
+}
+
+@media (min-width: 768px) {
+	.dropdown-menu {
+		border-top: none !important;
+	}
+
+	#sign-in-section .dropdown-menu {
+		width: 100%;
+		border-top: 4px solid #1858a8 !important;
+	}
+}
+
+/*Toggle*/
+.app-container .navbar-toggle {
+	position: absolute;
+	right: 20px;
+	padding: 10px 10px;
+	margin-top: 15px;
+	margin-right: 15px;
+	margin-bottom: 8px;
+	background-color: transparent;
+	background-image: none;
+	border: 2px solid #1858a8;
+	border-radius: 0;
+	z-index: 1000;
+}
+
+.napp-container .navbar-toggle:hover {
+	background-color: #1858a8;
+	border: 2px solid #1858a8;
+}
+
+.app-container .navbar-toggle:focus {
+
+}
+
+.app-container .navbar-toggle .icon-bar {
+	background-color: #1858a8;
+}
+
+/*Side Nav*/
+.panel.app-panel-default.app-sidenav-panel {
+	min-width: 257px;
+}
+
+.app-sidenav-panel .app-sidenav-body {
+	padding: 0;
+}
+
+.app-sidenav-body .col-lg-12 {
+	padding: 0;
+}
+
+.app-sidenav-panel .nav-stacked li {
+	padding: 0;
+	margin: 0;
+	border-bottom: 1px solid #ccc;
+}
+
+.app-sidenav-panel .nav-stacked a {
+	color: #333;
+	font-size: 16px;
+	padding: 20px 20px 15px 20px;
+	border-radius: 0;
+	border-top: 0;
+	height: 60px;
+}
+
+.nav-pills.app-sidenav > li:hover {
+	background: transparent;
+}
+
+.nav-pills.app-sidenav > li > a:hover, .nav-pills.app-sidenav > li > a:focus,
+.nav-pills.app-sidenav > li.active > a, .nav-pills.app-sidenav > li.active > a:hover, .nav-pills.app-sidenav > li.active > a:focus,
+.nav-pills.second-level-nav > li > a:hover, .nav-pills .second-level-nav > li > a:focus,
+.nav-pills .second-level-nav > li.active > a, .nav-pills .second-level-nav > li.active > a:hover, .nav-pills .second-level-nav > li.active > a:focus,
+.nav-pills .third-level-nav > li > a:hover, .nav-pills .third-level-nav > li > a:focus,
+.nav-pills .third-level-nav > li.active > a, .nav-pills .third-level-nav > li.active > a:hover, .nav-pills .third-level-nav > li.active > a:focus {
+	color: #0696d7;
+	background: transparent;
+}
+
+.nav-pills.second-level-nav > li > a:hover, .nav-pills .second-level-nav > li > a:focus,
+.nav-pills .second-level-nav > li.active > a, .nav-pills .second-level-nav > li.active > a:hover, .nav-pills .second-level-nav > li.active > a:focus,
+.nav-pills .third-level-nav > li > a:hover, .nav-pills .third-level-nav > li > a:focus,
+.nav-pills .third-level-nav > li.active > a, .nav-pills .third-level-nav > li.active > a:hover, .nav-pills .third-level-nav > li.active > a:focus {
+	font-weight: 600;
+}
+
+.app-sidenav-panel .nav-stacked .second-level-nav li,
+.app-sidenav-panel .nav-stacked .third-level-nav li {
+	border-bottom: none;
+}
+
+.app-sidenav .second-level-nav {
+	padding-left: 30px;
+}
+
+.app-sidenav .second-level-nav a {
+	border: 0;
+	padding: 15px;
+	height: auto;
+}
+
+.app-sidenav .second-level-nav li a:hover {
+	color: #0696d7;
+	background: transparent;
+}
+
+.app-sidenav .third-level-nav {
+	padding-left: 20px;
+}
+
+.app-sidenav .third-level-nav a {
+	font-size: 14px;
+	padding: 5px 0 5px 25px;
+}
+
+.app-sidenav .third-level-nav li span.caret {
+	width: 0px;
+	height: 0px;
+	border-top: 4px solid transparent;
+	border-bottom: 4px solid transparent;
+	border-left: 4px solid #1858a8;
+}
+
+.app-btn.back-to-top-btn {
+	width: calc(25% - 1px);
+	margin: 14px 0;
+	padding: 3px 10px;
+	font-size: 14px;
+	height: 35px;
+	position: fixed;
+	bottom: 10px;
+	right: 30px;
+}
+
+.app-container .affix {
+	position: fixed;
+	top: 5px;
+	width: 20%;
+	-webkit-transform: translate3d(0, 0, 0);
+	-moz-transform: translate3d(0, 0, 0);
+	-o-transform: translate3d(0, 0, 0);
+	transform: translate3d(0, 0, 0);
+}
+
+@media (max-width: 1199px) {
+	.panel.app-panel-default.app-sidenav-panel {
+		min-width: 215px;
+	}
+}
+
+@media (max-width: 768px) {
+	.panel.app-panel-default.app-sidenav-panel {
+		display: block;
+		min-height: 69px;
+		z-index: 999;
+	}
+
+	.app-button-container.mob-app-button-container.back-to-top-container {
+		display: block;
+	}
+}
+
+/*Cards My Apps*/
+.app-cards-body {
+	padding: 30px 0 10px 30px !important;
+}
+
+.app-card-group {
+	margin-bottom: 200px;
+	padding: 0;
+	text-align: center;
+	overflow: hidden;
+}
+
+.app-card-item-cont {
+	padding: 0;
+	float: left;
+	margin: 0 25px 30px 0;
+	height: 190px;
+	position: relative;
+	width: 31%;
+}
+
+.app-card-item-cont a:hover {
+	text-decoration: none;
+}
+
+.app-card-item {
+	background: #e6f0f5;
+	border-bottom: 3px solid #bbd7e5;
+	border-right: 3px solid #bbd7e5;
+	height: 100%;
+	overflow: hidden;
+	padding: 0;
+	text-align: left;
+	cursor: pointer;
+	position: relative;
+}
+
+.app-card-item .app-card-content {
+	position: relative;
+	top: 0;
+}
+
+.app-card-item.last-child {
+	margin-right: 0;
+}
+
+.app-card-header {
+	background: #bbbbbb;
+	padding: 15px 20px 10px;
+	height: 80px;
+	position: relative;
+	overflow: hidden;
+	z-index: 1;
+}
+
+.app-card-header.month-1, .app-card-header.month-2 {
+	background: #1858a8;
+}
+
+.app-card-header.month-3, .app-card-header.month-4 {
+	background: #336db5;
+}
+
+.app-card-header.month-5, .app-card-header.month-6 {
+	background: #618ec5;
+}
+
+.app-card-header.month-7, .app-card-header.month-8 {
+	background: #8faed4;
+}
+
+.app-card-header.month-9, .app-card-header.month-10 {
+	background: #bdcee4;
+}
+
+.app-card-header.month-11, .app-card-header.month-12 {
+	background: #cccccc;
+}
+
+.app-card-header.prev-year {
+	background: transparent;
+	border-bottom: 2px solid #fff;
+}
+
+.app-date-legend {
+	font-size: 12px;
+	font-weight: normal;
+	color: #fff;
+}
+
+.app-card-header.prev-year .app-card-title h5 {
+	color: #333;
+}
+
+.app-card-header.prev-year span {
+	color: #333;
+}
+
+.app-card-title {
+	height: 29px;
+	width: 100%;
+	display: inline-block;
+	box-sizing: border-box;
+	overflow: hidden;
+}
+
+.app-card-title h5 {
+	font-size: 16px;
+	font-weight: 700;
+	color: #fff;
+	line-height: 1.5em;
+	margin: 0;
+}
+
+.app-card-date {
+	display: inline-block;
+}
+
+.app-card-divider {
+	text-align: center;
+	margin-right: 20px;
+	clear: both;
+}
+
+.app-card-divider h6 {
+	margin: 0;
+}
+
+.app-card-divider hr {
+	margin: 5px 0 40px;
+	height: 2px;
+	display: block;
+	background: #eeeeee;
+	border: none;
+}
+
+.app-card-description {
+	position: relative;
+	color: #666;
+	padding: 20px;
+}
+
+.app-card-description p {
+	margin: 0;
+}
+
+.app-badge {
+	padding: 0;
+	display: inline-block;
+}
+
+.app-card-item .app-badge {
+	float: right;
+}
+
+.app-badge span {
+	padding: 2px 5px;
+	font-size: 12px;
+	font-weight: 600;
+	color: #333;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: baseline;
+	background: #ffcc00;
+	width: 85px;
+	border-radius: 2px;
+}
+
+.app-badge {
+	display: inline-block;
+	margin-left: 10px;
+}
+
+.app-card-item-hover {
+	position: absolute;
+	width: 100%;
+	left: 0;
+	background: #e6f0f5;
+	border-right: 3px solid #6591a6;
+	border-bottom: 3px solid #6591a6;
+	top: 190px;
+	z-index: 2;
+}
+
+.app-card-item-cont a:hover {
+	text-decoration: none;
+}
+
+.app-card-item-hover .app-card-header {
+	background: transparent;
+	height: auto;
+}
+
+.app-card-item-hover h5 {
+	color: #333;
+	font-weight: 600;
+	margin: 0;
+}
+
+.app-card-item-hover ul {
+	margin: 0;
+	padding: 0 20px;
+	list-style-type: none;
+	line-height: 1.5em;
+}
+
+.app-card-item-hover li {
+	color: #333;
+}
+
+.app-card-item-hover .app-badge {
+	display: inline-block;
+	margin-left: 5px;
+	border-radius: .30em;
+	width: 70px;
+	float: none;
+}
+
+.app-alert-container {
+	position: absolute;
+	top: 50px;
+	left: 0;
+	width: 100%;
+	display: block;
+	z-index: 1;
+}
+
+.app-alert {
+	position: relative;
+	top: 0;
+	padding: 20px;
+	margin: 0 auto;
+	border-radius: 2px;
+	border: none;
+	font-weight: 600;
+	opacity: 0.9;
+	width: 45%;
+	text-align: center;
+}
+
+.app-alert-success {
+	color: #ffffff;
+	background-color: #87bc40;
+}
+
+.app-alert-danger {
+	color: #FF5722;
+	background-color: #FFCCBF;
+}
+
+/*Header animation*/
+.app-card-item .app-card-header.st-def {
+	-webkit-transition: height 0.1s;
+	-moz-transition: height 0.1s;
+	-o-transition: height 0.1s;
+	transition: height 0.1s;
+}
+
+.app-card-item:hover .app-card-header.st-def {
+	height: 50px;
+}
+
+.app-card-item .app-card-date.st-def, .app-card-item .app-row-badge.st-def {
+	-webkit-transition: opacity 0.1s;
+	-moz-transition: opacity 0.1s;
+	-o-transition: opacity 0.1s;
+	transition: opacity 0.1s;
+}
+
+.app-card-item:hover .app-card-date.st-def, .app-card-item:hover .app-row-badge.st-def {
+	opacity: 0;
+}
+
+/*Content animation*/
+.app-card-item .app-card-content.st-def {
+	-webkit-transition: top 0.3s;
+	-moz-transition: top 0.3s;
+	-o-transition: top 0.3s;
+	transition: top 0.3s;
+}
+
+.app-card-item:hover .app-card-content.st-def {
+	top: -80px;
+}
+
+.app-card-item .app-card-item-hover {
+	width: 101%;
+	-webkit-transition: top 0.3s;
+	-moz-transition: top 0.3s;
+	-o-transition: top 0.3s;
+	transition: top 0.3s;
+}
+
+.app-card-item:hover .app-card-item-hover {
+	-webkit-transition: top 0.3s;
+	-moz-transition: top 0.3s;
+	-o-transition: top 0.3s;
+	transition: top 0.3s;
+	top: 50px;
+}
+
+.no-app-card-item {
+	border: dashed 2px #eee;
+	min-height: 200px;
+	padding: 0 20px;
+	margin: 0 20px 20px 0;
+	text-align: center;
+}
+
+.no-app-card-item .app-card-content {
+	padding: 64px 0;
+}
+
+.no-app-card-title h2 {
+	font-size: 20px;
+	font-weight: 600;
+	color: #333;
+	line-height: 1.5em;
+	margin: 0 0 10px;
+}
+
+@media (min-width: 1200px) {
+	.app-card-item-hover {
+		width: 100%;
+	}
+}
+
+@media (max-width: 1199px) {
+	.app-cards-body {
+		padding: 30px 0 10px 24px;
+	}
+
+	.app-card-item-cont {
+		width: 31%;
+		margin: 0 20px 30px 0;
+	}
+
+	.app-card-item-hover {
+		width: 102%;
+		height: 101%;
+	}
+
+	.app-card-item-hover ul {
+		line-height: 1.8em;
+		font-size: 13px;
+		max-height: 75%;
+		overflow-y: scroll;
+	}
+}
+
+@media (max-width: 991px) {
+	.app-card-item-cont {
+		width: calc(50% - 20px);
+	}
+
+	.app-card-item-hover {
+		width: 101%;
+		height: 101%;
+	}
+}
+
+@media (max-width: 646px) {
+	.app-card-item-cont {
+		width: 45%;
+	}
+
+	.app-card-item-hover {
+		width: 101%;
+		height: 101%;
+	}
+
+	.app-card-header {
+		height: auto;
+	}
+
+	.app-card-title h5 {
+		max-height: 50px;
+		overflow: hidden;
+	}
+
+	.app-card-date {
+		display: block;
+	}
+
+	.app-badge {
+		display: inline-block;
+		float: none;
+		margin: 10px 0 0;
+	}
+
+	.app-card-item .app-badge {
+		float: none;
+		margin: 0;
+	}
+}
+
+@media (max-width: 582px) {
+	.col-xs-12 {
+		width: 100%;
+	}
+
+	.app-card-item-cont {
+		width: calc(100% - 20px);
+	}
+
+	.app-card-item-hover {
+		width: 101%;
+	}
+
+	.app-card-date {
+		display: inline-block;
+	}
+
+	.app-badge {
+		display: inline-block;
+		float: none;
+		margin: 10px 0 0 0;
+	}
+
+	.app-card-item-hover ul {
+		max-height: 70%;
+		overflow-y: scroll;
+	}
+
+	.app-card-item .app-badge {
+		float: right;
+	}
+
+	.row-content p {
+		display: none;
+	}
+}
+
+/*Modal*/
+.modal.app-modal {
+	position: absolute;
+}
+
+.app-modal .vertical-alignment-helper {
+	display: table;
+	height: 100%;
+	width: 100%;
+}
+
+.app-modal .vertical-align-center {
+	/* To center vertically */
+	display: table-cell;
+	vertical-align: middle;
+}
+
+.app-modal .modal-content {
+	/* Bootstrap sets the size of the modal in the modal-dialog class, we need to inherit it */
+	width: inherit;
+	height: inherit;
+	/* To center horizontally */
+	margin: 0 auto;
+}
+
+.app-modal .modal-backdrop {
+	z-index: 0;
+	background-color: #333;
+	height: 100% !important;
+}
+
+.app-modal .modal-content {
+	position: relative;
+	background-color: #eee;
+	-webkit-background-clip: padding-box;
+	-moz-background-clip: padding-box;
+	-ms-background-clip: padding-box;
+	background-clip: padding-box;
+	border: 0;
+	border: 0;
+	border-radius: 0;
+	outline: 0;
+	-webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
+	-moz-box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
+	-ms-box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
+	box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
+}
+
+.app-modal .modal-header,
+.app-modal .modal-body,
+.app-modal .modal-footer {
+	text-align: center;
+}
+
+.app-modal .modal-header {
+	min-height: 16.42857143px;
+	padding: 20px 0 0;
+	border-bottom: 0;
+}
+
+.app-modal .modal-title {
+	font-weight: 600;
+}
+
+.app-modal .modal-body {
+	position: relative;
+	padding: 15px;
+	font-weight: normal;
+	font-size: 14;
+	color: #666;
+}
+
+.app-modal .modal-footer {
+	padding: 10px 20px 30px;
+	border-top: 0;
+}
+
+.app-modal .app-btn-default {
+	color: #1858a8;
+}
+
+.app-modal .app-btn-default:hover {
+	color: #fff;
+}
+
+/*Tooltip*/
+.app-tooltip .tooltip {
+	opacity: 1;
+}
+
+.app-tooltip .tooltip-inner {
+	min-width: 125px;
+	max-width: 500px;
+	padding: 10px;
+	color: #333;
+	font-family: "Open Sans", Helvetica, Arial, sans-serif;
+	text-align: center;
+	text-decoration: none;
+	background: #eee;
+	-webkit-background-clip: padding-box;
+	-moz-background-clip: padding-box;
+	-ms-background-clip: padding-box;
+	background-clip: padding-box;
+	border-bottom: 4px solid #1858a8;
+	border-right: none;
+	border-left: none;
+	border-top: none;
+	border-radius: 0;
+	-webkit-box-shadow: 2px 1px 3px 0 rgba(53, 55, 57, 0.5);
+	-moz-box-shadow: 2px 1px 3px 0 rgba(53, 55, 57, 0.5);
+	-ms-box-shadow: 2px 1px 3px 0 rgba(53, 55, 57, 0.5);
+	box-shadow: 2px 1px 3px 0 rgba(53, 55, 57, 0.5);
+}
+
+.app-tooltip .tooltip.top .tooltip-arrow {
+	bottom: 0;
+	left: 50%;
+	margin-left: -5px;
+	border-width: 5px 5px 0;
+	border-top-color: #1858a8;
+}
+
+.app-tooltip .tooltip-arrow {
+	position: absolute;
+	width: 0;
+	height: 0;
+	border-color: transparent;
+	border-style: solid;
+}
+
+/* API Detail Docs Section*/
+.app-api-section .app-api-section-heading {
+	background: transparent;
+	color: #1858a8;
+}
+
+.app-api-section .app-api-section-heading h2 {
+	border-bottom: 2px solid #6fbadc;
+	margin: 60px 0 0;
+	padding-bottom: 10px;
+	font-size: 24px;
+	font-weight: normal;
+}
+
+.app-api-section .app-api-section-heading h2.first-child {
+	margin: 0 0 30px;
+}
+
+.app-api-section .app-api-section-heading h3 {
+	font-weight: 600;
+	font-size: 20px;
+	margin: 60px 0 20px;
+	border-bottom: none;
+}
+
+.app-api-section h5 {
+	font-weight: 600;
+	color: #333;
+	margin: 30px 0 15px;
+}
+
+.app-api-section .app-api-picture {
+	padding: 0;
+	background: transparent;
+}
+
+.app-api-section .app-api-picture a {
+	display: block;
+	width: 100%;
+	height: 100%;
+	position: relative;
+}
+
+.app-api-section .app-api-picture img {
+	width: 100%;
+}
+
+.app-api-section .app-api-video {
+	padding: 10px;
+}
+
+.app-api-section .app-api-screenshoot {
+	background: transparent;
+	margin-bottom: 20px;
+}
+
+.app-api-section .app-api-screenshoot img {
+	border: 1px solid #ccc;
+}
+
+.app-api-section .app-api-browser {
+	background: #cdcccc;
+	padding: 10px;
+	margin-right: 10px;
+}
+
+.app-api-section a.try-in-console-lnk {
+	font-size: 14px;
+	margin-left: 20px;
+}
+
+.app-api-doc p {
+	line-height: 1.7em;
+}
+
+.app-api-doc ul {
+	margin: 15px 0;
+}
+
+.app-api-doc li {
+	margin: 10px 0;
+}
+
+/*Home Page General*/
+.panel.app-panel-home {
+	padding: 0;
+	margin: 0;
+	border: none;
+}
+
+.app-panel-home .panel-title {
+	font-size: 30px;
+	color: #ffffff;
+	line-height: 1.5em;
+	font-weight: lighter;
+	padding: 50px 0;
+}
+
+.app-panel-home .app-panel-text p {
+	font-size: 16px;
+	color: #666;
+	padding: 20px;
+	margin: 0;
+}
+
+.app-panel-home .app-panel-btn {
+	padding: 20px 0;
+}
+
+.app-panel-home .app-panel-btn .btn {
+	margin-bottom: 20px;
+}
+
+/*Home Page Section 1*/
+.panel-top {
+	background: url("../img/View&Data_ScreenShot2.jpg") transparent;
+	background-size: cover;
+	height: 605px;
+	top: 64px;
+	padding-top: 64px;
+}
+
+.panel-top .panel-top-title {
+	padding-top: 100px;
+}
+
+.panel-top h1 {
+	margin: 0 0 20px;
+	font-weight: lighter;
+	color: #333;
+}
+
+.panel-top h4 {
+	line-height: 1.5em;
+	margin: 0 0 20px;
+}
+
+.panel-top .app-btn {
+	margin: 0;
+}
+
+.app-panel-video {
+	position: relative;
+}
+
+#iphone-video {
+	position: relative;
+	top: 50%;
+	-webkit-transform: translateY(0%);
+	-moz-transform: translateY(0%);
+	-ms-transform: translateY(0%);
+	-o-transform: translateY(0%);
+	transform: translateY(0%);
+	left: 20%;
+	width: 600px;
+	-webkit-transition: all .4s ease-in;
+	-moz-transition: all .4s ease-in;
+	-ms-transition: all .4s ease-in;
+	-o-transition: all .4s ease-in;
+	transition: all .4s ease-in;
+}
+
+.app-panel-video video.promo {
+	position: absolute;
+	top: 25px;
+	left: 89px;
+	width: 423px;
+	height: 230px;
+}
+
+#body-home .page-footer {
+	margin: 0;
+}
+
+/*Home Page Section 2&4*/
+.panel.app-panel-home.app-panel-3groups {
+	text-align: center;
+	padding-bottom: 30px;
+}
+
+#AppsAutodeskPanel {
+	background: url("../img/section4.svg") 76% 0;
+	background-size: cover;
+}
+
+.app-panel-item-cont {
+	position: relative;
+	margin-bottom: 50px;
+	padding-left: 0;
+}
+
+#AppsAutodeskPanel .app-panel-item {
+	background: #f4f4f4;
+	position: relative;
+}
+
+#AppsAutodeskPanel .app-panel-item a:hover {
+	text-decoration: none;
+}
+
+#AppsAutodeskPanel .app-panel-image {
+	background: #f4f4f4;
+	padding-top: 20px;
+	margin-top: 30px;
+}
+
+.app-panel-image img {
+	max-height: 200px;
+	margin: 0 auto;
+}
+
+#AppsAutodeskPanel .app-panel-text {
+	background: #ffffff;
+	height: 180px;
+	padding: 20px;
+}
+
+#AppsAutodeskPanel .app-panel-text h3 {
+	margin: 0;
+	color: #0696d7;
+}
+
+#AppsAutodeskPanel .app-panel-text p {
+	border-bottom: none;
+	padding: 20px;
+	margin: 0;
+}
+
+.app-panel-item .app-panel-item-hover {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	padding: 50% 0;
+	top: 0;
+	-webkit-transition: all 0.4s ease-in-out;
+	-moz-transition: all 0.4s ease-in-out;
+	-o-transition: all 0.4s ease-in-out;
+	-ms-transition: all 0.4s ease-in-out;
+	transition: all 0.4s ease-in-out;
+
+	-webkit-transform: scale(0);
+	-moz-transform: scale(0);
+	-o-transform: scale(0);
+	-ms-transform: scale(0);
+	transform: scale(0);
+
+	-webkit-backface-visibility: hidden;
+}
+
+.app-panel-item:hover .app-panel-item-hover {
+	background: rgba(0, 0, 0, 0.2);
+	-webkit-transform: scale(1);
+	-moz-transform: scale(1);
+	-o-transform: scale(1);
+	-ms-transform: scale(1);
+	transform: scale(1);
+	opacity: 1;
+	cursor: pointer;
+}
+
+#AutodeskAPI {
+	background: url("../img/section2.png") 0 0;
+}
+
+#AutodeskAPI .app-panel-item {
+	height: 440px;
+	overflow: hidden;
+	position: relative;
+	padding: 0 20px 30px;
+	background: #ffffff;
+	color: #666;
+}
+
+#AutodeskAPI .app-panel-text {
+	padding: 0;
+}
+
+#AutodeskAPI .app-panel-text img {
+	height: 160px;
+	display: block;
+	width: 100%;
+	background: #f4f4f4;
+	padding-bottom: 15px;
+	margin-top: 20px;
+}
+
+#AutodeskAPI h4 {
+	padding: 20px 0;
+	background: #ffffff;
+	display: block;
+	color: #666;
+	vertical-align: middle;
+	line-height: 1.5em;
+	margin: 0;
+	border-bottom: 3px solid #9fc0d0;
+}
+
+#AutodeskAPI h4 span {
+	font-weight: bold;
+	display: block;
+	font-size: 30px;
+	margin-bottom: 10px;
+	color: #0696d7;
+}
+
+#AutodeskAPI a {
+	color: #fff;
+}
+
+/*Home Page Section 3*/
+#AutodeskAPIBenefits {
+	background: url("../img/entrepreneur_Test_v8.jpg") 0% 40%;
+	height: 638px;
+	padding: 10% 0;
+}
+
+#AutodeskAPIBenefits .app-panel-item {
+	padding: 20px;
+	color: #fff;
+}
+
+#AutodeskAPIBenefits .app-panel-item .app-panel-text {
+	text-align: center;
+	padding: 0 45px;
+	margin-top: 0;
+}
+
+#AutodeskAPIBenefits .app-panel-item .app-panel-text img.circle {
+	border-radius: 100%;
+	width: 100px;
+	height: 100px;
+	margin: 0 auto;
+}
+
+#AutodeskAPIBenefits h3 {
+	margin-top: 10px;
+	margin-right: 0;
+	margin-left: 0;
+	margin-bottom: 20px;
+	color: #ffffff;
+	line-height: 1.5em;
+	font-weight: lighter;
+	font-size: xx-large;
+}
+
+#AutodeskAPIBenefits .app-panel-item .app-panel-text p {
+	color: #ffffff;
+	font-size: medium;
+	line-height: 0%;
+}
+
+/*Home Page Section 5*/
+#Support {
+	background: #9fc0d0;
+	padding: 0 0 50px 0;
+}
+
+#Support .panel-title {
+	padding-bottom: 0px;
+}
+
+#Support p, #Support a.support-link {
+	color: #fff;
+}
+
+.support-icon .app-btn.btn-circle .bg-icon {
+	font-size: 40px;
+	padding: 10px 0;
+}
+
+.support-icon .btn-circle,
+.support-icon .btn-circle:hover {
+	background: #fff;
+	border: none;
+	margin: 20px 0;
+	font-size: 50px;
+	height: 90px;
+	width: 90px;
+	color: #0696d7;
+	border: 2px solid #ffffff;
+	padding: 5px;
+}
+
+.support-icon .btn-circle:hover {
+	border: 2px solid #fff;
+}
+
+.supportbb .support-icon .btn-circle,
+.supportbb .support-icon .btn-circle:hover {
+	background: #fff;
+	border: none;
+	margin-bottom: 20px;
+	font-size: 50px;
+	height: 90px;
+	width: 90px;
+	color: #0696d7;
+	border: 2px solid #9fc0d0;
+}
+
+.support-icon .btn-circle:hover {
+	border: 2px solid #fff;
+}
+
+/*Home Media Queries*/
+@media (max-width: 1199px) {
+	.panel-top {
+		height: 470px;
+	}
+
+	#iphone-video {
+		left: 0%;
+		width: 460px;
+	}
+
+	.app-panel-video video.promo {
+		top: -7px;
+		left: 69px;
+		width: 324px;
+	}
+
+	#AppsAutodeskPanel {
+		background: url("../img/section4.svg") 42% 0;
+		background-size: cover;
+	}
+
+	#AppsAutodeskPanel .app-panel-text {
+		height: 230px;
+	}
+
+	#AutodeskAPIBenefits {
+		padding: 7% 0;
+	}
+
+	#AutodeskAPI h4 {
+		padding: 16px;
+		font-size: 16px;
+	}
+
+	#AutodeskAPI h4 span {
+		font-size: 24px;
+	}
+}
+
+@media (max-width: 992px) {
+	.panel-top {
+		height: 470px;
+	}
+
+	#iphone-video {
+		width: 350px;
+	}
+
+	.app-panel-video video.promo {
+		top: -38px;
+		left: 63px;
+		width: 226px;
+	}
+
+	#AppsAutodeskPanel .app-panel-image {
+		margin-top: 0;
+	}
+
+	#AppsAutodeskPanel .app-panel-item {
+		margin-bottom: 20px;
+	}
+
+	#AppsAutodeskPanel .app-panel-item-cont {
+		margin-bottom: 30px;
+	}
+
+	#AppsAutodeskPanel .app-panel-item .app-panel-item-hover {
+		padding: 60% 0;
+	}
+
+	.app-panel-home.app-panel-3groups .app-panel-text {
+		padding: 10px 0;
+		text-align: center;
+	}
+
+	.app-panel-home.app-panel-3groups .app-panel-text p {
+		padding: 10px 0;
+	}
+
+	#AutodeskAPIBenefits {
+		height: 500px;
+		padding: 4% 0;
+	}
+
+	#AutodeskAPI h4 {
+		height: auto;
+		padding: 10px;
+	}
+
+	#AutodeskAPI .app-panel-item {
+		height: auto;
+	}
+
+	.app-panel-item-cont {
+		margin-bottom: 20px;
+	}
+}
+
+@media (max-width: 767px) {
+	.panel-top {
+		padding: 133px 0 40px;
+		text-align: center;
+		height: auto;
+	}
+
+	.panel-top .panel-top-title {
+		padding-top: 50px;
+	}
+
+	.panel-top h1 {
+		font-size: 28px;
+	}
+
+	.panel-top h4 {
+		font-size: 16px;
+	}
+
+	#iphone-video {
+		text-align: center;
+		margin: 0 auto;
+		width: 100%;
+	}
+
+	.app-panel-video video.promo {
+		top: 17%;
+		left: 15%;
+		width: 70%;
+		position: absolute;
+		height: auto;
+	}
+
+	.app-panel-home {
+		text-align: center;
+		padding: 0;
+	}
+
+	.app-panel-home .panel-title {
+		font-size: 24px;
+		text-align: center;
+		padding: 30px 0;
+	}
+
+	#AppsAutodeskPanel .app-panel-item-cont {
+		margin-bottom: 0;
+	}
+
+	#AppsAutodeskPanel .app-panel-text {
+		height: auto;
+	}
+
+	#AppsAutodeskPanel .app-panel-text h3 {
+		font-size: 20px;
+	}
+
+	.app-panel-home .app-panel-text p {
+		font-size: 14px;
+		margin-bottom: 0;
+	}
+
+	#AutodeskAPIBenefits {
+		height: auto;
+	}
+
+	#AutodeskAPIBenefits .app-panel-item {
+		margin: 30px 0 0;
+	}
+
+	#AutodeskAPIBenefits h3 {
+		font-size: 20px;
+	}
+
+	#AutodeskAPIBenefits .app-panel-item .app-panel-text {
+		padding: 0;
+	}
+
+	#AutodeskAPI h4 {
+		padding: 15px;
+		font-size: 14px;
+		text-align: center;
+	}
+
+	#Support .panel-title {
+		padding-bottom: 50px;
+	}
+
+	.panel-top button,
+	.app-panel-home .app-panel-btn .btn {
+		width: 100%;
+		margin-left: 0;
+	}
+
+	.app-panel-home.app-panel-3groups .app-panel-image img {
+		max-height: 120px;
+	}
+
+	.app-panel-item-cont {
+		margin-bottom: 20px;
+		padding: 0;
+	}
+}
+
+/*@media (max-width: 600px) {
+	.app-content-header.home-header .panel-title {
+	font-size: 26px;
+	}
+  
+  
+  .app-panel-home.app-panel-side .app-panel-text,
+  .app-panel-home.app-panel-centered .app-panel-text {
+	padding: 20px 0 0 0;
+  }
+}*/
+
+/*Admin Table*/
+caption {
+	text-align: left;
+	color: #333;
+	font-weight: 600;
+	margin-bottom: 20px;
+}
+
+.app-table-body {
+	padding: 30px !important;
+}
+
+.app-table-body .app-table-filter {
+	background: #e6f0f5;
+	padding: 20px;
+	margin-bottom: 40px;
+}
+
+.app-table-filter .filter-group {
+	padding: 0;
+	margin: 0px;
+}
+
+.app-table-filter .filter-control {
+	padding: 0;
+	margin-bottom: 10px;
+}
+
+.filter-group.search-filter-group {
+	margin-top: 25px;
+}
+
+.app-panel-default .app-table-filter .panel-title-text {
+	text-align: left;
+	padding: 0;
+}
+
+.app-table-body .app-button-container {
+	margin: 0 10px 15px 0;
+}
+
+.app-table-body .app-button-container p {
+	display: inline-block;
+	margin-right: 10px;
+}
+
+.app-table > thead > tr > th {
+	vertical-align: bottom;
+	border-bottom: 3px solid #bbd7e5;
+	font-size: 16px;
+	font-weight: 600;
+	background: #e6f0f5;
+	color: #333;
+	padding: 10px;
+	position: relative;
+}
+
+.app-table > thead > tr > th > .checkbox {
+	position: absolute;
+	top: 0;
+	margin: 5px 10px 15px 5px;
+}
+
+.app-table > tbody > tr > td > .checkbox {
+	margin: 5px 10px 15px 10px;
+}
+
+.app-table > thead > tr > th.app-th-ordered {
+	cursor: pointer;
+}
+
+.app-table > thead > tr > th > i {
+	font-size: 14px;
+	margin-left: 5px;
+	color: #6591a6;
+}
+
+.app-table > tbody > tr > td, .app-table > tfoot > tr > td {
+	padding: 5px;
+	line-height: 1.4;
+	vertical-align: middle;
+	border-bottom: 1px solid #ddd;
+	font-size: 14px;
+}
+
+.app-table td .app-badge {
+	margin: 0;
+}
+
+.app-badge-approved span {
+	background: #87bc40;
+}
+
+.app-badge-waitlisted span {
+	background: #9fc0d0;
+}
+
+.app-badge-suspended span {
+	background: #ff6a3b;
+}
+
+.app-table .app-action-cell button {
+	width: 115px;
+}
+
+.app-table-detail > thead > tr > th {
+	background: transparent;
+}
+
+.app-table-detail > thead > tr > td,
+.app-table-detail > tbody > tr > td {
+	padding: 10px 30px;
+	background: #f4f4f4;
+	border: none;
+}
+
+.app-table-detail > tbody > tr > td.label-table {
+	font-weight: 600;
+	width: 20%;
+	color: #333333;
+	background: #e6f0f5;
+	padding: 10px 20px;
+}
+
+/*Pagination*/
+.pagination-block {
+	padding: 0;
+}
+
+.pagination {
+	float: left;
+	padding: 0;
+	margin: 0 20px 0 0;
+}
+
+.pagination > ul {
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
+}
+
+.pagination > ul > li {
+	display: inline;
+}
+
+.pagination > ul > li:first-child > a,
+.pagination > ul > li:last-child > a {
+	border-radius: 0;
+}
+
+.pagination > ul > li > a {
+	position: relative;
+	float: left;
+	padding: 6px 12px;
+	margin-left: -1px;
+	line-height: 1.42857143;
+	color: #0696d7;
+	text-decoration: none;
+	background-color: #fff;
+	border: 1px solid #ddd;
+}
+
+.pagination > ul > li > a:hover,
+.pagination > ul > li > a:focus {
+	background: #eee;
+}
+
+.pagination ul li.active a, .pagination ul li.active span {
+	color: #fff;
+	font-weight: bold;
+	text-align: center;
+	vertical-align: middle;
+	border: 1px solid #ccc;
+	background-color: #1858a8;
+}
+
+.pagination ul > .disabled > span,
+.pagination ul > .disabled > a,
+.pagination ul > .disabled > a:hover,
+.pagination ul > .disabled > a:focus {
+	color: #999999;
+	background-color: transparent;
+	cursor: default;
+}
+
+.pagination-info {
+	display: block;
+	float: left;
+	margin: 5px 0 0 0;
+}
+
+.pagination-info.muted {
+	color: #999999;
+}
+
+.form-control-wrapper.form-inline-block {
+	display: inline-block;
+	position: absolute;
+	top: 0;
+	padding: 0;
+}
+
+.filter-control .form-control-wrapper.form-inline-block {
+	right: 0;
+}
+
+.form-control-wrapper.form-inline-block button,
+.form-control-wrapper.form-inline-block ul {
+	font-size: 12px;
+}
+
+.app-table-body .display-filter {
+	padding: 0;
+	text-align: right;
+	position: relative;
+}
+
+.app-table-body .display-filter label {
+	display: block;
+	float: left;
+}
+
+/*Progress Bar*/
+.app-progress {
+	margin: 0;
+	border-radius: 0;
+}
+
+.app-progress-bar {
+	background-color: #0696d7;
+}
+
+@media screen and (max-width: 1199px) {
+	.app-table > thead > tr > th {
+		font-size: 14px;
+		padding: 10px;
+	}
+
+	.app-table > thead > tr > th > .checkbox {
+		margin: 5px 7px;
+	}
+
+	.app-table > tbody > tr > td, .app-table > tfoot > tr > td {
+		font-size: 13px;
+	}
+}
+
+@media screen and (max-width: 992px) {
+	.table-responsive {
+		width: 100%;
+		margin-bottom: 15px;
+		overflow-x: auto;
+		overflow-y: hidden;
+		-webkit-overflow-scrolling: touch;
+		-ms-overflow-style: -ms-autohiding-scrollbar;
+		border: none;
+	}
+
+	.app-table > thead > tr > th {
+		font-size: 12px;
+		padding: 5px;
+	}
+
+	.app-table > thead > tr > th > .checkbox {
+		margin: 8px 10px;
+	}
+
+	.app-btn-xs, .app-btn-group-xs > .btn {
+		margin: 0;
+	}
+
+	.content-form .form-control-wrapper {
+		padding-left: 0;
+	}
+
+	.app-table-body .display-filter {
+		margin-top: 20px;
+		text-align: left;
+	}
+}
+
+@media screen and (max-width: 768px) {
+	.app-table > thead > tr > th > .checkbox {
+		margin: 0px 10px;
+	}
+}
+
+
+
+

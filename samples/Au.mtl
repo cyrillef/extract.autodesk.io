@@ -1,0 +1,9 @@
+# Blender3D MTL File: 
+# Material Count: 1
+newmtl lambert2SG
+illum 4
+Kd 0.00 0.00 0.00
+Ka 0.00 0.00 0.00
+Tf 1.00 1.00 1.00
+map_Kd Au.jpg
+Ni 1.00

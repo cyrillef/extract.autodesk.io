@@ -1,0 +1,75 @@
+{
+	"name": "extract.autodesk.io",
+	"description": "A Node.js server to extract Autodesk Forge Viewer bubbles",
+	"homepage": "http://around-the-corner.typepad.com/",
+	"version": "3.0.0",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/cyrillef/extract.autodesk.io.git"
+	},
+	"bugs": {
+		"url": "https://github.com/cyrillef/extract.autodesk.io/issues"
+	},
+	"author": "Cyrille Fauvel",
+	"contributors": [
+		"Cyrille Fauvel <cyrille@autodesk.com>"
+	],
+	"license": "MIT",
+	"engines": {
+		"node": ">= 0.12.4",
+		"npm": ">= 2.10.1"
+	},
+	"scripts": {
+		"start": "node start.js",
+		"debug": "node --debug-brk=5858 --nolazy start.js",
+		"test": "node_modules/.bin/mocha --require test/support/env --reporter spec --bail --check-leaks test/",
+		"postinstall": "bower install"
+	},
+	"files": [
+		"LICENSE",
+		"README.md"
+	],
+	"keywords": [
+		"express",
+		"framework",
+		"lmv",
+		"web",
+		"rest",
+		"restful",
+		"router",
+		"app",
+		"api"
+	],
+	"dependencies": {
+		"adm-zip": ">= 0.4.7",
+		"archiver": ">= 0.14.3",
+		"async": ">= 1.2.0",
+		"body-parser": ">= 1.11.0",
+		"connect-multiparty": ">= 1.2.5",
+		"cron": ">= 1.0.6",
+		"ejs": ">= 2.2.4",
+		"express": ">= 4.12.3",
+		"fs": ">= 0.0.2",
+		"gen-uid": "0.0.2",
+		"mkdirp": ">= 0.5.0",
+		"moment": ">= 2.10.3",
+		"path": ">= 0.11.14",
+		"request": ">= 2.55.0",
+		"rimraf": " >= 2.2.8",
+		"serve-favicon": ">= 2.3.0",
+		"stream": ">= 0.0.2",
+		"unirest": ">= 0.4.0",
+		"url": ">= 0.10.2",
+		"util": ">= 0.10.3",
+		"bower": "^1.6.5",
+		"mailjet-sendemail": "^1.1.4"
+	},
+	"devDependencies": {
+		"mocha": ">= 2.2.5",
+		"should": ">= 6.0.3",
+		"supertest": ">= 1.0.1",
+		"chai": ">= 3.0.0",
+		"expect.js": ">= 0.3.1"
+	},
+	"optionalDependencies": {}
+}
