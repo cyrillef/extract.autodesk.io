@@ -55,7 +55,7 @@ which would update/install automatically via 'npm':
 1. Node.js
 
     Node.js - built on Chrome's JavaScript runtime for easily building fast, scalable network applications.
-	You need at least version v0.12.4. You can get Node.js from [here](http://nodejs.org/)<br /><br />
+	You need at least version v5.11.1. You can get Node.js from [here](http://nodejs.org/)<br /><br />
 	Node.js modules:
 	```
     "adm-zip": ">= 0.4.7",
@@ -104,7 +104,7 @@ All these libraries can be install via bower
 "flow.js": "^ 2.9.0",
 "bootstrap": "^ 3.3.6",
 "jquery.cookie": "^ 1.4.1",
-"jsPlumb": "^ 2.0.4",
+"jsPlumb": "= 2.1.2",
 "dagre": "~0.7.4",
 "jquery-ui": "~1.11.4"
 ```
@@ -154,14 +154,16 @@ make sure to read [the developer notes](test/readme.md) before anything.<br />
           * Windows<br />
             ```
             set CONSUMERKEY=xxx
+
             set CONSUMERSECRET=xxx
             ```
           * OSX/Linux<br />
             ```
             export CONSUMERKEY xxx
+
             export CONSUMERSECRET xxx
             ```
-            or <br />
+            or passing on the command line to the Node.js process<br />
             ```
             sudo [PORT=<port>] CONSUMERKEY=xxx CONSUMERSECRET=xxx node start.js
             ```
