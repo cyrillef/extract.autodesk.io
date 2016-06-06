@@ -321,4 +321,4 @@ Please see the [LICENSE](LICENSE) file for full details.
 
 Cyrille Fauvel (Autodesk Developer Network)<br />
 http://www.autodesk.com/adn<br />
-http://around-the-corner.typepad.com/<br />
+http://around-the-corner.typepad.com/
