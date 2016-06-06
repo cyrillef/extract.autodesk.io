@@ -2,7 +2,7 @@
   "name": "extract.autodesk.io",
   "description": "A Node.js server to extract Autodesk Forge Viewer bubbles",
   "homepage": "http://around-the-corner.typepad.com/",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "private": true,
   "repository": {
     "type": "git",
@@ -39,7 +39,7 @@
     "flow.js": "^ 2.9.0",
     "bootstrap": "^ 3.3.6",
     "jquery.cookie": "^ 1.4.1",
-    "jsPlumb": "^ 2.0.4",
+    "jsPlumb": "= 2.1.2",
     "dagre": "~0.7.4",
     "jquery-ui": "~1.11.4"
   },
