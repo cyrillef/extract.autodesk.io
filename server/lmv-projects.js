@@ -34,14 +34,14 @@ router.use (bodyParser.json ()) ;
 // List local buckets since we cannot list server buckets
 router.get ('/projects/buckets', function (req, res) {
 	try {
-		fs.readdir ('data', function (err, files) {
+		fs.readdir (__dirname + '/../data', function (err, files) {
 			if ( err )
 				throw err;
 			var files =filterBucket (files, '(.*)\.bucket\.json') ;
 			// Verify that the bucket is still valid before returning it
 			//async.mapLimit (files, 10,
 			//	function (item, callback_map) { // Each tasks execution
-			//		fs.readFile ('data/' + item + '.bucket.json', 'utf-8', function (err, content) {
+			//		fs.readFile (__dirname + '/../data/' + item + '.bucket.json', 'utf-8', function (err, content) {
 			//				if ( err )
 			//					return (callback_map (err, null)) ;
 			//				var js =JSON.parse (content) ;
@@ -93,19 +93,19 @@ router.get ('/projects/:identifier/progress', function (req, res) {
 	var urn =new lmv.Lmv (bucket).getURN (identifier) ;
 	if ( urn == '' ) {
 		// Ok, we might be uploading to oss - we will try to return a file upload progress
-		fs.readFile ('data/' + identifier + '.json', function (err, data) {
+		fs.readFile (__dirname + '/../data/' + identifier + '.json', function (err, data) {
 			try {
 				if ( err ) // No luck, let's return a default answer
 					throw 'err' ;
 				data =JSON.parse (data) ;
 				var connections =null ;
 				try {
-					connections =fs.readFileSync ('data/' + identifier + '.dependencies.json') ;
+					connections =fs.readFileSync (__dirname + '/../data/' + identifier + '.dependencies.json') ;
 					connections =JSON.parse (connections) ;
 					var size =0, uploaded =0 ;
 					async.each (connections,
 						function (item, callback) { // Each tasks execution
-							fs.readFile ('data/' + item + '.json', function (err, data2) {
+							fs.readFile (__dirname + '/../data/' + item + '.json', function (err, data2) {
 								if ( err )
 									return (callback (err)) ;
 								data2 =JSON.parse (data2) ;
@@ -156,7 +156,7 @@ router.get ('/projects/:identifier/progress', function (req, res) {
 		.on ('success', function (data) {
 			//console.log (data) ;
 			if ( data.progress == 'complete' )
-				fs.writeFile ('data/' + identifier + '.resultdb.json', JSON.stringify (data), function (err) {}) ;
+				fs.writeFile (__dirname + '/../data/' + identifier + '.resultdb.json', JSON.stringify (data), function (err) {}) ;
 			res.json (data) ;
 		})
 		.on ('fail', function (err) {
@@ -197,7 +197,7 @@ router.get ('/projects/:identifier', function (req, res) {
 	var identifier =req.params.identifier ;
 	var filename ;
 	try {
-		var idData =fs.readFileSync ('data/' + identifier + '.json') ;
+		var idData =fs.readFileSync (__dirname + '/../data/' + identifier + '.json') ;
 		idData =JSON.parse (idData) ;
 		if ( idData.hasOwnProperty ('name') )
 			filename =idData.name ;
@@ -211,7 +211,7 @@ router.get ('/projects/:identifier', function (req, res) {
 
 	// GET /oss/{apiversion}/buckets/{bucketkey}/objects/{objectKey}/details
 	// would work as well, but since we saved it locally, use the local version
-	fs.readFile ('data/' + identifier + '.json', 'utf-8', function (err, data) {
+	fs.readFile (__dirname + '/../data/' + identifier + '.json', 'utf-8', function (err, data) {
 		if ( err ) {
 			new lmv.Lmv (bucket).checkObjectDetails (filename)
 				.on ('success', function (data) {
@@ -232,7 +232,7 @@ router.get ('/projects', function (req, res) {
 	var bucket =lmv.Lmv.getDefaultBucket () ;
 	// GET /oss/{api version}/buckets/{bucket key}/details
 	// would work as well, but since we saved it locally, use the local version
-	fs.readFile ('data/' + bucket + '.bucket.json', 'utf-8', function (err, data) {
+	fs.readFile (__dirname + '/../data/' + bucket + '.bucket.json', 'utf-8', function (err, data) {
 		if ( err ) {
 			new lmv.Lmv (bucket).checkBucket ()
 				.on ('success', function (data) {
@@ -269,7 +269,7 @@ router.post ('/projects', function (req, res) {
 	var items =[ connections.uniqueIdentifier ] ;
 	items =items.concat (traverseConnections (connections.children)) ;
 	// This is to help the upload progress bar to be more precise
-	fs.writeFile ('data/' + connections.uniqueIdentifier + '.dependencies.json', JSON.stringify (items), function (err) {
+	fs.writeFile (__dirname + '/../data/' + connections.uniqueIdentifier + '.dependencies.json', JSON.stringify (items), function (err) {
 		if ( err )
 			console.log ('ERROR: project dependencies not saved :(') ;
 	}) ;
@@ -333,7 +333,7 @@ router.post ('/projects', function (req, res) {
 										'success': '0%',
 										'urn': urn
 									} ;
-									fs.writeFile ('data/' + identifier + '.resultdb.json', JSON.stringify (data), function (err) {}) ;
+									fs.writeFile (__dirname + '/../data/' + identifier + '.resultdb.json', JSON.stringify (data), function (err) {}) ;
 									callbacks2 (null, 4) ;
 								})
 								.on ('fail', function (err) {
@@ -368,20 +368,20 @@ router.post ('/projects', function (req, res) {
 				}) ;
 			}) ;
 			fs.rename (
-				'data/' + connections.uniqueIdentifier + '.resultdb.json',
-				'data/' + connections.uniqueIdentifier + '.resultdb.failed',
+				__dirname + '/../data/' + connections.uniqueIdentifier + '.resultdb.json',
+				__dirname + '/../data/' + connections.uniqueIdentifier + '.resultdb.failed',
 				function (err) {}
 			) ;
 			return ;
 		} else {
-			fs.readFile ('data/' + connections.uniqueIdentifier + '.dependencies.json', 'utf-8', function (err, data) {
+			fs.readFile (__dirname + '/../data/' + connections.uniqueIdentifier + '.dependencies.json', 'utf-8', function (err, data) {
 				if ( err )
 					return ;
 				data =JSON.parse (data) ;
 				for ( var i =0 ; i < data.length ; i++ )
-					fs.unlink ('data/' + data [i] + '.json', function (err) {}) ;
-				fs.unlink ('data/' + connections.uniqueIdentifier + '.dependencies.json', function (err) {}) ;
-				fs.unlink ('data/' + connections.uniqueIdentifier + '.connections.json', function (err) {}) ;
+					fs.unlink (__dirname + '/../data/' + data [i] + '.json', function (err) {}) ;
+				fs.unlink (__dirname + '/../data/' + connections.uniqueIdentifier + '.dependencies.json', function (err) {}) ;
+				fs.unlink (__dirname + '/../data/' + connections.uniqueIdentifier + '.connections.json', function (err) {}) ;
 			}) ;
 		}
 	}) ;
