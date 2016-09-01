@@ -41,7 +41,7 @@ router.post ('/file', multipartMiddleware, function (req, res) {
 				'bytesRead': totalSize,
 				'bytesPosted': 0
 			} ;
-			fs.writeFile ('data/' + identifier + '.json', JSON.stringify (data), function (err) {
+			fs.writeFile (__dirname + '/../data/' + identifier + '.json', JSON.stringify (data), function (err) {
 				if ( err )
 					console.log (err) ;
 			}) ;
@@ -81,7 +81,7 @@ router.get ('/file', function (req, res) {
 router.get ('/file/*/details', function (req, res) {
 	//console.log ('GET', req) ;
 	var identifier =req.url.split ('/') [2] ;
-	fs.readFile ('data/' + identifier + '.json', function (err, data) {
+	fs.readFile (__dirname + '/../data/' + identifier + '.json', function (err, data) {
 		if ( err )
 			return (res.status (404).send ()) ; //- 404 Not Found
 		data =JSON.parse (data) ;
@@ -93,7 +93,7 @@ router.get ('/file/*/details', function (req, res) {
 router.get ('/file/*', function (req, res) {
 	//console.log ('GET', req) ;
 	var identifier =req.url.split ('/') [2] ;
-	var data =fs.readFile ('data/' + identifier + '.json', function (err, data) {
+	var data =fs.readFile (__dirname + '/../data/' + identifier + '.json', function (err, data) {
 		if ( err )
 			throw err ;
 		data =JSON.parse (data) ;
@@ -129,7 +129,7 @@ router.post ('/uri', bodyParser.json (), function (req, res) {
 			"bytesRead": 0,
 			"bytesPosted": 0
 		} ;
-		fs.writeFile ('data/' + identifier + '.json', JSON.stringify (data), function (err) {
+		fs.writeFile (__dirname + '/../data/' + identifier + '.json', JSON.stringify (data), function (err) {
 			if ( err )
 				return (res.status (500).end ()) ;
 			var r =request (uri)
@@ -139,18 +139,18 @@ router.post ('/uri', bodyParser.json (), function (req, res) {
 				//})
 				.on ('data', function (chunk) {
 					data.bytesRead +=chunk.length ;
-					fs.writeFile ('data/' + identifier + '.json', JSON.stringify (data), function (err) {}) ;
+					fs.writeFile (__dirname + '/../data/' + identifier + '.json', JSON.stringify (data), function (err) {}) ;
 				})
-				.pipe (fs.createWriteStream ('./tmp/' + original_filename)) ;
+				.pipe (fs.createWriteStream (__dirname + '/../tmp/' + original_filename)) ;
 			r.on ('close', function () {
 				if ( data.size !== -1 )
 					data.bytesRead =data.size ;
 				else
 					data.size =data.bytesRead ;
-				fs.writeFile ('data/' + identifier + '.json', JSON.stringify (data), function (err) {}) ;
+				fs.writeFile (__dirname + '/../data/' + identifier + '.json', JSON.stringify (data), function (err) {}) ;
 			}) ;
 			r.on ('error', function (message) {
-				fs.unlink ('data/' + identifier + '.json', function (err) {}) ;
+				fs.unlink (__dirname + '/../data/' + identifier + '.json', function (err) {}) ;
 			}) ;
 			res.json ({ 'status': identifier }) ;
 		}) ;
@@ -159,7 +159,7 @@ router.post ('/uri', bodyParser.json (), function (req, res) {
 
 router.options ('/uri', bodyParser.json (), function (req, res) {
 	var identifier =req.body.identifier ;
-	fs.readFile ('data/' + identifier + '.json', function (err, data) {
+	fs.readFile (__dirname + '/../data/' + identifier + '.json', function (err, data) {
 		if ( err )
 			return (res.status (500).end ()) ;
 		try {
