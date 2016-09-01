@@ -57,13 +57,13 @@ router.get ('/reinit', function (req, res) {
 // List translated projects
 router.get ('/results', function (req, res) {
 	try {
-		fs.readdir ('data', function (err, files) {
+		fs.readdir (__dirname + '/../data', function (err, files) {
 			if ( err )
 				throw err ;
 			files =filterProject (files, '(.*)\\.resultdb\\.json') ;
 			async.mapLimit (files, 10,
 				function (file, callback_map) { // Each tasks execution
-					fs.readFile ('data/' + file + '.resultdb.json', 'utf-8', function (err, data) {
+					fs.readFile (__dirname + '/../data/' + file + '.resultdb.json', 'utf-8', function (err, data) {
 						if ( err || data == '' )
 							return (callback_map (null, null)) ;
 						data =JSON.parse (data) ;
@@ -112,7 +112,7 @@ router.get ('/results/:identifier/thumbnail', function (req, res) {
 	new lmv.Lmv (bucket).thumbnail (urn, 215, 146)
 		.on ('success', function (data) {
 			try {
-				fs.writeFile ('www/extracted/' + identifier + '.png', data, function (err) {}) ;
+				fs.writeFile (__dirname + '/../www/extracted/' + identifier + '.png', data, function (err) {}) ;
 			} catch ( err ) {
 			}
 			res.setHeader ('Content-Type', 'image/png') ;
@@ -135,7 +135,7 @@ router.get ('/results/:identifier', function (req, res) {
 	new lmv.Lmv (bucket).all (urn)
 		.on ('success', function (data) {
 			if ( data.progress == 'complete' )
-				fs.writeFile ('data/' + identifier + '.resultdb.json', JSON.stringify (data), function (err) {}) ;
+				fs.writeFile (__dirname + '/../data/' + identifier + '.resultdb.json', JSON.stringify (data), function (err) {}) ;
 			res.json (data) ;
 		})
 		.on ('fail', function (err) {
@@ -151,21 +151,21 @@ router.delete ('/results/:identifier', function (req, res) {
 	var urn =new lmv.Lmv (bucket).getURN (identifier) ;
 	if ( urn == '' )
 		return (res.status (404).end ()) ;
-	fs.exists ('data/' + identifier + '.resultdb.json', function (exist) {
+	fs.exists (__dirname + '/../data/' + identifier + '.resultdb.json', function (exist) {
 		if ( !exist )
 			return (res.status (404).end ()) ;
-		fs.unlink ('data/' + identifier + '.resultdb.json', function (err) { res.end () ; }) ;
+		fs.unlink (__dirname + '/../data/' + identifier + '.resultdb.json', function (err) { res.end () ; }) ;
 		res.end () ;
 	}) ;
-	fs.exists ('www/extracted/' + identifier + '.png', function (exist) {
+	fs.exists (__dirname + '/../www/extracted/' + identifier + '.png', function (exist) {
 		if ( !exist )
 			return ;
-		fs.unlink ('www/extracted/' + identifier + '.png', function (err) {}) ;
+		fs.unlink (__dirname + '/../www/extracted/' + identifier + '.png', function (err) {}) ;
 	}) ;
-	fs.exists ('www/extracted/' + identifier + '.zip', function (exist) {
+	fs.exists (__dirname + '/../www/extracted/' + identifier + '.zip', function (exist) {
 		if ( !exist )
 			return ;
-		fs.unlink ('www/extracted/' + identifier + '.zip', function (err) {}) ;
+		fs.unlink (__dirname + '/../www/extracted/' + identifier + '.zip', function (err) {}) ;
 	}) ;
 }) ;
 
@@ -177,25 +177,25 @@ router.get ('/results/:identifier/project', function (req, res) {
 	if ( urn == '' )
 		return (res.status (404).end ()) ;
 
-	fs.exists ('www/extracted/' + identifier + '.zip', function (exist) {
+	fs.exists (__dirname + '/../www/extracted/' + identifier + '.zip', function (exist) {
 		if ( exist )
 			return ; // Do not proceed again
-		fs.exists ('data/' + identifier + '.lock', function (exists) {
+		fs.exists (__dirname + '/../data/' + identifier + '.lock', function (exists) {
 			var list =[] ;
 			if ( exists ) {
 				if ( req.query.email && req.query.email !== '' ) {
-					list =JSON.parse (fs.readFileSync ('data/' + identifier + '.lock')) ;
+					list =JSON.parse (fs.readFileSync (__dirname + '/../data/' + identifier + '.lock')) ;
 					list.push (req.query.email) ;
-					fs.writeFile ('data/' + identifier + '.lock', JSON.stringify (list), function (err) {}) ;
+					fs.writeFile (__dirname + '/../data/' + identifier + '.lock', JSON.stringify (list), function (err) {}) ;
 				}
 				return ; // Do not proceed again
 			} else {
-				fs.writeFile ('data/' + identifier + '.lock', JSON.stringify (list), function (err) {}) ;
+				fs.writeFile (__dirname + '/../data/' + identifier + '.lock', JSON.stringify (list), function (err) {}) ;
 			}
 			extractorProgressMgr.release (identifier) ;
 
 			try {
-				rimraf ('data/' + identifier, function (err) {
+				rimraf (__dirname + '/../data/' + identifier, function (err) {
 					if ( err )
 						throw err ;
 					async.waterfall ([
@@ -210,7 +210,7 @@ router.get ('/results/:identifier/project', function (req, res) {
 					) ;
 				}) ;
 			} catch ( err ) {
-				fs.unlink ('data/' + identifier + '.lock', function (err) {}) ;
+				fs.unlink (__dirname + '/../data/' + identifier + '.lock', function (err) {}) ;
 				console.log ('router.get (/results/:identifier/project) exception ' + err) ;
 			}
 		}) ;
@@ -225,7 +225,7 @@ var ExtractorProgressMgr =function () {
 	this.progress =function (identifier) {
 		if ( this.projects.hasOwnProperty (identifier) && typeof this.projects [identifier] === 'string' )
 			return (this.projects [identifier]) ;
-		if ( fs.existsSync ('www/extracted/' + identifier + '.zip') )
+		if ( fs.existsSync (__dirname + '/../www/extracted/' + identifier + '.zip') )
 			return (100) ;
 		if ( !this.projects.hasOwnProperty (identifier) )
 			return (0) ;
@@ -298,7 +298,7 @@ function wf1_GetFullDetails (callback_wf1a, bucket, identifier, urn) {
 	new lmv.Lmv (bucket).all (urn)
 		.on ('success', function (data) {
 			if ( data.progress == 'complete' )
-				fs.writeFile ('data/' + identifier + '.resultdb.json', JSON.stringify (data), function (err) {}) ;
+				fs.writeFile (__dirname + '/../data/' + identifier + '.resultdb.json', JSON.stringify (data), function (err) {}) ;
 			callback_wf1a (null, data) ;
 		})
 		.on ('fail', function (err) {
@@ -391,7 +391,7 @@ function DownloadUrnAndSaveItemToDisk (callback_mapx, bucket, identifier, item) 
 			.on ('success', function (data) {
 				//var filename =item.split ('/').pop () ;
 				//var filename =path.basename (urn) ;
-				var fullpath ='data/' + identifier + '/' + urn.substring (urn.indexOf ('/output/') + 8) ;
+				var fullpath =__dirname + '/../data/' + identifier + '/' + urn.substring (urn.indexOf ('/output/') + 8) ;
 				var filepath =path.dirname (fullpath) ;
 				try {
 					mkdirp (filepath, function (err) {
@@ -414,7 +414,7 @@ function DownloadUrnAndSaveItemToDisk (callback_mapx, bucket, identifier, item) 
 			.on ('fail', function (err) {
 				if ( err == 404 || err == 504 ) {
 					console.log ('Warning(' + err + ') - ' + urn + ' <ignoring>') ;
-					var fullpath ='data/' + identifier + '/' + urn.substring (urn.indexOf ('/output/') + 8) ;
+					var fullpath =__dirname + '/../data/' + identifier + '/' + urn.substring (urn.indexOf ('/output/') + 8) ;
 					callback_mapx (null, { urn: urn, name: fullpath.substring (5), size: item.size, error: err }) ;
 					return ;
 				}
@@ -435,7 +435,7 @@ function DownloadFileAndSaveItemToDisk (callback_mapx, bucket, identifier, item)
 		.end (function (response) {
 			try {
 				//var filename =path.basename (item) ;
-				var fullpath ='data/' + identifier + '/' + item.substring (item.indexOf ('/viewers/') + 9) ;
+				var fullpath =__dirname + '/../data/' + identifier + '/' + item.substring (item.indexOf ('/viewers/') + 9) ;
 				var filepath =path.dirname (fullpath) ;
 
 				if ( response.statusCode != 200 ) {
@@ -545,7 +545,7 @@ function wf1_ReadSvfItem (callback_map2, item, identifier, svf) {
 	//uris.push ({ 'path': pathname, 'name': name }) ;
 
 	// Get manifest file
-	fs.readFile ('data/' + item.name, function (err, content) {
+	fs.readFile (__dirname + '/../data/' + item.name, function (err, content) {
 		var ozip =new AdmZip (content) ;
 		var zipEntries =ozip.getEntries () ;
 		zipEntries.forEach (function (zipEntry) {
@@ -574,7 +574,7 @@ function wf1_ReadF2dItem (callback_map3, item, identifier, f2d) {
 }
 
 function wf1_ReadManifest (callback_map4, item, identifier) {
-	fs.readFile ('data/' + item.name, function (err, content) {
+	fs.readFile (__dirname + '/../data/' + item.name, function (err, content) {
 		//var unzipContent =zlib.unzipSync (content).toString ('utf8') ;
 		zlib.unzip (content, function (err, unzipContent) {
 			var manifest =JSON.parse (unzipContent) ;
@@ -631,14 +631,14 @@ function wf1_GenerateLocalHtml (refs, callback_wf1e, bucket, identifier) {
 	doclist =doclist.map (function (obj) { if ( obj.hasOwnProperty ('size') ) delete obj.size ; return (obj) ; }) ;
 	refs =refs.filter (function (obj) { return (!obj.hasOwnProperty ('path')) ; }) ;
 
-	fs.createReadStream ('views/go.ejs').pipe (fs.createWriteStream ('data/' + identifier + '/index.bat')) ;
+	fs.createReadStream ('views/go.ejs').pipe (fs.createWriteStream (__dirname + '/../data/' + identifier + '/index.bat')) ;
 	refs.push ({ name: identifier + '/index.bat', size: 602, dl: 602 }) ;
 	fs.readFile ('views/view.ejs', 'utf-8', function (err, st) {
 		if ( err )
 			return (callback_wf1e (err, refs)) ;
 		var data =ejs.render (st, { docs: doclist }) ;
 		var fullnameHtml =identifier + '/index.html' ;
-		fs.writeFile ('data/' + fullnameHtml, data, function (err) {
+		fs.writeFile (__dirname + '/../data/' + fullnameHtml, data, function (err) {
 			if ( err ) {
 				callback_wf1e (err, refs) ;
 				return ;
@@ -673,11 +673,11 @@ function wf1_AddViewerFiles (refs, callback_wf1f, bucket, identifier) {
 			}
 			results =results.concat (refs) ;
 			extractorProgressMgr.dlProgressFull (identifier, results) ;
-			fs.createReadStream ('www/bower_components/jquery/dist/jquery.min.js')
-				.pipe (fs.createWriteStream ('data/' + identifier + '/jquery.min.js')) ;
+			fs.createReadStream (__dirname + '/../www/bower_components/jquery/dist/jquery.min.js')
+				.pipe (fs.createWriteStream (__dirname + '/../data/' + identifier + '/jquery.min.js')) ;
 			results.push ({ urn: 'www/bower_components/jquery/dist/jquery.min.js', name: (identifier + '/jquery.min.js'), size: 84380, dl: 84380 }) ;
-			fs.createReadStream ('www/bower_components/jquery-ui/jquery-ui.min.js')
-					.pipe (fs.createWriteStream ('data/' + identifier + '/jquery-ui.min.js')) ;
+			fs.createReadStream (__dirname + '/../www/bower_components/jquery-ui/jquery-ui.min.js')
+					.pipe (fs.createWriteStream (__dirname + '/../data/' + identifier + '/jquery-ui.min.js')) ;
 			results.push ({ urn: 'www/bower_components/jquery-ui/jquery-ui.min.js', name: (identifier + '/jquery-ui.min.js'), size: 240427, dl: 240427 }) ;
 			callback_wf1f (null, results) ;
 		}
@@ -703,8 +703,8 @@ function wf1End_PackItems (err, results, identifier) {
 			console.log ('PackItems ended successfully.') ;
 		}) ;
 
-		//var output =fs.createWriteStream ('data/' + identifier + '/' + identifier + '.zip') ;
-		var output =fs.createWriteStream ('www/extracted/' + identifier + '.zip') ;
+		//var output =fs.createWriteStream (__dirname + '/../data/' + identifier + '/' + identifier + '.zip') ;
+		var output =fs.createWriteStream (__dirname + '/../www/extracted/' + identifier + '.zip') ;
 		archive.pipe (output) ;
 
 		var merged =[] ;
@@ -712,8 +712,8 @@ function wf1End_PackItems (err, results, identifier) {
 		for ( var i =0 ; i < merged.length ; i++ ) {
 			if ( !merged [i].hasOwnProperty ('error') )
 			//archive.append (merged [i].content, { name: merged [i].name }) ;
-			//archive.append (fs.createReadStream ('data/' + merged [i].name), { name: merged [i].name }) ;
-				archive.file ('data/' + merged [i].name, { name: merged [i].name }) ;
+			//archive.append (fs.createReadStream (__dirname + '/../data/' + merged [i].name), { name: merged [i].name }) ;
+				archive.file (__dirname + '/../data/' + merged [i].name, { name: merged [i].name }) ;
 		}
 		archive.finalize () ;
 	} catch ( err ) {
@@ -725,20 +725,20 @@ function wf1End_PackItems (err, results, identifier) {
 function wf1End_Cleanup (identifier, bSuccess) {
 	bSuccess =bSuccess || false ;
 	if ( bSuccess ) {
-		fs.readFile ('data/' + identifier + '.lock', 'utf-8', function (err, data) {
+		fs.readFile (__dirname + '/../data/' + identifier + '.lock', 'utf-8', function (err, data) {
 			if ( err )
 				return ;
 			data =JSON.parse (data) ;
 			if ( data.length )
 				wf1End_Notify (identifier, data)
-			fs.unlink ('data/' + identifier + '.lock', function (err) {}) ;
+			fs.unlink (__dirname + '/../data/' + identifier + '.lock', function (err) {}) ;
 		}) ;
 	} else {
 		wf1End_NotifyError (identifier) ;
-		fs.unlink ('data/' + identifier + '.lock', function (err) {}) ;
+		fs.unlink (__dirname + '/../data/' + identifier + '.lock', function (err) {}) ;
 	}
 	extractorProgressMgr.release (identifier) ;
-	rimraf ('data/' + identifier, function (err) {}) ; // Cleanup
+	rimraf (__dirname + '/../data/' + identifier, function (err) {}) ; // Cleanup
 }
 
 function wf1End_Notify (identifier, tos) {
@@ -783,7 +783,7 @@ router.get ('/results/file/:identifier/:fragment', function (req, res) {
 	var identifier =req.params.identifier ;
 	var fragment =req.params.fragment ;
 
-	fs.readFile ('data/' + identifier + '.resultdb.json', 'utf-8', function (err, data) {
+	fs.readFile (__dirname + '/../data/' + identifier + '.resultdb.json', 'utf-8', function (err, data) {
 		if ( err )
 			return (res.status (404).end ()) ;
 		data =JSON.parse (data) ;
