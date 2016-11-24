@@ -18,26 +18,23 @@
 // DOES NOT WARRANT THAT THE OPERATION OF THE PROGRAM WILL BE
 // UNINTERRUPTED OR ERROR FREE.
 //
-var express =require ('express') ;
-var bodyParser =require ('body-parser') ;
-var favicon =require ('serve-favicon') ;
-var ejs =require ('./ejs') ;
-var forgeToken =require ('./forge-token') ;
-var fileUpload =require ('./upload-flow') ;
-var projects =require ('./projects') ;
-var results =require ('./results') ;
+var config ={
+	credentials: {
+		// Replace placeholder below by the Consumer Key and Consumer Secret you got from
+		// http://developer.autodesk.com/ for the production server
+		client_id: process.env.FORGE_CLIENT_ID || '<replace with your consumer key>',
+		client_secret: process.env.FORGE_CLIENT_SECRET || '<replace with your consumer secret>',
+		grant_type: 'client_credentials',
+		scope: [ 'data:read', 'data:write' ]
+	},
 
-var app =express () ;
-//app.use (bodyParser.urlencoded ({ extended: true })) ; // Support encoded bodies
-app.use (bodyParser.json ()) ;
-app.use (express.static (__dirname + '/../www')) ;
-app.use (favicon (__dirname + '/../www/favicon.ico')) ;
-app.set ('view engine', 'ejs') ;
-app.use ('/explore', ejs) ;
-app.use ('/api', fileUpload) ;
-app.use ('/api', projects) ;
-app.use ('/api', results) ;
+	bucket: 'extract-autodesk-io-2016',
+	mailTo: '',
 
-app.set ('port', process.env.PORT || 80) ;
+	MJ_APIKEY_PUBLIC: process.env.MJ_APIKEY_PUBLIC || '<replace with your mailjet public key>',
+	MJ_APIKEY_PRIVATE: process.env.MJ_APIKEY_PRIVATE || '<replace with your mailjet private key>',
+	MJ_ACCOUNT : process.env.MJ_ACCOUNT || '<replace with your mailjet account name>'
 
-module.exports =app ;
+} ;
+
+module.exports =config ;

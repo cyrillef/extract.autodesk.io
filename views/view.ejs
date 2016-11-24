@@ -3,8 +3,8 @@
 
 <head>
 	<meta charset="UTF-8">
-    <title>ADN - Autodesk Forge Viewer Node.js Extractor example (local view)</title>
-    <meta content="ADN - Autodesk Forge Viewer Node.js Extractor example" name="description" />
+    <title>Autodesk Forge Viewer Node.js Extractor example (local view)</title>
+    <meta content="Autodesk Forge Viewer Node.js Extractor example" name="description" />
     <meta content="Extractor Node.js Forge Viewer" name="keywords" />
     <meta content="Autodesk" name="author" />
 
@@ -56,7 +56,8 @@
             background-color: #eee; border: 2px dashed #aaa; border-radius: 10px; }
         div#footer { margin: 0 auto; width: 900px; text-align: left; }
         div#list { width: 175px; height: 700px; padding: 0px; position:relative;
-            background-color: #eee; border: 2px dashed #aaa; border-radius: 10px; }
+            background-color: #eee; border: 2px dashed #aaa; border-radius: 10px;
+	        overflow: auto; }
 
         div#list div button {
             background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #44c767), color-stop(1, #5cbf2a));
@@ -80,7 +81,7 @@
             text-decoration:none;
             text-shadow:0px 1px 0px #2f6627;
             margin: 2px;
-            height: 42px;
+	        /*height: 42px;*/height: 212px;
             width: 170px;
         }
         div#list div button:hover {
@@ -94,6 +95,8 @@
             background-color:#5cbf2a;
         }
         div#list div button:active { position:relative; top:1px; }
+
+        div#list div button div img { width: 150px; }
     </style>
 
     <script>
@@ -104,7 +107,7 @@
         var oViewer =null ;
         $(document).ready (function () {
             //var options ={ 'document': '', 'env': 'AutodeskProduction' } ;
-            var options ={ 'docid': docs [0].path, env: '' } ;
+            var options ={ 'docid': docs [0].path, env: 'Local' } ;
 
             //oViewer =new Autodesk.Viewing.Viewer3D ($("#viewer") [0], {}) ; // No toolbar
             oViewer =new Autodesk.Viewing.Private.GuiViewer3D ($("#viewer") [0], {}) ; // With toolbar
@@ -115,10 +118,14 @@
                     oViewer.fitToView (true) ;
                     setTimeout (function () { oViewer.autocam.setHomeViewFrom (oViewer.navigation.getCamera ()) ; }, 1000) ;
                 }) ;
-				oViewer.load (options.docid) ;
+				oViewer.loadModel (options.docid) ;
 
 				for ( var i =0 ; i < docs.length ; i++ ) {
-					var r =$('<div><button id="view_' + i + '">' + docs [i].name + '</button></div>') ;
+					var guid =docs [i].path.match (/^\.\/(.*)\/.*$/) ;
+					guid =guid != null ? guid [1].replace ('_f2d', '') : '' ;
+					var r =$('<div><button id="view_' + i + '">'
+						+ docs [i].name
+						+ '<div><img id="img__' + i + '" src="' + guid + '.png"></div></button></div>') ;
 					$('#list').append (r) ;
 					$('#view_' + i).click (function (e) {
 						e.stopPropagation () ;
@@ -127,9 +134,9 @@
                         // tearDown() unloads extensions too, so you need setUp() after that to load again
                         // setUp() requires the viewer configuration again, the one you use to start the viewer.
                         oViewer.tearDown () ;
-                        oViewer.setUp ({ env: '' }) ;
+                        oViewer.setUp ({ env: 'Local' }) ;
 						var i =parseInt (e.target.id.substring (5)) ;
-						oViewer.load (docs [i].path) ;
+						oViewer.loadModel (docs [i].path) ;
 					}) ;
 				}
 			}) ;

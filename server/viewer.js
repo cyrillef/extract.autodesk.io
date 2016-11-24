@@ -18,8 +18,6 @@
 // DOES NOT WARRANT THAT THE OPERATION OF THE PROGRAM WILL BE
 // UNINTERRUPTED OR ERROR FREE.
 //
-var express =require ('express') ;
-var request =require ('request') ;
 
 // config.BaseEndPoint
 var viewer =[

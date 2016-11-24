@@ -36,60 +36,43 @@ $(document).ready (function () {
 		$('#usage-control').text ('Show Description & Information') ;
 	}
 
-	$('#new-project').click (function (evt) {
+	$('#clear-workspace').click (function (evt) {
 		evt.stopPropagation () ;
 		location.reload () ;
 	}) ;
 
-	$('#create-project').click (function (evt) {
+	$('#submit-project').click (function (evt) {
 		evt.stopPropagation () ;
 		var elts =$('div.alert-info[id^=flow-file-]') ;
 		if ( elts.length != 0 )
 			return (alert ('You need to wait for the upload to complete!')) ;
 		elts =$('div.alert-success[id^=flow-file-]') ;
 		if ( elts.length == 0 )
-			return (alert ('There is no file loaded successfully!')) ;
-		if ( elts.length > 1 ) { // Show the dependency editor
-			window.jsp.reset () ;
-			window.jsp.bind ('click', function (c) { window.jsp.detach (c) ; }) ;
-			$('#dependencyEditorCanvas')
-				.children ('.jtk-surface-canvas')
-				.empty () ;
-			var node0 =undefined ;
-			$.each (elts, function (index, elt) {
-				var node =addJsPlumbNode ({
-					name: $(elt).children ('.flow-file-name').text (),
-					uniqueIdentifier: $(elt).prop ('id').replace (/^flow-file-/, '')
-				}) ;
-				node0 =node0 || node ;
-				if ( node0 !== node )
-					connectJsPlumbNodes (node0, node) ;
-			}) ;
-			$('#dependencyEditorDialog').modal () ;
-			// See to continue - $("#dependencyEditorDialog .btn").on ('click'
-		} else { // No need for dependency editor
-			var data ={
-				name: $(elts [0]).children ('.flow-file-name').text (),
-				uniqueIdentifier: $(elts [0]).prop ('id').replace (/^flow-file-/, ''),
-				children: []
-			} ;
-			//$('#dependencyEditorDialog').modal () ; // No need
-			submitProject (data) ;
+			return (alert ('No files were uploaded successfully!')) ;
+
+		var main =$('#fileUploadArea div.list-group')
+			.find ('div.glyphicon-home')
+			.parent () ;
+		var name =$(main).children ('.flow-file-name').text () ;
+		var regexpr =new RegExp ('-' + name + '$') ;
+		var identifier =$(main).prop ('id').replace (/^flow-file-/, '').replace (regexpr, '') ;
+		var data ={
+			main: name,
+			name: $('#flow-file-' + identifier).children ('.flow-file-name').text (),
+			uniqueIdentifier: identifier,
+			children: []
+		} ;
+		for ( var i =0 ; i < elts.length ; i++ ) {
+			var elt =$(elts [i]) ;
+			name =elt.children ('.flow-file-name').text () ;
+			regexpr =new RegExp ('-' + name + '$') ;
+			name =elt.prop ('id').replace (/^flow-file-/, '').replace (regexpr, '') ;
+			if ( $.inArray (name, data.children) == -1 )
+				data.children.push (name) ;
 		}
-	}) ;
-
-	$('#dependencyEditorDialog').on ('shown.bs.modal', function() {
-		autoArrangeJsPlumb () ;
-	})
-
-	$("#dependencyEditorDialog .btn").on ('click', function (evt) {
-		//evt.stopPropagation () ;
-		//var nodes =$('.statemachine .w') ;
-		var edges =window.jsp.getAllConnections () ;
-		var data =buildDependencyTree (edges) ;
+		//console.log (JSON.stringify (data)) ;
 		submitProject (data) ;
-		//$('#dependencyEditorDialog').modal ('hide') ;
-	});
+	}) ;
 
 	$('#projectProgressDialog').on ('shown.bs.modal', function () {
 		$("#projectProgressDialog").draggable ({ handle: ".modal-header" }) ;
@@ -107,8 +90,41 @@ function listProjects () {
 		complete: null
 	}).done (function (results) {
 		for ( var i =0 ; i < results.length ; i++ )
-			createProjectVignette (results [i].name, results [i]) ;
+			createProjectVignette (results [i].key, results [i]) ;
 	}) ;
+}
+
+function createProjectVignette (identifier, data) {
+	data.hasThumbnail =data.hasThumbnail || 'false' ;
+	data.progress =data.progress || 'complete' ;
+	if ( data.hasThumbnail == 'false' )
+		data.progress ='project' ;
+	data.success =data.success || '100%' ;
+	var progressui =(data.progress != 'complete' && data.progress != 'failed' ? '<progress class="project-progress-bar" value="' + parseInt (data.success) + '" max="100"></progress>' : '') ;
+	var imageui =(data.progress == 'complete' ?
+		  '/extracted/' + identifier + '.png'
+		: (data.progress == 'failed' ? '/images/failed.png' : '/images/processing.png')) ;
+	var url =(data.progress != 'failed' ? '/explore/' + identifier : '#') ;
+	$('#vignette-' + identifier).remove () ;
+	$('#project-results').append (
+		'<div class="view view-first flex-item" id="vignette-' + identifier + '">'
+			//+	'<a href="#' + identifier + '" />'
+		+	'<img src="' + imageui + '" />'
+		+ 	'<div class="mask">'
+		+		'<h2>' + data.name + '</h2>'
+		+		'<p>' + data.progress + ' (' + data.success + ')</p>'
+		//+		'<a href="' + url + '" class="info" target="' + identifier + '">Explore</a>'
+		+		'<a href="javascript:void(0)" data="' + url + '" class="info" target="' + identifier + '">Please Wait</a>'
+		+	'</div>'
+		+	progressui
+		+ '</div>'
+	) ;
+	if ( data.progress != 'complete' && data.progress != 'failed' ) {
+		console.log ('progress state = ' + data.progress) ;
+		setTimeout (function () { projectProgress (identifier) ; }, 5000) ;
+	}
+	if ( data.progress == 'complete' )
+		$('#vignette-' + identifier + ' div a.info').unbind ('click').text ('Explore').attr ('href', '/explore/' + identifier) ;
 }
 
 function submitProject (data) {
@@ -121,14 +137,12 @@ function submitProject (data) {
 	}).done (function (response) {
 		//- At this stage we asked the server to:
 		//-   1. upload the files on the Autodesk server
-		//-   2. set the dependencies between files
-		//-   3. register files to the translation service
+		//-   2. post a svf translation job to the Model Derivative Service
 		//- We can now wait for the service to complete translation
 
 		var root =data.uniqueIdentifier ;
-		createProjectVignette (root, { 'progress': 'requested', 'success': '0%', 'hasThumbnail': 'true' }) ;
+		createProjectVignette (root, { 'name': data.name, 'progress': 'requested', 'success': '0%', 'hasThumbnail': 'true' }) ;
 		$('#tabs #view-project-tab a').tab ('show') ;
-		//$('#projectProgressDialog').modal () ;
 
 		setTimeout (function () { scrollTo (root) ; }, 100) ;
 		setTimeout (function () { projectProgress (root) ; }, 5000) ;
@@ -151,7 +165,7 @@ function projectProgress (root, nb) {
 		if ( response.progress == 'complete' ) {
 			$(name + ' progress').remove () ;
 			if ( response.status == 'success' ) {
-				$(name + ' div p').text ('success (' + response.success + ')') ;
+				$(name + ' div p').text ('success (' + response.status + ')') ;
 				$(name + ' div a.info').unbind ('click').text ('Explore').attr ('href', '/explore/' + root) ;
 
 				if ( response.hasThumbnail == 'true' ) {
@@ -171,7 +185,7 @@ function projectProgress (root, nb) {
 			}
 		} else {
 			if ( response.progress === 'uploading to oss' )
-				$(name + ' progress').val (parseInt (response.success) || 0) ;
+				$(name + ' progress').val (parseInt (response.oss) || 0) ;
 			else
 				$(name + ' progress').val (parseInt (response.progress) || 0) ;
 			$(name + ' div p').text (response.progress) ;
@@ -189,37 +203,6 @@ function projectProgress (root, nb) {
 		$(name + ' img').attr ('src', '/images/failed.png') ;
 	}) ;
 } ;
-
-function createProjectVignette (identifier, data) {
-	data.hasThumbnail =data.hasThumbnail || 'false' ;
-	data.progress =data.progress || 'complete' ;
-	if ( data.hasThumbnail == 'false' )
-		data.progress ='project' ;
-	data.success =data.success || '100%' ;
-	var name =identifier ;
-	var progressui =(data.progress != 'complete' && data.progress != 'failed' ? '<progress class="project-progress-bar" value="' + parseInt (data.success) + '" max="100"></progress>' : '') ;
-	var imageui =(data.progress == 'complete' ?
-		  '/extracted/' + name + '.png'
-		: (data.progress == 'failed' ? '/images/failed.png' : '/images/processing.png')) ;
-	var url =(data.progress != 'failed' ? '/explore/' + identifier : '#') ;
-	$('#vignette-' + name).remove () ;
-	$('#project-results').append (
-			'<div class="view view-first flex-item" id="vignette-' + name + '">'
-				//+	'<a href="#' + name + '" />'
-			+	'<img src="' + imageui + '" />'
-			+ 	'<div class="mask">'
-			+		'<h2>' + identifier + '</h2>'
-			+		'<p>' + data.progress + ' (' + data.success + ')</p>'
-			+		'<a href="' + url + '" class="info" target="' + name + '">Explore</a>'
-			+	'</div>'
-			+	progressui
-			+ '</div>'
-	) ;
-	if ( data.progress != 'complete' && data.progress != 'failed' ) {
-		console.log ('progress state = ' + data.progress) ;
-		setTimeout (function () { projectProgress (identifier) ; }, 5000) ;
-	}
-}
 
 function scrollTo (identifier) {
 	var name ='#vignette-' + identifier ;

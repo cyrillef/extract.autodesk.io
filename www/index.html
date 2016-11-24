@@ -31,7 +31,8 @@
     <script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
     <link href="/css/maria-base-theme.css" rel="stylesheet" />
     <link href="/css/maria-theme.css" rel="stylesheet" />
-    <link href="/css/open-sans.css" rel="stylesheet" />
+    <!--link href="/css/open-sans.css" rel="stylesheet" /-->
+    <link href="//fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" />
     <link href="/css/custom.css" rel="stylesheet" />
 	<link href="/css/vignettes.css" rel="stylesheet" />
     <link href="//www.fuelcdn.com/fuelux/3.6.3/css/fuelux.min.css" rel="stylesheet" />
@@ -47,16 +48,6 @@
     <script src="https://www.google.com/jsapi?key=AIzaSyAsdhYT8LmF3YMkd7v76oiauI4fHH0d5bc"></script>
     <script src="https://apis.google.com/js/client.js?onload=googleDriveOnloadInit"></script>
     <script src="https://js.live.net/v5.0/OneDrive.js"></script>
-
-	<script src="/bower_components/lodash/lodash.js "></script>
-	<script src="/bower_components/graphlib/dist/graphlib.core.js "></script>
-	<script src="/bower_components/dagre/dist/dagre.core.js "></script>
-	<script src="/bower_components/jsPlumb/dist/js/jsPlumb-2.1.2.js "></script>
-	<link href="/js/jsPlumbToolkit-defaults.css" rel="stylesheet" /><!-- https://jsplumbtoolkit.com/css/jsPlumbToolkit-defaults.css -->
-	<script src="/js/jsPlumbToolkit-1.0.11.js"></script><!-- https://jsplumbtoolkit.com/demos/wrapped/statemachine/lib/jsPlumbToolkit-1.0.11.js -->
-	<!-- https://jsplumbtoolkit.com/css/jsPlumbToolkit-demo.css -->
-    <link href="/js/dependency-editor.css" rel="stylesheet" />
-    <script src="/js/dependency-editor.js"></script>
 
 	<script src="/bower_components/jquery.cookie/jquery.cookie.js"></script>
 	<script src="/js/app.js"></script>
@@ -143,12 +134,14 @@
                                     <p>There is no guarantee your file will be kept on this sample forever. However, you got
                                         full control on the time life of your design file and 'bubbles' on this server and
                                         Autodesk server.</p>
-                                    <p>How to use the sample:
+                                    <p>How to use the sample: (<a href="https://github.com/cyrillef/extract.autodesk.io/blob/master/README.md#UseOfTheSample">more instructions</a>)
                                         <ol>
-                                            <li>Upload one design file (and it dependencies) you want to process</li>
-                                            <li>If your model depends on multiple files, edit the references to specify
-                                                the relationships between those files</li>
-                                            <li>Launch the translation process</li>
+                                            <li>Upload one design file (and it dependencies) you want to process <br />
+                                                Files can be uploaded as a ZIP file or multiple files. The application will
+                                                assemble all files together automatically for you</li>
+                                            <li>If your model depends on multiple files, make sure to point to the master
+                                                file by assign the <span class="glyphicon glyphicon-home"> </span> icon to it</li>
+                                            <li>Launch the translation process by clicking on the 'Submit my project' button</li>
                                             <li>... wait ...</li>
                                             <li>View and verify the results</li>
                                             <li>Request the extraction zip file</li>
@@ -159,13 +152,17 @@
 	                                <ol>
 		                                <li>Unzip the file on your hardrive</li>
 		                                <li>If you have node.js and node.js http-server already installed on your computer,
-			                                launch the local viewer by running the index.bat</li>
+                                            launch the local viewer by running the index.bat (Windows) or ./index (OSX/Linux)</li>
 		                                <li>If you do not have have node.js http-server installed,
-			                                read instructions <a href="https://github.com/cyrillef/extract-view.and.data.api/blob/master/README.md#node">here</a></li>
+			                                read instructions <a href="https://github.com/cyrillef/extract.autodesk.io/blob/master/README.md#node">here</a></li>
 		                                <li>If you prefer using Python, Apache/PHP, or other WEB technologies,
-			                                read instructions <a href="https://github.com/cyrillef/extract-view.and.data.api/blob/master/README.md#others">here</a></li>
+			                                read instructions <a href="https://github.com/cyrillef/extract.autodesk.io/blob/master/README.md#others">here</a></li>
 	                                </ol>
-
+                                    <p>Reporting issues:</p>
+                                    <ol>
+                                        <li><a href="https://github.com/cyrillef/extract.autodesk.io/issues" target="GitHub">Report on GitHub</a></li>
+                                        <li><a href="mailto:forge.help.autodesk.com?Subject=extract.autodesk.io%20problem">Email us</a></li>
+                                    </ol>
                                 </div>
                                 <div><button id="usage-control" type="button" class="btn btn-info">Hide Description &amp; Information</button></div>
                             </div>
@@ -274,7 +271,7 @@
 		            </div>
 		        </div>
 
-		        <div id="fileUploadArea" class="row noshow">
+		        <div id="fileUploadArea" class="row noshow0">
 		            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 		                <div class="panel panel-default app-panel-default">
 		                    <div class="panel-body app-panel-body app-api-doc">
@@ -283,21 +280,27 @@
 		                                <div class="list-group">
 		                                    <!-- This items below is a template for the Flow.js upload code -->
 		                                    <div id="fileupload-sample" class="alert alert-info noshow" role="alert">
-		                                        <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1"><i class="fa fa-file-code-o fa-2x pull-left"></i></div>
+                                                <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 glyphicon glyphicon-cloud-upload"></div>
+		                                        <!-- div class="col-xs-1 col-sm-1 col-md-1 col-lg-1"><i class="fa fa-file-code-o fa-2x pull-left"></i></div -->
 		                                        <div class="flow-file-name col-xs-4 col-sm-4 col-md-4 col-lg-4">test.jpg</div>
 		                                        <div class="flow-file-progress col-xs-7 col-sm-7 col-md-7 col-lg-7">
 			                                        <progress min="0" max="100" value="0" class="jquery" /></div>
 		                                    </div>
+                                            <div id="fileupload-sample-sub" class="alert alert-info noshow" role="alert">
+                                                <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1"></div>
+                                                <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 glyphicon glyphicon-ok"></div>
+                                                <div class="flow-file-name col-xs-10 col-sm-10 col-md-10 col-lg-10">test.jpg</div>
+                                            </div>
 			                                <!-- Items here will be added by cloning the one above -->
 
 		                                </div>
 		                            </div>
 			                        <div class="row">
 				                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 center-block">
-					                        <button id="new-project" type="button" class="btn btn-primary center-block">Clear workspace</button>
+					                        <button id="clear-workspace" type="button" class="btn btn-primary center-block">Clear workspace</button>
 				                        </div>
 				                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6 center-block">
-					                        <button id="create-project" type="button" class="btn btn-primary center-block">Submit my project</button>
+					                        <button id="submit-project" type="button" class="btn btn-primary center-block">Submit my project</button>
 				                        </div>
 			                        </div>
 		                        </div>
@@ -343,56 +346,6 @@
 			    </div>
 		    </div>
 
-	    </div>
-
-        <!-- Modal Dependency Editor -->
-        <div id="dependencyEditorDialog" class="modal fade" role="dialog">
-            <div class="modal-dialog">
-                <!-- Modal content-->
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Dependency Editor</h4>
-                    </div>
-                    <div id="dependencyEditor" class="modal-body">
-	                    <div class="row">
-		                    Click on a connection to delete it. Click on a yellow box, and drag to another node to build
-		                    a connection. The node without a parent will be the master file. All others will be dependencies.
-	                    </div>
-	                    <div class="jtk-main">
-		                    <div class="jtk-canvas canvas-wide statemachine jtk-surface jtk-surface-nopan" id="dependencyEditorCanvas"></div>
-	                    </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Create project</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-	    <!-- Modal Project Creation Dialog -->
-	    <div id="projectDialog" class="modal fade" role="dialog">
-		    <div class="modal-dialog">
-			    <!-- Modal content-->
-			    <div class="modal-content">
-				    <div class="modal-header">
-					    <button type="button" class="close" data-dismiss="modal">&times;</button>
-					    <h4 class="modal-title">Dependency Editor</h4>
-				    </div>
-				    <div id="dependencyEditor" class="modal-body">
-					    <div class="row">
-						    Click on a connection to delete it. Click on a yellow box, and drag to another node to build
-						    a connection. The node without a parent will be the master file. All others will be dependencies.
-					    </div>
-					    <div class="jtk-main">
-						    <div class="jtk-canvas canvas-wide statemachine jtk-surface jtk-surface-nopan" id="dependencyEditorCanvas"></div>
-					    </div>
-				    </div>
-				    <div class="modal-footer">
-					    <button type="button" class="btn btn-default" data-dismiss="modal">Continue</button>
-				    </div>
-			    </div>
-		    </div>
 	    </div>
 
     </div>

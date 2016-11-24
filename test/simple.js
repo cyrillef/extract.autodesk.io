@@ -4,7 +4,7 @@
 var request =require ('supertest') ;
 var should =require ('should') ;
 var app =require ('../server/server') ;
-var _config =require ('../server/credentials_.js') ;
+var _config =require ('../server/config.js') ;
 var fs =require ('fs') ;
 var path =require ('path') ;
 app.set ('port', process.env.PORT || 8000) ;
@@ -12,8 +12,6 @@ app.set ('port', process.env.PORT || 8000) ;
 describe ('Starting Test server...', function () {
 
 	var server ;
-	//var port =app.get ('port') ;
-	//var url ='http://extract.autodesk.io' ;
 	var port =app.get ('port') ;
 	//var url ='http://localhost:' + port ;
 
@@ -22,24 +20,16 @@ describe ('Starting Test server...', function () {
 	var auObjBucket =_config.bucket ; /* transient */
 	//var transientAuObjUrn ='urn:adsk.objects:os.object:' + auObjBucket + '/' + path.basename (auObjFile) ;
 
-	/*var testFile ='Au.obj' ;
-	var testIdentifier =auObjIdentifier ;
-	var testBucket =_config.bucket ;
-	if ( process.env.CONSUMERKEY ) {
-		testBucket +='-' + process.env.CONSUMERKEY.toLowerCase () ;
-	} else {
-		var config =require ('../server/credentials.js') ;
-		testBucket +='-' + config.credentials.client_id.toLowerCase () ;
-	}
-	var permanentAuObjUrn ='urn:adsk.objects:os.object:' + testBucket + '/' + testFile ;
-	*/
-
 	// Start/End test server
 	before (function (done) {
 		console.log ('Starting server listening on port ' + app.get ('port')) ;
 		this.timeout (12000) ;
 		if ( fs.existsSync ('data/token.json') )
 			fs.unlinkSync ('data/token.json') ;
+		if ( fs.existsSync ('data/tokenRO.json') )
+			fs.unlinkSync ('data/tokenRO.json') ;
+		auObjIdentifier =fs.statSync (auObjFile).size + '-Auobj' ;
+
 		server =app.listen (port, function () {
 			console.log ('Server listening on port ' + server.address ().port) ;
 			setTimeout (done, 6000) ;
@@ -52,58 +42,36 @@ describe ('Starting Test server...', function () {
 
 	// Tests
 	describe ('Setup & token module', function () {
-		/*it('server/credential.js present', function (done) {
-			fs.exists ('server/credentials.js', function (exists) {
-				exists.should.be.equal (true) ;
-				done () ;
-			}) ;
-		}) ;
-
-		it('server/credential.js with valid keys', function (done) {
-			fs.readFile ('server/credentials.js', 'utf8', function (err, content) {
-				content.indexOf ('<replace with your consumer key>').should.be.equal (-1) ;
-				content.indexOf ('<replace with your consumer secret>').should.be.equal (-1) ;
-				done () ;
-			}) ;
-		}) ;
-		*/
-
 		/*before (function (done) {
 			// We need to give time to refresh the token
 			this.timeout (10000) ;
 			setTimeout (done, 6000) ;
 		}) ;
 		*/
-		it('server/credential_.js present', function (done) {
-			fs.exists ('server/credentials_.js', function (exists) {
+		it('server/config.js present', function (done) {
+			fs.exists ('server/config.js', function (exists) {
 				exists.should.be.equal (true) ;
 				done () ;
 			}) ;
 		}) ;
 
-		it('server/credential_.js with no valid keys', function (done) {
-			fs.readFile ('server/credentials_.js', 'utf8', function (err, content) {
+		it('server/config.js with no valid keys', function (done) {
+			fs.readFile ('server/config.js', 'utf8', function (err, content) {
+				should.not.exist (err) ;
 				content.indexOf ('<replace with your consumer key>').should.be.not.equal (-1) ;
 				content.indexOf ('<replace with your consumer secret>').should.be.not.equal (-1) ;
+				content.indexOf ('<replace with your mailjet public key>').should.be.not.equal (-1) ;
+				content.indexOf ('<replace with your mailjet private key>').should.be.not.equal (-1) ;
+				content.indexOf ('<replace with your mailjet account name>').should.be.not.equal (-1) ;
 				done () ;
 			}) ;
 		}) ;
 
-		var access_tokenEP ='/api/token' ;
-		it('(get) ' + access_tokenEP + ' - returns status 200 with a valid token', function (done) {
-			request (app)
-				.get (access_tokenEP)
-				.expect (200) //, done)
-				.expect (function (res) {
-					res.text.should.be.String ;
-					res.text.should.length (28) ;
-				})
-				.end (function (err, res) {
-					if ( err )
-						throw err ;
-					res.status.should.equal (200) ;
-					done () ;
-				}) ;
+		it('data/token.json', function (done) {
+			fs.readFile ('data/token.json', 'utf8', function (err, content) {
+				should.not.exist (err) ;
+				done () ;
+			}) ;
 		}) ;
 
 	}) ;
@@ -140,61 +108,14 @@ describe ('Starting Test server...', function () {
 	describe ('projects module', function () {
 		var projectsEP ='/api/projects' ;
 
-		it('(get) ' + projectsEP + ' - get bucket list', function (done) {
-			request (app)
-				.get (projectsEP)
-				.expect (200) //, done)
-				.expect ('Content-Type', /json/)
-				.expect (function (res) {
-					res.body.should.be.Array ;
-				})
-				.end (function (err, res) {
-					if ( err )
-						throw err ;
-					res.status.should.equal (200) ;
-					done () ;
-				}) ;
-		}) ;
-
-		it('(post) ' + projectsEP + ' - post bucket/file to oss', function (done) {
+		it('(post) ' + projectsEP + ' - post file to oss and requested translation', function (done) {
 			request (app)
 				.post (projectsEP)
-				.send ({ 'uniqueIdentifier': auObjIdentifier, 'children': [] })
+				.send ({ 'uniqueIdentifier': auObjIdentifier, 'children': [ auObjIdentifier ] })
 				.expect (200) //, done)
 				.expect ('Content-Type', /json/)
-				.expect ({ 'status': 'submitted' }, done) ;
+				.expect ({ 'uniqueIdentifier': auObjIdentifier, 'children': [ auObjIdentifier ] }, done) ;
 		}) ;
-
-		/*it('(get) ' + projectsEP + '/:bucket - get bucket details for [test file]', function (done) {
-			this.timeout (9000) ;
-			request (app)
-				.get (projectsEP + '/' + testBucket)
-				.expect ('Content-Type', /json/)
-				.expect (200, done) ;
-		}) ;*/
-
-		/*it('(get) ' + projectsEP + '/:identifier - get details for [test file]', function (done) {
-			this.timeout (9000) ;
-			request (app)
-				.get (projectsEP + '/' + testFile)
-				.expect ('Content-Type', /json/)
-				.expect (200, done) ;
-		}) ;*/
-
-		/*it('(get) ' + projectsEP + '/:bucket/:identifier/progress - get translation progress [test file]', function (done) {
-			this.timeout (9000) ;
-			request (app)
-				.get (projectsEP + '/' + testBucket + '/' + testIdentifier + '/progress')
-				.expect ('Content-Type', /json/)
-				.expect (200)
-				.end (function (err, res) {
-					if ( err )
-						throw err ;
-					var encodedURN =new Buffer (permanentAuObjUrn).toString ('base64') ;
-					res.body.should.have.property ('guid').and.be.equal (encodedURN) ;
-					done () ;
-				}) ;
-		}) ;*/
 
 	}) ;
 
@@ -205,22 +126,6 @@ describe ('Starting Test server...', function () {
 			// We need to give time to oss upload
 			this.timeout (12000) ;
 			setTimeout (done, 10000) ;
-		}) ;
-
-		/*it('(get) ' + projectsEP + '/:bucket - get bucket details', function (done) {
-			this.timeout (9000) ;
-			request (app)
-				.get (projectsEP + '/' + auObjBucket)
-				.expect ('Content-Type', /json/)
-				.expect (200, done) ;
-		}) ;*/
-
-		it('(get) ' + projectsEP + '/:identifier - get bucket-file details', function (done) {
-			this.timeout (9000) ;
-			request (app)
-				.get (projectsEP + '/' + auObjIdentifier)
-				.expect ('Content-Type', /json/)
-				.expect (200, done) ;
 		}) ;
 
 		it('(get) ' + projectsEP + '/:identifier/progress - get translation progress', function (done) {

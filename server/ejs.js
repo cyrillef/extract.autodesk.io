@@ -21,38 +21,38 @@
 // http://blog.niftysnippets.org/2008/03/mythical-methods.html
 //
 var express =require ('express') ;
-var request =require ('request') ;
 var fs =require ('fs') ;
 var ejs =require ('ejs') ;
-var lmv =require ('./lmv') ;
+var config =require ('./config') ;
+var utils =require ('./utils') ;
+var forgeToken =require ('./forge-token') ;
 
 var router =express.Router () ;
 
 router.get ('/:identifier', function (req, res) {
-	var bucket =lmv.Lmv.getDefaultBucket () ;
+	var bucket =config.bucket ;
 	var identifier =req.params.identifier ;
 
 	var zipExist =false ;
-	try {
-		fs.lstatSync ('www/extracted/' + identifier + '.zip') ;
-		zipExist =true ;
-	} catch ( err ) {
-	}
-
-	try {
-		var data =fs.readFileSync ('data/' + identifier + '.resultdb.json') ;
-		data =JSON.parse (data) ;
-		var obj ={
-			urn: data.urn,
-			'bucket': bucket,
-			root: identifier,
-			accessToken: lmv.Lmv.getToken (),
-			extracted: zipExist.toString ()
-		} ;
-		res.render ('explore', obj) ;
-	} catch ( err ) {
-		res.status (404).end () ;
-	}
+	utils.fileexists (utils.path ('www/extracted/' + identifier + '.zip'))
+		.then (function (bExists) {
+			zipExist =bExists ;
+			return (utils.json (identifier + '.resultdb')) ;
+		})
+		.then (function (data) {
+			var obj ={
+				urn: data.urn,
+				bucket: bucket,
+				root: identifier,
+				accessToken: forgeToken.RO.getCredentials ().access_token,
+				extracted: zipExist.toString ()
+			} ;
+			res.render ('explore', obj) ;
+		})
+		.catch (function (error) {
+			res.status (404).end () ;
+		})
+	;
 }) ;
 
 module.exports =router ;

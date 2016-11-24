@@ -18,25 +18,28 @@
 // DOES NOT WARRANT THAT THE OPERATION OF THE PROGRAM WILL BE
 // UNINTERRUPTED OR ERROR FREE.
 //
-var express =require ('express') ;
-var request =require ('request') ;
 var Mailjet =require ('mailjet-sendemail') ;
-var config =(require ('fs').existsSync ('server/credentials.js') ?
-	require ('./credentials')
-	: (console.log ('No credentials.js file present, assuming using CONSUMERKEY & CONSUMERSECRET system variables.'), require ('./credentials_'))) ;
+var config =require ('./config') ;
 
 function sendMail1 (mail) {
 	mail.to =mail.to || config.mailTo ;
-	if ( config.MAILJET1 === '<replace with your mailjet consumer key>' || mail.to === '' )
+	if (   config.MJ_APIKEY_PUBLIC === '<replace with your mailjet consumer key>'
+		|| mail.to === ''
+		|| (typeof mail.to === 'object' && mail.to.length == 0)
+	)
 		return ;
-	var mjet =new Mailjet (config.MAILJET1, config.MAILJET2) ;
-	mjet.sendContent (
-		mail.from,
-		mail.to,
-		mail.subject,
-		'html',
-		mail.html
-	) ;
+	if ( typeof mail.to === 'string' )
+		mail.to =[ mail.to ] ;
+	var mjet =new Mailjet (config.MJ_APIKEY_PUBLIC, config.MJ_APIKEY_PRIVATE) ;
+	for ( var i =0 ; i < mail.to.length ; i++ ) {
+		mjet.sendContent (
+			mail.from,
+			mail.to [i],
+			mail.subject,
+			'html',
+			mail.html
+		) ;
+	}
 }
 
 module.exports =sendMail1 ;

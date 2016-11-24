@@ -60,6 +60,41 @@ $(document).ready (function () {
 			.prop ('title', message) ;
 		$('#flow-file-' + file.uniqueIdentifier + ' div.flow-file-progress progress')
 			.prop ('value', 100) ;
+		var test =$('#fileUploadArea div.glyphicon-home') ;
+		var glyph =test == undefined || test.length == 0 ? 'glyphicon-home' : 'glyphicon-ok' ;
+		$('#flow-file-' + file.uniqueIdentifier + ' .glyphicon')
+			.removeClass ('glyphicon-cloud-upload')
+			.addClass (glyph)
+			.click (selectAsHome) ;
+
+		try {
+			message =JSON.parse (message) ;
+		} catch ( e ) {
+			message ={} ;
+		}
+		if ( message.entries != undefined && message.entries.length > 0 ) {
+			$('#flow-file-' + file.uniqueIdentifier + ' .glyphicon')
+				.removeClass (glyph)
+				.addClass ('glyphicon-ok')
+				.unbind ('click') ;
+			for ( var i =0 ; i < message.entries.length ; i++ ) {
+				var entry =message.entries [i] ;
+				var elt =$("#fileupload-sample-sub")
+					.clone ()
+					.prop ('id', 'flow-file-' + file.uniqueIdentifier + '-' + entry)
+					.removeClass ('noshow')
+					.removeClass ('alert-info')
+					.addClass ('alert-success')
+					.appendTo ($('#fileUploadArea div.list-group')) ;
+				elt.children ('div.flow-file-name')
+					.text (entry) ;
+				elt.children ('div.glyphicon')
+					.removeClass ('glyphicon-cloud-upload')
+					.addClass (glyph)
+					.click (selectAsHome) ;
+				glyph ='glyphicon-ok' ;
+			}
+		}
 	}) ;
 	r.on ('fileError', function (file, message) {
 		// Reflect that the file upload has resulted in error
@@ -67,6 +102,9 @@ $(document).ready (function () {
 			.removeClass ('alert-info')
 			.addClass ('alert-danger')
 			.prop ('title', message) ;
+		$('#flow-file-' + file.uniqueIdentifier + ' .glyphicon')
+			.removeClass ('glyphicon-cloud-upload')
+			.addClass ('glyphicon-remove') ;
 	}) ;
 	r.on ('catchAll', function () {
 		console.log.apply (console, arguments) ;
@@ -86,3 +124,14 @@ $(document).ready (function () {
 	} ;
 
 }) ;
+
+function selectAsHome (evt) {
+	evt.stopPropagation () ;
+	$('#fileUploadArea div.list-group')
+		.find ('div.glyphicon-home')
+		.removeClass ('glyphicon-home')
+		.addClass ('glyphicon-ok') ;
+	$(evt.target)
+		.removeClass ('glyphicon-ok')
+		.addClass ('glyphicon-home') ;
+}

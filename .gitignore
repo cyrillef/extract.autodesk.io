@@ -32,6 +32,6 @@ bower_components/
 Thumbs.db
 .DS_Store
 
-credentials.js
 token.txt
+tokenRO.txt
 files.txt

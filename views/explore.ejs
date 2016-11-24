@@ -8,71 +8,72 @@
     <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
 
-    <title>ADN - Bubble Extractor example</title>
+    <title>Autodesk Forge Viewer Node.js Extractor example</title>
     <meta content="Extractor example" name="description" />
-    <meta content="Forge Viewer Node.js Extractor" name="keywords" />
+    <meta content="Extractor Node.js Forge Viewer" name="keywords" />
     <meta content="Autodesk" name="author" />
     <link href="../favicon.ico" rel="shortcut icon" />
 
-    <!-- icons-->
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" />
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-    <script src="//oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-    <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
-    <script src="/bower_components/jquery/dist/jquery.js"></script>
-    <link href="/bower_components/jquery-ui/themes/smoothness/jquery-ui.css" rel="stylesheet">
-    <script src="/bower_components/jquery-ui/jquery-ui.js"></script>
-    <link href="/css/ionicons.css" rel="stylesheet" />
-    <link href="/css/maria-theme-checkbox.css" rel="stylesheet" />
-    <link href="/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-    <link href="/css/maria-base-theme.css" rel="stylesheet" />
-    <link href="/css/maria-theme.css" rel="stylesheet" />
-    <link href="/css/open-sans.css" rel="stylesheet" />
-    <link href="/css/custom.css" rel="stylesheet" />
-    <link href="//www.fuelcdn.com/fuelux/3.6.3/css/fuelux.min.css" rel="stylesheet" />
-    <script src="//www.fuelcdn.com/fuelux/3.12.0/js/fuelux.min.js"></script>
+	<!-- icons-->
+	<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" />
+	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	<script src="//oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+	<script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	<![endif]-->
+	<script src="/bower_components/jquery/dist/jquery.js"></script>
+	<link href="/bower_components/jquery-ui/themes/smoothness/jquery-ui.css" rel="stylesheet">
+	<script src="/bower_components/jquery-ui/jquery-ui.js"></script>
+	<link href="/css/ionicons.css" rel="stylesheet" />
+	<link href="/css/maria-theme-checkbox.css" rel="stylesheet" />
+	<link href="/bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+	<script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+	<link href="/css/maria-base-theme.css" rel="stylesheet" />
+	<link href="/css/maria-theme.css" rel="stylesheet" />
+	<!--link href="/css/open-sans.css" rel="stylesheet" /-->
+	<link href="//fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" />
+	<link href="/css/custom.css" rel="stylesheet" />
+	<link href="//www.fuelcdn.com/fuelux/3.6.3/css/fuelux.min.css" rel="stylesheet" />
+	<script src="//www.fuelcdn.com/fuelux/3.12.0/js/fuelux.min.js"></script>
 
-    <script src="/bower_components/jquery.cookie/jquery.cookie.js"></script>
+	<script src="/bower_components/jquery.cookie/jquery.cookie.js"></script>
 
-    <!-- Autodesk Forge Viewer -->
-    <link rel="stylesheet" href="https://autodeskviewer.com/viewers/2.10/style.min.css" />
-    <script src="https://autodeskviewer.com/viewers/2.10/three.min.js"></script>
-    <script src="https://autodeskviewer.com/viewers/2.10/viewer3D.min.js"></script>
+	<!-- Autodesk Forge Viewer -->
+	<link href="https://developer.api.autodesk.com/viewingservice/v1/viewers/style.min.css" rel="stylesheet" />
+	<script src="https://developer.api.autodesk.com/viewingservice/v1/viewers/three.min.js"></script>
+	<script src="https://developer.api.autodesk.com/viewingservice/v1/viewers/viewer3D.min.js"></script>
 
-    <!-- Our scripts -->
-    <style>
-        div#viewer { width: auto; height: 700px; cursor: pointer; padding: 0px; margin-bottom: 20px;
-            position: relative; overflow: hidden; border: 2px dashed #aaa; border-radius: 10px; }
+	<!-- Our scripts -->
+	<style>
+		div#viewer { width: auto; height: 700px; cursor: pointer; padding: 0px; margin-bottom: 20px;
+			position: relative; overflow: hidden; border: 2px dashed #aaa; border-radius: 10px; }
 
-        div.docking-panel { top: 0px; left: 0px; width: 305px; height: 250px; resize: none; }
-        div.docking-panel-minimized { height: 34px; min-height: 34px }
+		div.docking-panel { top: 0px; left: 0px; width: 305px; height: 250px; resize: none; }
+		div.docking-panel-minimized { height: 34px; min-height: 34px }
 
-        div#extract\.autodesk\.io-extract-panel.docking-panel { top: 0px; left: 0px; width: 550px; height: 220px; resize: none; }
-        div#extract\.autodesk\.io-extract-panel.docking-panel input { width: 100%; }
-        div#extract\.autodesk\.io-extract-panel.docking-panel progress { width: 100%; }
-        div#extract\.autodesk\.io-extract-panel.docking-panel #bubbles-uri { color: white; }
-        input:required:invalid,
-        input:focus:invalid {
-            background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAeVJREFUeNqkU01oE1EQ/mazSTdRmqSxLVSJVKU9RYoHD8WfHr16kh5EFA8eSy6hXrwUPBSKZ6E9V1CU4tGf0DZWDEQrGkhprRDbCvlpavan3ezu+LLSUnADLZnHwHvzmJlvvpkhZkY7IqFNaTuAfPhhP/8Uo87SGSaDsP27hgYM/lUpy6lHdqsAtM+BPfvqKp3ufYKwcgmWCug6oKmrrG3PoaqngWjdd/922hOBs5C/jJA6x7AiUt8VYVUAVQXXShfIqCYRMZO8/N1N+B8H1sOUwivpSUSVCJ2MAjtVwBAIdv+AQkHQqbOgc+fBvorjyQENDcch16/BtkQdAlC4E6jrYHGgGU18Io3gmhzJuwub6/fQJYNi/YBpCifhbDaAPXFvCBVxXbvfbNGFeN8DkjogWAd8DljV3KRutcEAeHMN/HXZ4p9bhncJHCyhNx52R0Kv/XNuQvYBnM+CP7xddXL5KaJw0TMAF8qjnMvegeK/SLHubhpKDKIrJDlvXoMX3y9xcSMZyBQ+tpyk5hzsa2Ns7LGdfWdbL6fZvHn92d7dgROH/730YBLtiZmEdGPkFnhX4kxmjVe2xgPfCtrRd6GHRtEh9zsL8xVe+pwSzj+OtwvletZZ/wLeKD71L+ZeHHWZ/gowABkp7AwwnEjFAAAAAElFTkSuQmCC);
-            background-position: right top;
-            background-repeat: no-repeat;
-            -moz-box-shadow: none;
-        }
-        input:required:valid {
-            background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAepJREFUeNrEk79PFEEUx9/uDDd7v/AAQQnEQokmJCRGwc7/QeM/YGVxsZJQYI/EhCChICYmUJigNBSGzobQaI5SaYRw6imne0d2D/bYmZ3dGd+YQKEHYiyc5GUyb3Y+77vfeWNpreFfhvXfAWAAJtbKi7dff1rWK9vPHx3mThP2Iaipk5EzTg8Qmru38H7izmkFHAF4WH1R52654PR0Oamzj2dKxYt/Bbg1OPZuY3d9aU82VGem/5LtnJscLxWzfzRxaWNqWJP0XUadIbSzu5DuvUJpzq7sfYBKsP1GJeLB+PWpt8cCXm4+2+zLXx4guKiLXWA2Nc5ChOuacMEPv20FkT+dIawyenVi5VcAbcigWzXLeNiDRCdwId0LFm5IUMBIBgrp8wOEsFlfeCGm23/zoBZWn9a4C314A1nCoM1OAVccuGyCkPs/P+pIdVIOkG9pIh6YlyqCrwhRKD3GygK9PUBImIQQxRi4b2O+JcCLg8+e8NZiLVEygwCrWpYF0jQJziYU/ho2TUuCPTn8hHcQNuZy1/94sAMOzQHDeqaij7Cd8Dt8CatGhX3iWxgtFW/m29pnUjR7TSQcRCIAVW1FSr6KAVYdi+5Pj8yunviYHq7f72po3Y9dbi7CxzDO1+duzCXH9cEPAQYAhJELY/AqBtwAAAAASUVORK5CYII=);
-            background-position: right top;
-            background-repeat: no-repeat;
-        }
+		div#extract\.autodesk\.io-extract-panel.docking-panel { top: 0px; left: 0px; width: 550px; height: 220px; resize: none; }
+		div#extract\.autodesk\.io-extract-panel.docking-panel input { width: 100%; }
+		div#extract\.autodesk\.io-extract-panel.docking-panel progress { width: 100%; }
+		div#extract\.autodesk\.io-extract-panel.docking-panel #bubbles-uri { color: white; }
+		input:required:invalid,
+		input:focus:invalid {
+			background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAeVJREFUeNqkU01oE1EQ/mazSTdRmqSxLVSJVKU9RYoHD8WfHr16kh5EFA8eSy6hXrwUPBSKZ6E9V1CU4tGf0DZWDEQrGkhprRDbCvlpavan3ezu+LLSUnADLZnHwHvzmJlvvpkhZkY7IqFNaTuAfPhhP/8Uo87SGSaDsP27hgYM/lUpy6lHdqsAtM+BPfvqKp3ufYKwcgmWCug6oKmrrG3PoaqngWjdd/922hOBs5C/jJA6x7AiUt8VYVUAVQXXShfIqCYRMZO8/N1N+B8H1sOUwivpSUSVCJ2MAjtVwBAIdv+AQkHQqbOgc+fBvorjyQENDcch16/BtkQdAlC4E6jrYHGgGU18Io3gmhzJuwub6/fQJYNi/YBpCifhbDaAPXFvCBVxXbvfbNGFeN8DkjogWAd8DljV3KRutcEAeHMN/HXZ4p9bhncJHCyhNx52R0Kv/XNuQvYBnM+CP7xddXL5KaJw0TMAF8qjnMvegeK/SLHubhpKDKIrJDlvXoMX3y9xcSMZyBQ+tpyk5hzsa2Ns7LGdfWdbL6fZvHn92d7dgROH/730YBLtiZmEdGPkFnhX4kxmjVe2xgPfCtrRd6GHRtEh9zsL8xVe+pwSzj+OtwvletZZ/wLeKD71L+ZeHHWZ/gowABkp7AwwnEjFAAAAAElFTkSuQmCC);
+			background-position: right top;
+			background-repeat: no-repeat;
+			-moz-box-shadow: none;
+		}
+		input:required:valid {
+			background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAepJREFUeNrEk79PFEEUx9/uDDd7v/AAQQnEQokmJCRGwc7/QeM/YGVxsZJQYI/EhCChICYmUJigNBSGzobQaI5SaYRw6imne0d2D/bYmZ3dGd+YQKEHYiyc5GUyb3Y+77vfeWNpreFfhvXfAWAAJtbKi7dff1rWK9vPHx3mThP2Iaipk5EzTg8Qmru38H7izmkFHAF4WH1R52654PR0Oamzj2dKxYt/Bbg1OPZuY3d9aU82VGem/5LtnJscLxWzfzRxaWNqWJP0XUadIbSzu5DuvUJpzq7sfYBKsP1GJeLB+PWpt8cCXm4+2+zLXx4guKiLXWA2Nc5ChOuacMEPv20FkT+dIawyenVi5VcAbcigWzXLeNiDRCdwId0LFm5IUMBIBgrp8wOEsFlfeCGm23/zoBZWn9a4C314A1nCoM1OAVccuGyCkPs/P+pIdVIOkG9pIh6YlyqCrwhRKD3GygK9PUBImIQQxRi4b2O+JcCLg8+e8NZiLVEygwCrWpYF0jQJziYU/ho2TUuCPTn8hHcQNuZy1/94sAMOzQHDeqaij7Cd8Dt8CatGhX3iWxgtFW/m29pnUjR7TSQcRCIAVW1FSr6KAVYdi+5Pj8yunviYHq7f72po3Y9dbi7CxzDO1+duzCXH9cEPAQYAhJELY/AqBtwAAAAASUVORK5CYII=);
+			background-position: right top;
+			background-repeat: no-repeat;
+		}
 
-        label { color: white; }
+		label { color: white; }
 
-        div.modal .panel-heading { border-top-left-radius: inherit; border-top-right-radius: inherit; }
-    </style>
-    <script>
+		div.modal .panel-heading { border-top-left-radius: inherit; border-top-right-radius: inherit; }
+	</style>
+	<script>
         var oExtracted =<%= extracted %> ;
         var oDocument =null, oViewer =null ;
         var oViewables =null, oViews3D =null, oViews2D =null, oViewsCtrl =null, oViewsPanel =null ;
@@ -127,31 +128,7 @@
                         setTimeout (function () { oViewer.autocam.setHomeViewFrom (oViewer.navigation.getCamera ()) ; }, 1000) ;
                     }) ;
 
-                    if ( oViewsCtrl != null ) {
-                        var viewsctrl =oViewsCtrl.combo ;
-                        var nb =oViews2D.length + oViews3D.length ;
-                        if ( nb > 12 ) {
-                            oViewsPanel =createSubViewsPanel (false) ;
-                            viewsctrl =oViewsPanel ;
-                            oViewsCtrl.combo.onClick =$.proxy (oViewsPanel.toggleVisibility, oViewsPanel) ;
-                        }
-                        $.each (oViews2D, function (index, view) {
-                            var ctrl =createButton (
-                                viewsctrl, 'extractIO.2dViews' + index,
-                                'url(/images/2d.png)', getName (view),
-                                onLoadSubViews
-                            ) ;
-                            ctrl.button.view =view ;
-                        }) ;
-                        $.each (oViews3D, function (index, view) {
-                            var ctrl =createButton (
-                                viewsctrl, 'extractIO.3dViews' + index,
-                                'url(/images/3d.png)', getName (view),
-                                onLoadSubViews
-                            ) ;
-                            ctrl.button.view =view ;
-                        }) ;
-                    }
+					fillViewsList () ;
                     oExtractPanel =createExtractPanel (true) ;
                 },
                 function (errorCode, errorMsg, messages) { // onErrorCallback
@@ -199,7 +176,38 @@
                 'extractIO.ExtractZone', 'extractIO.Views',
                 'url(/images/views.png)', 'Select a 2D/3D view to load in the viewer'
             ) ;
+	        fillViewsList () ;
         }
+
+        function fillViewsList () {
+            if ( oViewsCtrl == null || oViewsCtrl.initialized || oViews2D == null || oViews3D == null )
+                return ;
+	        oViewsCtrl.initialized =true ;
+	        var viewsctrl =oViewsCtrl.combo ;
+	        var nb =oViews2D.length + oViews3D.length ;
+	        if ( nb > 12 ) {
+		        oViewsPanel =createSubViewsPanel (false) ;
+		        viewsctrl =oViewsPanel ;
+		        oViewsCtrl.combo.onClick =$.proxy (oViewsPanel.toggleVisibility, oViewsPanel) ;
+	        }
+	        $.each (oViews2D, function (index, view) {
+		        var ctrl =createButton (
+			        viewsctrl, 'extractIO.2dViews' + index,
+			        'url(/images/2d.png)', getName (view),
+			        onLoadSubViews
+		        ) ;
+		        ctrl.button.view =view ;
+	        }) ;
+	        $.each (oViews3D, function (index, view) {
+		        var ctrl =createButton (
+			        viewsctrl, 'extractIO.3dViews' + index,
+			        'url(/images/3d.png)', getName (view),
+			        onLoadSubViews
+		        ) ;
+		        ctrl.button.view =view ;
+	        }) ;
+        }
+
 
         function onLoadSubViews (evt) {
             evt.stopPropagation () ;
@@ -306,7 +314,9 @@
                     data: { email: email },
                     complete: null
                 }).done (function (results) {
-                    setTimeout (function () { extractionProgress () ; }, 2000) ;
+                    setTimeout (function () { extractionProgress () ; }, 1000) ;
+                }).fail (function (error) {
+	                console.error (error) ;
                 }) ;
             }) ;
             return (panel) ;
@@ -319,21 +329,20 @@
                 //data: null,
                 complete: null
             }).done (function (results) {
-                $('#bubbles-progress').val (parseInt (results.progress)) ;
-                if ( typeof results.progress === 'string' ) {
-                    $('#bubbles-uri').empty ().text (results.progress) ;
-                } else if ( results.progress != 100 ) {
-                    setTimeout (function () { extractionProgress () ; }, 2000) ;
+	            $('#bubbles-progress').val (parseInt (results._progress)) ;
+                $('#bubbles-uri').empty ().text (results.msg) ;
+                if ( results.msg !== 'Completed' ) {
+	                setTimeout (function () { extractionProgress () ; }, 1000) ;
                 } else {
-                    $('#bubbles-uri').empty ().text ('packing...') ;
-                    setTimeout (function () {
-                        $('#bubbles-uri').empty () ;
-                        $(document.createElement ('a'))
-                            .prop ('href', '/extracted/<%= root %>.zip')
-                            .text ('<%= root %>.zip')
-                            .appendTo ($('#bubbles-uri')) ;
-                    }, 5000) ;
+                    $('#bubbles-uri').empty () ;
+                    $(document.createElement ('a'))
+                        .prop ('href', '/extracted/<%= root %>.zip')
+                        .text ('<%= root %>.zip')
+                        .appendTo ($('#bubbles-uri')) ;
                 }
+            })
+            .fail (function (error) {
+	            console.error (error) ;
             }) ;
         }
 
@@ -470,28 +479,35 @@
                                         <p>There is no guarantee your file will be kept on this sample forever. However, you got
                                             full control on the time life of your design file and 'bubbles' on this server and
                                             Autodesk server.</p>
-                                        <p>How to use the sample: (<a href="https://github.com/cyrillef/extract-view.and.data.api/blob/master/README.md#UseOfTheSample">more instructions</a>)
+                                        <p>How to use the sample: (<a href="https://github.com/cyrillef/extract.autodesk.io/blob/master/README.md#UseOfTheSample">more instructions</a>)
                                             <ol>
-                                                <li>Upload one design file (and it dependencies) you want to process</li>
-                                                <li>If your model depends on multiple files, edit the references to specify
-                                                    the relationships between those files</li>
-                                                <li>Launch the translation process</li>
-                                                <li>... wait ...</li>
-                                                <li>View and verify the results</li>
-                                                <li>Request the extraction zip file</li>
-                                                <li>Optionally delete the project (this can be done at any time)</li>
+			                                    <li>Upload one design file (and it dependencies) you want to process <br />
+				                                    Files can be uploaded as a ZIP file or multiple files. The application will
+				                                    assemble all files together automatically for you</li>
+			                                    <li>If your model depends on multiple files, make sure to point to the master
+				                                    file by assign the <span class="glyphicon glyphicon-home"> </span> icon to it</li>
+			                                    <li>Launch the translation process by clicking on the 'Submit my project' button</li>
+			                                    <li>... wait ...</li>
+			                                    <li>View and verify the results</li>
+			                                    <li>Request the extraction zip file</li>
+			                                    <li>Optionally delete the project (this can be done at any time)</li>
                                             </ol>
                                         </p>
                                         <p>After extraction:</p>
                                         <ol>
                                             <li>Unzip the file on your hardrive</li>
                                             <li>If you have node.js and node.js http-server already installed on your computer,
-                                                launch the local viewer by running the index.bat</li>
+                                                launch the local viewer by running the index.bat (Windows) or ./index (OSX/Linux)</li>
                                             <li>If you do not have have node.js http-server installed,
-                                                read instructions <a href="https://github.com/cyrillef/extract-view.and.data.api/blob/master/README.md#node">here</a></li>
+                                                read instructions <a href="https://github.com/cyrillef/extract.autodesk.io/blob/master/README.md#node">here</a></li>
                                             <li>If you prefer using Python, Apache/PHP, or other WEB technologies,
-                                                read instructions <a href="https://github.com/cyrillef/extract-view.and.data.api/blob/master/README.md#others">here</a></li>
+                                                read instructions <a href="https://github.com/cyrillef/extract.autodesk.io/blob/master/README.md#others">here</a></li>
                                         </ol>
+	                                    <p>Reporting issues:</p>
+	                                    <ol>
+		                                    <li><a href="https://github.com/cyrillef/extract.autodesk.io/issues" target="GitHub">Report on GitHub</a></li>
+		                                    <li><a href="mailto:forge.help.autodesk.com?Subject=extract.autodesk.io%20problem">Email us</a></li>
+		                                </ol>
                                     </div>
                                     <div><button id="usage-control" type="button" class="btn btn-info">Hide About</button></div>
                                 </div>
