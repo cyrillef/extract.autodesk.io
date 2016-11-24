@@ -369,4 +369,57 @@ router.delete ('/results/:identifier', function (req, res) {
 	;
 }) ;
 
+// Report status
+router.get ('/results/status', function (req, res) {
+	utils.readdir (utils.path ('data'))
+		.then (function (files) {
+			files =files.filter (function (f) { return (/.*\.resultdb\.json$/.test (f)) ; }) ;
+			//console.log (files) ;
+
+			var promises =files.map (function (f) {
+				return (new Promise (function (fulfill, reject) {
+					var json ={
+						id: f.match (/^(.*)\.resultdb\.json$/) [1],
+						status: '?',
+						urn: '?'
+					} ;
+					utils.readFile (utils.path ('data/' + f))
+						.then (function (content) {
+							content =JSON.parse (content.toString ('utf-8')) ;
+							var ModelDerivative =new ForgeSDK.DerivativesApi () ;
+							return (ModelDerivative.getManifest (content.urn, {}, forgeToken.RW, forgeToken.RW.getCredentials ())) ;
+						})
+						.then (function (manifest) {
+							//console.log (manifest) ;
+							manifest =manifest.body ;
+							json.status =(manifest.status === 'failed' || manifest.status === 'timeout' ? 'failed' : manifest.status) ;
+							json.urn =manifest.urn ;
+							fulfill (json) ;
+						})
+						.catch (function (error) {
+							json.status ='failed' ;
+							fulfill (json) ;
+						})
+					;
+				})) ;
+			}) ;
+			return (Promise.all (promises)) ;
+		})
+		.then (function (ps) {
+			for ( var i =0 ; i < ps.length ; i++ ) {
+				if ( ps [i].status === 'failed' ) {
+					utils.unlink (utils.path ('data/' + ps [i].id + '.resultdb.json')) ;
+					utils.unlink (utils.path ('www/extracted/' + ps [i].id + '.png')) ;
+				}
+			}
+			res.json (ps) ;
+		})
+		.catch (function (error) {
+			console.error (error) ;
+			res,status (500).end () ;
+		})
+	;
+	//res.end () ;
+}) ;
+
 module.exports =router ;
