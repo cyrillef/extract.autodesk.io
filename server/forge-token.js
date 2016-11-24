@@ -21,6 +21,7 @@
 var fs =require ('fs') ;
 var ForgeSDK =require ('forge-apis') ;
 var config =require ('./config') ;
+var utils =require ('./utils') ;
 
 var oAuth2TwoLegged =null ;
 var refreshToken =function (credentials) {
@@ -32,18 +33,15 @@ var refreshToken =function (credentials) {
 			console.log ('Token: ' + response.access_token) ;
 			oAuth2TwoLegged.setCredentials (response) ;
 			setTimeout (refreshToken, (response.expires_in - 300) * 1000) ; // - 5 minutes
-			fs.writeFile ('data/token.json', JSON.stringify (response), function (err) {
-				if ( err )
+			utils.writeFile (utils.data ('token'), response)
+				.catch (function (err) {
 					throw err ;
-			}) ;
+				}) ;
 		})
 		.catch (function (error) {
 			setTimeout (refreshToken, 2000) ; // Try again
-			fs.exists ('data/token.json', function (exists) {
-				if ( exists )
-					fs.unlink ('data/token.json', function (err) {}) ;
-			}) ;
-			console.log ('Token: ERROR! (' + error + ')') ;
+			utils.unlink (utils.data ('token')) ;
+			console.error ('Token: ERROR! ', error) ;
 		})
 	;
 	return (oAuth2TwoLegged) ;
@@ -59,18 +57,15 @@ var refreshTokenRO =function (credentials) {
 			console.log ('Token RO: ' + response.access_token) ;
 			oAuth2TwoLeggedRO.setCredentials (response) ;
 			setTimeout (refreshTokenRO, (response.expires_in - 300) * 1000) ; // - 5 minutes
-			fs.writeFile ('data/tokenRO.json', JSON.stringify (response), function (err) {
-				if ( err )
+			utils.writeFile (utils.data ('tokenRO'), response)
+				.catch (function (err) {
 					throw err ;
-			}) ;
+				}) ;
 		})
 		.catch (function (error) {
 			setTimeout (refreshTokenRO, 2000) ; // Try again
-			fs.exists ('data/tokenRO.json', function (exists) {
-				if ( exists )
-					fs.unlink ('data/tokenRO.json', function (err) {}) ;
-			}) ;
-			console.log ('Token RO: ERROR! (' + error + ')') ;
+			utils.unlink (utils.data ('tokenRO')) ;
+			console.log ('Token RO: ERROR!', error) ;
 		})
 	;
 	return (oAuth2TwoLeggedRO) ;
