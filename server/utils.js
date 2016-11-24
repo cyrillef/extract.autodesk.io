@@ -68,6 +68,7 @@ var utils ={
 					try {
 						fulfill (JSON.parse (res)) ;
 					} catch ( ex ) {
+						console.error (ex.message, name) ;
 						reject (ex) ;
 					}
 				}, reject) ;

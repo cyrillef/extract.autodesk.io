@@ -20,7 +20,7 @@
 // UNINTERRUPTED OR ERROR FREE.
 //
 */
-.view { width: 215px; height: 146px; margin: 10px; float: left; border: 10px solid #fff; overflow: hidden; position: relative;
+.view { width: 207px; height: 146px; margin: 4px; float: left; border: 10px solid #fff; overflow: hidden; position: relative;
 	text-align: center; box-shadow: 1px 1px 2px #e6e6e6; cursor: default;
 	background: #aaa url(/images/bgimg.jpg) no-repeat center center; }
 .view .mask, .view .content { width: 215px; height: 146px; position: absolute; overflow: hidden; top: 0; left: 0; }

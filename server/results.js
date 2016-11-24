@@ -45,15 +45,14 @@ router.get ('/results', function (req, res) {
 		})
 		.then (function (manifests) {
 			for ( var i =0 ; i < manifests.length ; i++ ) {
-				manifests [i].name =utils.safeBase64decode (manifests [i].urn).replace (/^.*\//, '') ;
-				// If we did not pull the manifest yet, let's try now
-				if ( !manifests [i].hasOwnProperty ('type') || manifests [i].type !== 'manifest' ) {
-					var ModelDerivative =new ForgeSDK.DerivativesApi () ;
-					ModelDerivative.getManifest (manifests [i].urn, {}, forgeToken.RW, forgeToken.RW.getCredentials ())
-						.then (function (manifest) {
-							utils.writeFile (utils.data (manifests [i].key + '.resultdb'), manifest.body) ;
-						}) ; // if it fails here, we do not really care
-				}
+				var manifest =manifests [i] ;
+				manifest.name =decodeURI (utils.safeBase64decode (manifest.urn).replace (/^.*\//, '')) ;
+				utils.writeFile (utils.data (manifest.key + '.resultdb'), manifest)
+					.then (function (content) {
+						// Pull the thumbnail if it does not exists yet, and do not wait
+						downloadThumbnail (content.key) ;
+					})
+				;
 			}
 			res.json (manifests) ;
 		})
@@ -77,6 +76,9 @@ var getLocalManifest =function (identifier) {
 			json.key =identifier ;
 			return (json) ;
 		})
+		.catch (function (error) {
+			console.log (error) ;
+		})
 	) ;
 } ;
 
@@ -96,6 +98,8 @@ router.get ('/results/:identifier/thumbnail', function (req, res) {
 		.catch (function (error) {
 			utils.json (identifier + '.resultdb')
 				.then (function (json) {
+					if ( json.hasThumbnail === 'false' )
+						throw new Error ('No thumbnail') ;
 					var ModelDerivative =new ForgeSDK.DerivativesApi () ;
 					return (ModelDerivative.getThumbnail (json.urn, { width: 200, height: 200 }, forgeToken.RW, forgeToken.RW.getCredentials ())) ;
 				})
@@ -111,6 +115,34 @@ router.get ('/results/:identifier/thumbnail', function (req, res) {
 		})
 	;
 }) ;
+
+var downloadThumbnail =function (identifier) {
+	var png =utils.path ('www/extracted/' + identifier + '.png') ;
+	utils.filesize (png)
+		.then (function (info) {
+			// All good, we have it already
+		})
+		.catch (function (error) {
+			utils.json (identifier + '.resultdb')
+				.then (function (json) {
+					if ( json.hasThumbnail === 'false' )
+						throw new Error ('No thumbnail') ;
+					var ModelDerivative =new ForgeSDK.DerivativesApi () ;
+					return (ModelDerivative.getThumbnail (json.urn, { width: 200, height: 200 }, forgeToken.RW, forgeToken.RW.getCredentials ())) ;
+				})
+				.then (function (thumbnail) {
+					fs.writeFile (png, thumbnail.body) ;
+					console.log ('written to disk', png) ;
+				})
+				.catch (function (error) {
+					console.error (error, png) ;
+					fs.createReadStream (utils.path ('www/images/project-sheet.png'))
+						.pipe (fs.createWriteStream (utils.path ('www/extracted/' + identifier + '.png'))) ;
+				})
+			;
+		})
+	;
+} ;
 
 // Download viewable data as a zip file containing all resources
 var _locks ={} ;
