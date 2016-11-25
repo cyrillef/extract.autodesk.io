@@ -37,6 +37,30 @@ var refreshToken =function (credentials) {
 				.catch (function (err) {
 					throw err ;
 				}) ;
+			// Ok, now it might be the first time we run that sample on this account key-pair
+			// and the bucket may not exists yet! so create it now otherwise we will get into trouble later.
+			var sdk =new ForgeSDK.BucketsApi () ;
+			sdk.getBucketDetails (config.bucket, oAuth2TwoLegged, oAuth2TwoLegged.getCredentials ())
+				.then (function (bucket) {
+					// We are all good! :)
+					console.log (config.bucket, 'present!') ;
+				})
+				.catch (function (error) {
+					console.error (config.bucket, 'does not exist?', error) ;
+					if ( error.statusCode === 404 ) {
+						console.log ('Creating bucket: ', config.bucket) ;
+						sdk.createBucket ({ bucketKey: config.bucket, policyKey: 'persistent' }, {}, oAuth2TwoLegged, oAuth2TwoLegged.getCredentials ())
+							.then (function (response) {
+								// We are all good now! :)
+								console.log (config.bucket, 'created! -') ;
+							})
+							.catch (function (error) {
+								console.error (config.bucket, 'could not be created! - ', error) ;
+							})
+						;
+					}
+				})
+			;
 		})
 		.catch (function (error) {
 			setTimeout (refreshToken, 2000) ; // Try again

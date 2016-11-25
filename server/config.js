@@ -25,10 +25,10 @@ var config ={
 		client_id: process.env.FORGE_CLIENT_ID || '<replace with your consumer key>',
 		client_secret: process.env.FORGE_CLIENT_SECRET || '<replace with your consumer secret>',
 		grant_type: 'client_credentials',
-		scope: [ 'data:read', 'data:write' ]
+		scope: [ 'data:read', 'data:write', 'bucket:read', 'bucket:create' ]
 	},
 
-	bucket: 'extract-autodesk-io-2016',
+	bucket: 'extract-autodesk-io-2017',
 	mailTo: '',
 
 	MJ_APIKEY_PUBLIC: process.env.MJ_APIKEY_PUBLIC || '<replace with your mailjet public key>',
