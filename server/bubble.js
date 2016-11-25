@@ -52,8 +52,8 @@ function bubble (progress) {
 						self._progress._estimatedSize =0 | (result.totalSize / (1024 * 1024)) ;
 						console.log ('Estimated download size:', self._progress._estimatedSize, 'MB') ;
 
-						self.fixFlatBubbles (result) ;
-						self.fixFusionBubbles (result) ;
+						//self.fixFlatBubbles (result) ;
+						//self.fixFusionBubbles (result) ;
 
 						self._progress.msg ='Downloading derivative files' ;
 						self.downloadAllDerivativeFiles (result.list, self._outPath, function (failed, succeeded) {
@@ -99,25 +99,34 @@ function bubble (progress) {
 				res.push (item) ;
 				if (   node.mime == 'application/autodesk-svf'
 					|| node.mime == 'application/autodesk-f2d'
-				)
+				) {
 					item.name =node.name =parent.name ;
+					if ( parent.hasThumbnail === 'true' ) {
+						var thumbnailItem ={ mime: 'thumbnail', urn: bubble.urn, guid: parent.guid,
+							localPath: item.localPath,
+							thumbnailUrn: '$file$/thumbnails/' + parent.guid + '.png',
+							rootFileName: (item.rootFileName + '.png')
+						} ;
+						res.push (thumbnailItem) ;
+					}
+				}
 			}
 			if ( node.type === 'geometry' ) {
 				// Why would we be sane and use real booleans??
-				if ( node.hasThumbnail === 'true' ) {
-					var item ={ mime: 'thumbnail', urn: bubble.urn, guid: node.guid } ;
-					if ( node.guid.substring (0, 1) === '{' ) {
-						try {
-							var guidObject =JSON.parse (node.guid) ;
-							node.assetguid =guidObject.asset ;
-							item.assetguid =guidObject.asset ;
-						} catch ( ex ) {
-						}
-					}
-					item.localPath ='/' ;
-					node.thumbnailUrn ='$file$/thumbnails/' + item.guid + '.png' ;
-					res.push (item) ;
-				}
+				//if ( node.hasThumbnail === 'true' ) {
+				//	var item ={ mime: 'thumbnail', urn: bubble.urn, guid: node.guid } ;
+				//	if ( node.guid.substring (0, 1) === '{' ) {
+				//		try {
+				//			var guidObject =JSON.parse (node.guid) ;
+				//			node.assetguid =guidObject.asset ;
+				//			item.assetguid =guidObject.asset ;
+				//		} catch ( ex ) {
+				//		}
+				//	}
+				//	item.localPath ='/' ;
+				//	node.thumbnailUrn ='$file$/thumbnails/' + item.guid + '.png' ;
+				//	res.push (item) ;
+				//}
 				if ( node.intermediateFile && node.children ) {
 					// We will derive the full intermediate file path from the child F2D node
 					var f2dNode ;
@@ -192,7 +201,8 @@ function bubble (progress) {
 				files.push (rootItem.rootFileName) ;
 				onProgress () ;
 			} else if ( rootItem.mime === 'thumbnail' ) {
-				rootItem.files.push ((rootItem.assetguid || rootItem.guid) + '.png') ;
+				//rootItem.files.push ((rootItem.assetguid || rootItem.guid) + '.png') ;
+				rootItem.files.push (rootItem.rootFileName) ;
 				onProgress () ;
 			} else if ( rootItem.mime === 'application/autodesk-svf' ) {
 				var svfPath =rootItem.urn.slice (basePath.length) ;
@@ -492,66 +502,66 @@ function bubble (progress) {
 		;
 	} ;
 
-	this.fixFlatBubbles =function (result) {
-		// Trying to fix paths without breaking ones which are already good
-		// We're lucky that our array is sorted by viewables
-		var guid ='f0224dd3-8767-45c1-ff99-5c9c881b9fee' ;
-		for ( var i =0 ; i < result.list.length ; i++ ) { // Find the first thumbnail guid to start with
-			if ( result.list [i].mime === 'thumbnail' ) {
-				guid =result.list [i].guid ;
-				break ;
-			}
-		}
-		for ( var i =0 ; i < result.list.length ; i++ ) {
-			var obj =result.list [i] ;
-			if ( obj.rootFileName === 'designDescription.json' ) {
-				// Do nothing
-			} else if ( obj.mime !== 'thumbnail' ) {
-				if ( obj.localPath === '' )
-					obj.localPath =guid + '/' ;
-			} else { // Switch guid
-				guid =obj.guid ;
-			}
-		}
-	} ;
-
-	this.fixFusionBubbles =function (result) {
-		// We're lucky that our array is sorted by viewables
-		var bFusionFixRequired =false
-		var guid ='f0224dd3-8767-45c1-ff99-5c9c881b9fee' ;
-		for ( var i =0 ; i < result.list.length ; i++ ) { // Find the first thumbnail guid to start with
-			var obj =result.list [i] ;
-			if ( result.list [i].rootFileName === 'designDescription.json' ) {
-				// Do nothing
-			} else if ( obj.mime === 'thumbnail' ) {
-				guid =obj.assetguid || obj.guid ;
-				bFusionFixRrequired =obj.assetguid !== undefined ;
-				break ;
-			}
-		}
-		//if ( !bFusionFixRequired )
-		//	return ;
-		for ( var i =0 ; i < result.list.length ; i++ ) {
-			var obj =result.list [i] ;
-			if ( obj.mime !== 'thumbnail' ) {
-				if (    bFusionFixRequired
-					|| /^[0-9]+\/.*$/.test (obj.localPath)
-					|| /^(Resource)\/.*$/.test (obj.localPath)
-				) {
-					var paths =obj.localPath.split ('/') ;
-					paths [0] =guid ;
-					obj.localPath =paths.join ('/') ;
-				}
-				//else if ( /^(Resource)\/.*$/.test (obj.localPath) ) {
-				//	var paths =obj.localPath.split ('/') ;
-				//	paths.unshift (guid) ;
-				//	obj.localPath =paths.join ('/') ;
-				//}
-			} else { // Switch guid
-				guid =obj.assetguid || obj.guid ;
-			}
-		}
-	} ;
+	//this.fixFlatBubbles =function (result) {
+	//	// Trying to fix paths without breaking ones which are already good
+	//	// We're lucky that our array is sorted by viewables
+	//	var guid ='f0224dd3-8767-45c1-ff99-5c9c881b9fee' ;
+	//	for ( var i =0 ; i < result.list.length ; i++ ) { // Find the first thumbnail guid to start with
+	//		if ( result.list [i].mime === 'thumbnail' ) {
+	//			guid =result.list [i].guid ;
+	//			break ;
+	//		}
+	//	}
+	//	for ( var i =0 ; i < result.list.length ; i++ ) {
+	//		var obj =result.list [i] ;
+	//		if ( obj.rootFileName === 'designDescription.json' ) {
+	//			// Do nothing
+	//		} else if ( obj.mime !== 'thumbnail' ) {
+	//			if ( obj.localPath === '' )
+	//				obj.localPath =guid + '/' ;
+	//		} else { // Switch guid
+	//			guid =obj.guid ;
+	//		}
+	//	}
+	//} ;
+	//
+	//this.fixFusionBubbles =function (result) {
+	//	// We're lucky that our array is sorted by viewables
+	//	var bFusionFixRequired =false
+	//	var guid ='f0224dd3-8767-45c1-ff99-5c9c881b9fee' ;
+	//	for ( var i =0 ; i < result.list.length ; i++ ) { // Find the first thumbnail guid to start with
+	//		var obj =result.list [i] ;
+	//		if ( result.list [i].rootFileName === 'designDescription.json' ) {
+	//			// Do nothing
+	//		} else if ( obj.mime === 'thumbnail' ) {
+	//			guid =obj.assetguid || obj.guid ;
+	//			bFusionFixRrequired =obj.assetguid !== undefined ;
+	//			break ;
+	//		}
+	//	}
+	//	//if ( !bFusionFixRequired )
+	//	//	return ;
+	//	for ( var i =0 ; i < result.list.length ; i++ ) {
+	//		var obj =result.list [i] ;
+	//		if ( obj.mime !== 'thumbnail' ) {
+	//			if (    bFusionFixRequired
+	//				|| /^[0-9]+\/.*$/.test (obj.localPath)
+	//				|| /^(Resource)\/.*$/.test (obj.localPath)
+	//			) {
+	//				var paths =obj.localPath.split ('/') ;
+	//				paths [0] =guid ;
+	//				obj.localPath =paths.join ('/') ;
+	//			}
+	//			//else if ( /^(Resource)\/.*$/.test (obj.localPath) ) {
+	//			//	var paths =obj.localPath.split ('/') ;
+	//			//	paths.unshift (guid) ;
+	//			//	obj.localPath =paths.join ('/') ;
+	//			//}
+	//		} else { // Switch guid
+	//			guid =obj.assetguid || obj.guid ;
+	//		}
+	//	}
+	//} ;
 
 } ;
 

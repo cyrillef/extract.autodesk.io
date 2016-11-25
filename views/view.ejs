@@ -121,12 +121,9 @@
 				oViewer.loadModel (options.docid) ;
 
 				for ( var i =0 ; i < docs.length ; i++ ) {
-					//var guid =docs [i].path.match (/^\.\/(.*)\/.*$/) ;
-					var guid =docs[i].path.split('/') ;
-					guid =guid != null ? guid [1].replace ('_f2d', '') : '' ;
 					var r =$('<div><button id="view_' + i + '">'
 						+ docs [i].name
-						+ '<div><img id="img__' + i + '" src="' + guid + '.png"></div></button></div>') ;
+						+ '<div><img id="img__' + i + '" src="' + docs [i].path + '.png"></div></button></div>') ;
 					$('#list').append (r) ;
 					$('#view_' + i).click (function (e) {
 						e.stopPropagation () ;
