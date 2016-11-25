@@ -60,8 +60,10 @@ router.post ('/projects', function (req, res) {
 	Promise.all (uploadPromises)
 		.then (function (files) {
 			//console.log (JSON.stringify (files, null, 2)) ;
-			for ( var i =0 ; i < files.length ; i++ )
+			for ( var i =0 ; i < files.length ; i++ ) {
 				console.log (files [i].objectKey + ' uploaded to OSS') ;
+				utils.unlink (utils.path ('tmp/' + files [i].objectKey)) ;
+			}
 			return (utils.json (req.body.uniqueIdentifier)) ;
 		})
 		.then (function (mainFile) {

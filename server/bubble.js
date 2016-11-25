@@ -503,35 +503,50 @@ function bubble (progress) {
 			}
 		}
 		for ( var i =0 ; i < result.list.length ; i++ ) {
-			if ( result.list [i].mime !== 'thumbnail' ) {
-				if ( result.list [i].localPath === '' )
-					result.list [i].localPath =guid + '/' ;
+			var obj =result.list [i] ;
+			if ( obj.rootFileName === 'designDescription.json' ) {
+				// Do nothing
+			} else if ( obj.mime !== 'thumbnail' ) {
+				if ( obj.localPath === '' )
+					obj.localPath =guid + '/' ;
 			} else { // Switch guid
-				guid =result.list [i].guid ;
+				guid =obj.guid ;
 			}
 		}
 	} ;
 
 	this.fixFusionBubbles =function (result) {
 		// We're lucky that our array is sorted by viewables
-		var bFusionFixRrequired =false
+		var bFusionFixRequired =false
 		var guid ='f0224dd3-8767-45c1-ff99-5c9c881b9fee' ;
 		for ( var i =0 ; i < result.list.length ; i++ ) { // Find the first thumbnail guid to start with
 			var obj =result.list [i] ;
-			if ( obj.mime === 'thumbnail' ) {
+			if ( result.list [i].rootFileName === 'designDescription.json' ) {
+				// Do nothing
+			} else if ( obj.mime === 'thumbnail' ) {
 				guid =obj.assetguid || obj.guid ;
 				bFusionFixRrequired =obj.assetguid !== undefined ;
 				break ;
 			}
 		}
-		if ( !bFusionFixRrequired )
-			return ;
+		//if ( !bFusionFixRequired )
+		//	return ;
 		for ( var i =0 ; i < result.list.length ; i++ ) {
 			var obj =result.list [i] ;
 			if ( obj.mime !== 'thumbnail' ) {
-				var paths =obj.localPath.split ('/') ;
-				paths [0] =guid ;
-				obj.localPath =paths.join ('/') ;
+				if (    bFusionFixRequired
+					|| /^[0-9]+\/.*$/.test (obj.localPath)
+					|| /^(Resource)\/.*$/.test (obj.localPath)
+				) {
+					var paths =obj.localPath.split ('/') ;
+					paths [0] =guid ;
+					obj.localPath =paths.join ('/') ;
+				}
+				//else if ( /^(Resource)\/.*$/.test (obj.localPath) ) {
+				//	var paths =obj.localPath.split ('/') ;
+				//	paths.unshift (guid) ;
+				//	obj.localPath =paths.join ('/') ;
+				//}
 			} else { // Switch guid
 				guid =obj.assetguid || obj.guid ;
 			}
