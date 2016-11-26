@@ -1,10 +1,6 @@
 //
 // Copyright (c) Autodesk, Inc. All rights reserved
 //
-// Large Model Viewer Extractor
-// by Cyrille Fauvel - Autodesk Developer Network (ADN)
-// January 2015
-//
 // Permission to use, copy, modify, and distribute this software in
 // object code form for any purpose and without fee is hereby granted,
 // provided that the above copyright notice appears in all copies and
@@ -17,6 +13,9 @@
 // MERCHANTABILITY OR FITNESS FOR A PARTICULAR USE.  AUTODESK, INC.
 // DOES NOT WARRANT THAT THE OPERATION OF THE PROGRAM WILL BE
 // UNINTERRUPTED OR ERROR FREE.
+//
+// Forge Extractor
+// by Cyrille Fauvel - Autodesk Developer Network (ADN)
 //
 $(document).ready (function () {
 	var r =new Flow ({
@@ -37,74 +36,18 @@ $(document).ready (function () {
 		r.upload () ;
 	}) ;
 	r.on ('fileAdded', function (file) {
-		$('#fileUploadArea').removeClass ('noshow') ;
-		var elt =$("#fileupload-sample")
-			.clone ()
-			.prop ('id', 'flow-file-' + file.uniqueIdentifier)
-			.removeClass ('noshow')
-			.appendTo ($('#fileUploadArea div.list-group')) ;
-		elt.children ('div.flow-file-name')
-			.text (file.name) ;
+		fileUploadItem.createElt (file.uniqueIdentifier, file.name) ;
 	}) ;
 	r.on ('uploadStart', function () {}) ;
 	r.on ('fileProgress', function (file) {
-		//console.log ('fileProgress') ;
-		$('#flow-file-' + file.uniqueIdentifier + ' div.flow-file-progress progress')
-			.prop ('value', Math.floor (r.progress () * 100)) ;
+		fileUploadItem.progress (file.uniqueIdentifier, Math.floor (r.progress () * 100)) ;
 	}) ;
 	r.on ('complete', function () {}) ;
 	r.on ('fileSuccess', function (file, message) {
-		$('#flow-file-' + file.uniqueIdentifier)
-			.removeClass ('alert-info')
-			.addClass ('alert-success')
-			.prop ('title', message) ;
-		$('#flow-file-' + file.uniqueIdentifier + ' div.flow-file-progress progress')
-			.prop ('value', 100) ;
-		var test =$('#fileUploadArea div.glyphicon-home') ;
-		var glyph =test == undefined || test.length == 0 ? 'glyphicon-home' : 'glyphicon-ok' ;
-		$('#flow-file-' + file.uniqueIdentifier + ' .glyphicon')
-			.removeClass ('glyphicon-cloud-upload')
-			.addClass (glyph)
-			.click (selectAsHome) ;
-
-		try {
-			message =JSON.parse (message) ;
-		} catch ( e ) {
-			message ={} ;
-		}
-		if ( message.entries != undefined && message.entries.length > 0 ) {
-			$('#flow-file-' + file.uniqueIdentifier + ' .glyphicon')
-				.removeClass (glyph)
-				.addClass ('glyphicon-ok')
-				.unbind ('click') ;
-			for ( var i =0 ; i < message.entries.length ; i++ ) {
-				var entry =message.entries [i] ;
-				var elt =$("#fileupload-sample-sub")
-					.clone ()
-					.prop ('id', 'flow-file-' + file.uniqueIdentifier + '-' + entry)
-					.removeClass ('noshow')
-					.removeClass ('alert-info')
-					.addClass ('alert-success')
-					.appendTo ($('#fileUploadArea div.list-group')) ;
-				elt.children ('div.flow-file-name')
-					.text (entry) ;
-				elt.children ('div.glyphicon')
-					.removeClass ('glyphicon-cloud-upload')
-					.addClass (glyph)
-					.click (selectAsHome) ;
-				glyph ='glyphicon-ok' ;
-			}
-		}
+		fileUploadItem.success (file.uniqueIdentifier, message) ;
 	}) ;
 	r.on ('fileError', function (file, message) {
-		// Reflect that the file upload has resulted in error
-		$('#flow-file-' + file.uniqueIdentifier)
-			.removeClass ('alert-info')
-			.addClass ('alert-danger')
-			.prop ('title', message) ;
-		$('#flow-file-' + file.uniqueIdentifier + ' .glyphicon')
-			.removeClass ('glyphicon-cloud-upload')
-			.addClass ('glyphicon-remove') ;
+		fileUploadItem.error (file.uniqueIdentifier, message) ;
 	}) ;
 	r.on ('catchAll', function () {
 		console.log.apply (console, arguments) ;
@@ -124,14 +67,3 @@ $(document).ready (function () {
 	} ;
 
 }) ;
-
-function selectAsHome (evt) {
-	evt.stopPropagation () ;
-	$('#fileUploadArea div.list-group')
-		.find ('div.glyphicon-home')
-		.removeClass ('glyphicon-home')
-		.addClass ('glyphicon-ok') ;
-	$(evt.target)
-		.removeClass ('glyphicon-ok')
-		.addClass ('glyphicon-home') ;
-}

@@ -45,6 +45,7 @@
 		"body-parser": "*",
 		"connect-multiparty": "*",
 		"express": "*",
+	  	"request": "*",
 		"serve-favicon": "*",
 		"ejs": "*",
 		"mkdirp": "*",

@@ -1,10 +1,6 @@
 //
 // Copyright (c) Autodesk, Inc. All rights reserved
 //
-// Large Model Viewer Extractor
-// by Cyrille Fauvel - Autodesk Developer Network (ADN)
-// January 2015
-//
 // Permission to use, copy, modify, and distribute this software in
 // object code form for any purpose and without fee is hereby granted,
 // provided that the above copyright notice appears in all copies and
@@ -17,6 +13,9 @@
 // MERCHANTABILITY OR FITNESS FOR A PARTICULAR USE.  AUTODESK, INC.
 // DOES NOT WARRANT THAT THE OPERATION OF THE PROGRAM WILL BE
 // UNINTERRUPTED OR ERROR FREE.
+//
+// Forge Extractor
+// by Cyrille Fauvel - Autodesk Developer Network (ADN)
 //
 // http://blog.niftysnippets.org/2008/03/mythical-methods.html
 //

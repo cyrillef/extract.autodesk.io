@@ -1,10 +1,6 @@
 //
 // Copyright (c) Autodesk, Inc. All rights reserved
 //
-// Large Model Viewer Extractor
-// by Cyrille Fauvel - Autodesk Developer Network (ADN)
-// January 2015
-//
 // Permission to use, copy, modify, and distribute this software in
 // object code form for any purpose and without fee is hereby granted,
 // provided that the above copyright notice appears in all copies and
@@ -18,6 +14,9 @@
 // DOES NOT WARRANT THAT THE OPERATION OF THE PROGRAM WILL BE
 // UNINTERRUPTED OR ERROR FREE.
 //
+// Forge Extractor
+// by Cyrille Fauvel - Autodesk Developer Network (ADN)
+//
 $(document).ready (function () {
     $('#upload-modal input[type=file]').change (function (evt) {
         evt.stopPropagation () ;
@@ -29,9 +28,9 @@ $(document).ready (function () {
     $('#upload-modal li#uri-input button').click (function (evt) {
         evt.stopPropagation () ;
         var elt =$('#upload-modal li#uri-input input[type=text]') ;
-        var uri =elt.prop ("value") ;
+        var uri =elt.prop ('value') ;
         uploadFile (uri) ;
-        elt.prop ("value", '') ;
+        elt.prop ('value', '') ;
     }) ;
 
 	loadersInitialize ("#dropbox", "#box", "#gDrive") ;
@@ -44,15 +43,7 @@ function uploadFile (uri, filename, size) {
 	filename =filename || decodeURIComponent (uri).replace (/[\?#].*$/, "").replace (/.*\//, "") ;
 	size =size || filename.hashCode () ;
 	var uniqueIdentifier =size + '-' + filename.replace (/[^0-9a-zA-Z_-]/img, '') ;
-	$('#fileUploadArea').removeClass ('noshow') ;
-	var elt =$("#fileupload-sample")
-		.clone ()
-		.prop ('id', 'flow-file-' + uniqueIdentifier)
-		.removeClass ('noshow')
-		.appendTo ($('#fileUploadArea div.list-group')) ;
-	elt.children ('div.flow-file-name')
-		.text (filename) ;
-
+	fileUploadItem.createElt (uniqueIdentifier, filename) ;
 	$.ajax ({
 		url: '/api/uri',
 		type: 'post',
@@ -68,11 +59,7 @@ function uploadFile (uri, filename, size) {
 	}).done (function (response) {
 		uploadFileProgress (uniqueIdentifier) ;
 	}).fail (function (xhr, ajaxOptions, thrownError) {
-		var elt =$('#flow-file-' + uniqueIdentifier)
-			.removeClass ('alert-info')
-			.addClass ('alert-danger') ;
-		elt.children ('div.flow-file-progress').children ('progress')
-			.prop ('value', 0) ;
+		fileUploadItem.error (uniqueIdentifier, xhr.responseText || '') ;
 	}) ;
 }
 
@@ -85,24 +72,17 @@ function uploadFileProgress (uniqueIdentifier) {
 			contentType: 'application/json',
 			complete: null
 		}).done (function (response) {
-			var elt =$('#flow-file-' + uniqueIdentifier) ;
-			if ( response.progress == -1 ) {
-				return ;
-			} else if ( response.progress == 100 ) {
+			if ( response.progress === -1 ) {
+				// Do nothing!
+			} else if ( response.progress === 100 ) {
 				clearInterval (uploadFileProgressInterval) ;
-				elt
-					.removeClass ('alert-info')
-					.addClass ('alert-success') ;
+				fileUploadItem.success (uniqueIdentifier, response) ;
+			} else {
+				fileUploadItem.progress (uniqueIdentifier, response.progress) ;
 			}
-			elt.children ('div.flow-file-progress').children ('progress')
-				.prop ('value', response.progress) ;
 		}).fail (function (xhr, ajaxOptions, thrownError) {
 			clearInterval (uploadFileProgressInterval) ;
-			var elt =$('#flow-file-' + uniqueIdentifier)
-				.removeClass ('alert-info')
-				.addClass ('alert-danger') ;
-			elt.children ('div.flow-file-progress').children ('progress')
-				.prop ('value', 0) ;
+			fileUploadItem.error (uniqueIdentifier, xhr.responseText || '') ;
 		}) ;
 	}, 2000) ;
 }

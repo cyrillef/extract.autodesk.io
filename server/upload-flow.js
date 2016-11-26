@@ -1,10 +1,6 @@
 //
 // Copyright (c) Autodesk, Inc. All rights reserved
 //
-// Large Model Viewer Extractor
-// by Cyrille Fauvel - Autodesk Developer Network (ADN)
-// January 2015
-//
 // Permission to use, copy, modify, and distribute this software in
 // object code form for any purpose and without fee is hereby granted,
 // provided that the above copyright notice appears in all copies and
@@ -18,7 +14,11 @@
 // DOES NOT WARRANT THAT THE OPERATION OF THE PROGRAM WILL BE
 // UNINTERRUPTED OR ERROR FREE.
 //
+// Forge Extractor
+// by Cyrille Fauvel - Autodesk Developer Network (ADN)
+//
 var express =require ('express') ;
+var request =require ('request') ;
 var fs =require ('fs') ;
 var multipart =require ('connect-multiparty') ;
 var bodyParser =require ('body-parser') ;
@@ -133,7 +133,7 @@ router.post ('/uri', bodyParser.json (), function (req, res) {
 	var original_filename =req.body.name || decodeURIComponent (uri).replace (/[\?#].*$/, "").replace (/.*\//, "") ;
 	request.head (uri, function (err, headRes, body) {
 		if ( err )
-			return (res.status (500).end ()) ;
+			return (res.status (headRes.statusCode).end (headRes.statusMessage)) ;
 		if ( headRes.statusCode != 200 )
 			return (res.status (headRes.statusCode).end (headRes.statusMessage)) ;
 		//console.log ('content-type:', headRes.headers ['content-type']) ;
@@ -164,12 +164,24 @@ router.post ('/uri', bodyParser.json (), function (req, res) {
 					data.bytesRead =data.size ;
 				else
 					data.size =data.bytesRead ;
+
+				if ( utils.isCompressed (original_filename) ) {
+					data.entries =[] ;
+					var zip =new AdmZip ('./tmp/' + original_filename) ;
+					zip.getEntries ().forEach (function (zipEntry) {
+						//console.log (zipEntry.toString ()) ;
+						if ( zipEntry.isDirectory == false )
+							data.entries.push (zipEntry.entryName) ;
+					}) ;
+				}
+
+				//res.json (data) ;
 				fs.writeFile ('data/' + identifier + '.json', JSON.stringify (data), function (err) {}) ;
 			}) ;
 			r.on ('error', function (message) {
 				fs.unlink ('data/' + identifier + '.json', function (err) {}) ;
 			}) ;
-			res.json ({ 'status': identifier }) ;
+			res.json ({ uniqueIdentifier: identifier }) ;
 		}) ;
 	}) ;
 }) ;
@@ -184,9 +196,9 @@ router.options ('/uri', bodyParser.json (), function (req, res) {
 			if ( data.size == -1 )
 				throw "error" ;
 		} catch ( e ) {
-			return (res.json ({ 'status': identifier, 'progress': -1 })) ;
+			return (res.json ({ uniqueIdentifier: identifier, progress: -1 })) ;
 		}
-		res.json ({ 'status': identifier, 'progress': Math.floor (100 * data.bytesRead / data.size) }) ;
+		res.json ({ uniqueIdentifier: identifier, progress: Math.floor (100 * data.bytesRead / data.size), entries: data.entries }) ;
 	}) ;
 }) ;
 
