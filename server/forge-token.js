@@ -57,6 +57,10 @@ var refreshToken =function (credentials) {
 								console.error (config.bucket, 'could not be created! - ', error) ;
 							})
 						;
+					} else if ( error.statusCode === 403 || error.statusCode === 409 ) {
+						console.error ('This bucket name is already taken by another account, please change it!') ;
+					} else {
+						console.error ('Contact your administrator!') ;
 					}
 				})
 			;

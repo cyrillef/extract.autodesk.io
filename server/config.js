@@ -38,9 +38,10 @@ var config ={
 
 } ;
 
+
 // Make sure it is a unique bucket name by using the public key
-var md5sum =crypto.createHash ('md5').update (config.bucket).digest ('hex') ;
-if ( md5sum !== '37e06274b75aa068cf2d40af85248953' )
-	config.bucket +=config.client_id.toLowerCase () ;
+var md5sum =crypto.createHash ('md5').update (config.credentials.client_id).digest ('hex') ;
+if ( md5sum !== 'e2d2cb3afdf3050238f0315c47a22be8' )
+	config.bucket +=config.credentials.client_id.toLowerCase () ;
 
 module.exports =config ;

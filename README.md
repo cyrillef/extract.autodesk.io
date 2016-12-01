@@ -100,6 +100,26 @@ which would update/install automatically via 'bower':
    application (like Skype, or IIS, or Apache, ...), you can use any other free port such as 8000, 3000, etc...
    But in the next section you would need to specify the port to use, i.e. http://localhost[:port]/
 
+5. There is an issue in the FORGE SDK which needs to be fixed - in the meantime, please do teh following:
+
+   After npm install, go to /node_modules/forge-apis/src/ <br >
+   https://github.com/Autodesk-Forge/forge-api-nodejs-client/blob/master/src/ApiClient.js#L350 <br />
+   and change code like this: <br />
+
+	```
+	  if (accepts.length > 0) {
+		  headers['Accept'] = accepts.join(',');
+		  for ( var i =0 ; i < accepts.length ; i++ ) {
+			  if ( accepts [i] === 'application/octet-stream' )
+				  requestParams.encoding = null;
+		  }
+	  }
+	  if ( headerParams ['Accept-Encoding'] == 'gzip, deflate' )
+		  requestParams.encoding = null;
+
+	  _this.debug('request params were', requestParams);
+	```
+
 
 <a name="UseOfTheSample"></a>
 ### Use of the sample
