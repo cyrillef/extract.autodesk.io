@@ -3,7 +3,6 @@
 [![build status](https://api.travis-ci.org/cyrillef/extract.autodesk.io.png)](https://travis-ci.org/cyrillef/extract.autodesk.io)
 [![Node.js](https://img.shields.io/badge/Node.js-6.3.1-blue.svg)](https://nodejs.org/)
 [![npm](https://img.shields.io/badge/npm-3.10.3-blue.svg)](https://www.npmjs.com/)
-[![Viewer](https://img.shields.io/badge/Forge%20Viewer-v2.8-green.svg)](http://developer-autodesk.github.io/)
 ![Platforms](https://img.shields.io/badge/platform-windows%20%7C%20osx%20%7C%20linux-lightgray.svg)
 [![License](http://img.shields.io/:license-mit-blue.svg)](http://opensource.org/licenses/MIT)
 
