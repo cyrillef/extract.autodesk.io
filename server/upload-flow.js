@@ -53,7 +53,7 @@ router.post ('/file', multipartMiddleware, function (req, res) {
 						var zip =new AdmZip ('./tmp/' + original_filename) ;
 						zip.getEntries ().forEach (function (zipEntry) {
 							//console.log (zipEntry.toString ()) ;
-							if ( zipEntry.isDirectory == false )
+							if ( zipEntry.isDirectory === false )
 								data.entries.push (zipEntry.entryName) ;
 						}) ;
 					}
@@ -170,7 +170,7 @@ router.post ('/uri', bodyParser.json (), function (req, res) {
 					var zip =new AdmZip ('./tmp/' + original_filename) ;
 					zip.getEntries ().forEach (function (zipEntry) {
 						//console.log (zipEntry.toString ()) ;
-						if ( zipEntry.isDirectory == false )
+						if ( zipEntry.isDirectory === false )
 							data.entries.push (zipEntry.entryName) ;
 					}) ;
 				}

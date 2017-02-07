@@ -33,7 +33,7 @@ router.get ('/:identifier', function (req, res) {
 	var identifier =req.params.identifier ;
 
 	var zipExist =false ;
-	utils.fileexists (utils.path ('www/extracted/' + identifier + '.zip'))
+	utils.fileexists (utils.extracted (identifier + '.zip'))
 		.then (function (bExists) {
 			zipExist =bExists ;
 			return (utils.json (identifier + '.resultdb')) ;

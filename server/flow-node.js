@@ -47,7 +47,7 @@ module.exports =flow =function (temporaryFolder) {
     function validateRequest (chunkNumber, chunkSize, totalSize, identifier, filename, fileSize) {
         identifier =cleanIdentifier (identifier) ; // Clean up the identifier
         // Check if the request is sane
-        if ( chunkNumber == 0 || chunkSize == 0 || totalSize == 0 || identifier.length == 0 || filename.length == 0 )
+        if ( chunkNumber === 0 || chunkSize === 0 || totalSize === 0 || identifier.length === 0 || filename.length === 0 )
             return ('non_flow_request') ;
         var numberOfChunks =Math.max (Math.floor (totalSize / (chunkSize * 1.0)), 1) ;
         if ( chunkNumber > numberOfChunks )
@@ -93,17 +93,17 @@ module.exports =flow =function (temporaryFolder) {
     $.post =function (req, callback) {
         var fields =req.body ;
         var files =req.files ;
-        var chunkNumber =fields['flowChunkNumber'] ;
-        var chunkSize =fields['flowChunkSize'] ;
-        var totalSize =fields['flowTotalSize'] ;
-        var identifier =cleanIdentifier (fields ['flowIdentifier']) ;
-        var filename =fields ['flowFilename'] ;
+        var chunkNumber =fields.flowChunkNumber ;
+        var chunkSize =fields.flowChunkSize ;
+        var totalSize =fields.flowTotalSize ;
+        var identifier =cleanIdentifier (fields.flowIdentifier) ;
+        var filename =fields.flowFilename ;
         if ( !files [$.fileParameterName] || !files [$.fileParameterName].size ) {
             callback ('invalid_flow_request', null, null, null, null) ;
             return ;
         }
 
-        var original_filename =files [$.fileParameterName] ['originalFilename'] ;
+        var original_filename =files [$.fileParameterName].originalFilename ;
         var validation =validateRequest (chunkNumber, chunkSize, totalSize, identifier, filename, files [$.fileParameterName].size) ;
         if ( validation == 'valid' ) {
             var chunkFilename =getChunkFilename (chunkNumber, identifier) ;
@@ -142,7 +142,7 @@ module.exports =flow =function (temporaryFolder) {
     //   stream.on('finish', function(){...});
     $.write =function (identifier, writableStream, options) {
         options =options || {} ;
-        options.end =(typeof options ['end'] == 'undefined' ? true : options ['end']) ;
+        options.end =(typeof options.end === 'undefined' ? true : options.end) ;
         // Iterate over each chunk
         var pipeChunk =function (number) {
             var chunkFilename =getChunkFilename (number, identifier) ;

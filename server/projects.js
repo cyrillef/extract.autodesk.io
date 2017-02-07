@@ -90,10 +90,10 @@ router.post ('/projects', function (req, res) {
 				urn: response.body.urn,
 				progress: '0% complete',
 				status: 'requested',
-				success: '0%',
-				name: utils.safeBase64decode (response.body.urn).replace (/^.*\//, '')
+				progress: '0%',
+				name: utils.safeBase64decode (response.body.urn).replace (/^.*\//, ''),
+				key: req.body.uniqueIdentifier
 			} ;
-			//utils.writeFile (utils.data (req.body.uniqueIdentifier + '.resultdb'), JSON.stringify (data)) ;
 			utils.writeFile (utils.data (req.body.uniqueIdentifier + '.resultdb'), data) ;
 
 			// Ok, now we rely on the client browser to pull the manifest and thumbnail, but what if the user
@@ -166,6 +166,8 @@ router.get ('/projects/:identifier/progress', function (req, res) {
 		})
 		.then (function (manifest) {
 			//console.log(JSON.stringify(manifest, null, 2)) ;
+			manifest.name =utils.safeBase64decode (manifest.body.urn).replace (/^.*\//, '') ;
+			manifest.key =identifier ;
 			utils.writeFile (utils.data (identifier + '.resultdb'), manifest.body) ;
 			res.json ({
 				status: manifest.body.status,

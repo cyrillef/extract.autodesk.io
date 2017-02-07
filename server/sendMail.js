@@ -24,7 +24,7 @@ function sendMail1 (mail) {
 	mail.to =mail.to || config.mailTo ;
 	if (   config.MJ_APIKEY_PUBLIC === '<replace with your mailjet consumer key>'
 		|| mail.to === ''
-		|| (typeof mail.to === 'object' && mail.to.length == 0)
+		|| (typeof mail.to === 'object' && mail.to.length === 0)
 	)
 		return ;
 	if ( typeof mail.to === 'string' )

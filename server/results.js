@@ -25,6 +25,7 @@ var ejs =require ('ejs') ;
 //var AdmZip =require ('adm-zip') ;
 var archiver =require ('archiver') ;
 var ForgeSDK =require ('forge-apis') ;
+var config =require ('./config') ;
 var utils =require ('./utils') ;
 var bubble =require ('./bubble') ;
 var forgeToken =require ('./forge-token') ;
@@ -45,13 +46,17 @@ router.get ('/results', function (req, res) {
 		.then (function (manifests) {
 			for ( var i =0 ; i < manifests.length ; i++ ) {
 				var manifest =manifests [i] ;
-				manifest.name =decodeURI (utils.safeBase64decode (manifest.urn).replace (/^.*\//, '')) ;
-				utils.writeFile (utils.data (manifest.key + '.resultdb'), manifest)
-					.then (function (content) {
-						// Pull the thumbnail if it does not exists yet, and do not wait
-						downloadThumbnail (content.key) ;
-					})
-				;
+				//manifest.name =decodeURI (utils.safeBase64decode (manifest.urn).replace (/^.*\//, '')) ;
+				//utils.writeFile (utils.data (manifest.key + '.resultdb'), manifest)
+				//	.then (function (content) {
+				//		// Pull the thumbnail if it does not exists yet, and do not wait
+				//		downloadThumbnail (content.key) ;
+				//	})
+				//;
+
+				// Pull the thumbnail if it does not exists yet, and do not wait
+				if ( manifest.hasThumbnail === "true" )
+					downloadThumbnail (manifest.key) ;
 			}
 			res.json (manifests) ;
 		})
@@ -69,10 +74,20 @@ var filterProject =function  (arr, criteria) {
 	return (results) ;
 } ;
 
+var getLocalFileDescriptor =function (identifier) {
+	return (utils.json (identifier)
+		.then (function (json) {
+			return (json) ;
+		})
+		.catch (function (error) {
+			console.log (error) ;
+		})
+	) ;
+} ;
+
 var getLocalManifest =function (identifier) {
 	return (utils.json (identifier + '.resultdb')
 		.then (function (json) {
-			json.key =identifier ;
 			return (json) ;
 		})
 		.catch (function (error) {
@@ -84,7 +99,7 @@ var getLocalManifest =function (identifier) {
 // Download the thumbnail
 router.get ('/results/:identifier/thumbnail', function (req, res) {
 	var identifier =req.params.identifier ;
-	var png =utils.path ('www/extracted/' + identifier + '.png') ;
+	var png =utils.extracted (identifier + '.png') ;
 	utils.filesize (png)
 		.then (function (info) {
 			res.writeHead (200, {
@@ -116,7 +131,7 @@ router.get ('/results/:identifier/thumbnail', function (req, res) {
 }) ;
 
 var downloadThumbnail =function (identifier) {
-	var png =utils.path ('www/extracted/' + identifier + '.png') ;
+	var png =utils.extracted (identifier + '.png') ;
 	utils.filesize (png)
 		.then (function (info) {
 			// All good, we have it already
@@ -136,7 +151,7 @@ var downloadThumbnail =function (identifier) {
 				.catch (function (error) {
 					console.error (error, png) ;
 					fs.createReadStream (utils.path ('www/images/project-sheet.png'))
-						.pipe (fs.createWriteStream (utils.path ('www/extracted/' + identifier + '.png'))) ;
+						.pipe (fs.createWriteStream (utils.extracted (identifier + '.png'))) ;
 				})
 			;
 		})
@@ -149,7 +164,7 @@ var _progress ={} ;
 router.get ('/results/:identifier/project', function (req, res) {
 	var identifier =req.params.identifier ;
 	var urn ='', manifest ='' ;
-	utils.fileexists (utils.path ('www/extracted/' + identifier + '.zip'))
+	utils.fileexists (utils.extracted (identifier + '.zip'))
 		.then (function (bExists) {
 			if ( bExists )
 				throw new Error ('Bubble already extracted!') ;
@@ -197,7 +212,7 @@ router.get ('/results/:identifier/project', function (req, res) {
 			// Generate zip file
 			_progress [identifier].msg ='Preparing ZIP file' ;
 			var inDir =utils.path ('data/' + identifier + '/') ;
-			var outZip =utils.path ('www/extracted/' + identifier + '.zip') ;
+			var outZip =utils.extracted (identifier + '.zip') ;
 			return (PackBubble (inDir, outZip)) ;
 		})
 		.then (function (outZipFilename) {
@@ -233,7 +248,7 @@ function GenerateStartupFiles (bubble, identifier) {
 		fs.createReadStream (utils.path ('views/bash.ejs'))
 			.pipe (ws) ;
 		ws.on ('finish', function () {
-			if ( /^win/.test (process.platform) == false )
+			if ( /^win/.test (process.platform) === false )
 				fs.chmodSync (utils.path ('data/' + identifier + '/index'), 0777) ;
 		}) ;
 		utils.readFile (utils.path ('views/view.ejs'), 'utf-8')
@@ -308,7 +323,7 @@ function DownloadViewerItem  (uri, outPath, item) {
 			})
 		;
 	})) ;
-} ;
+}
 
 function PackBubble (inDir, outZip) {
 	return (new Promise (function (fulfill, reject) {
@@ -367,7 +382,7 @@ function NotifyPeople (identifier, locks, template, subject) {
 					'subject': subject,
 					'html': data,
 					'forceEmbeddedImages': true
-				})
+				}) ;
 				fulfill () ;
 			})
 			.catch (function (error) {
@@ -386,19 +401,81 @@ router.get ('/results/:identifier/project/progress', function (req, res) {
 
 // Delete the project from the website
 router.delete ('/results/:identifier', function (req, res) {
+	var bucket =config.bucket ;
 	var identifier =req.params.identifier ;
+	if ( identifier === 'all' )
+		return (deleteAll (res)) ;
 	utils.json (identifier + '.resultdb')
 		.then (function (json) {
-			utils.unlink (utils.path ('data/' + identifier + '.resultdb.json')) ;
-			utils.unlink (utils.path ('www/extracted/' + identifier + '.png')) ;
-			utils.unlink (utils.path ('www/extracted/' + identifier + '.zip')) ;
+			utils.unlink (utils.extracted (identifier + '.png')) ;
+			utils.unlink (utils.extracted (identifier + '.zip')) ;
+			getLocalManifest (identifier)
+				.then (function (content) {
+					var ModelDerivative =new ForgeSDK.DerivativesApi () ;
+					//ModelDerivative.deleteManifest (content.urn, forgeToken.RW, forgeToken.RW.getCredentials ()) ;
+					utils.unlink (utils.data (this.identifier + '.resultdb')) ;
+					utils.unlink (utils.data (this.identifier + '.job')) ;
+					return (getLocalFileDescriptor (this.identifier)) ;
+				}.bind ({ identifier: identifier }))
+				.then (function (desc) {	
+					var ObjectsApi =new ForgeSDK.ObjectsApi () ;
+					//ObjectsApi.deleteObject (bucket, content.name, forgeToken.RW, forgeToken.RW.getCredentials ()) ;
+					utils.unlink (utils.data (this.identifier)) ;
+					console.log (this.identifier + " project deleted!") ;
+				}.bind ({ identifier: identifier }))
+				.catch (function (err) {
+					console.log (err) ;
+				})
+			;
 			res.end () ;
 		})
 		.catch (function (error) {
-			res.status (404).end ()
+			res.status (404).end () ;
 		})
 	;
 }) ;
+
+// Delete all project from the website
+var deleteAll =function (res) {
+	var bucket =config.bucket ;
+	utils.readdir (utils.path ('data'))
+		.then (function (files) {
+			files =filterProject (files, '(.*)\\.resultdb\\.json') ;
+			var promises =files.map (getLocalManifest) ;
+			return (Promise.all (promises)) ;
+		})
+		.then (function (manifests) {
+			for ( var i =0 ; i < manifests.length ; i++ ) {
+				var manifest =manifests [i] ;
+				var identifier =manifest.key ;
+				utils.unlink (utils.extracted (identifier + '.png')) ;
+				utils.unlink (utils.extracted (identifier + '.zip')) ;
+				getLocalManifest (identifier)
+					.then (function (content) {
+						var ModelDerivative =new ForgeSDK.DerivativesApi () ;
+						//ModelDerivative.deleteManifest (content.urn, forgeToken.RW, forgeToken.RW.getCredentials ()) ;
+						utils.unlink (utils.data (this.identifier + '.resultdb')) ;
+						utils.unlink (utils.data (this.identifier + '.job')) ;
+						return (getLocalFileDescriptor (this.identifier)) ;
+					}.bind ({ identifier: identifier }))
+					.then (function (desc) {
+						var ObjectsApi =new ForgeSDK.ObjectsApi () ;
+						//ObjectsApi.deleteObject (bucket, desc.objectKey, forgeToken.RW, forgeToken.RW.getCredentials ()) ;
+						utils.unlink (utils.data (this.identifier)) ;
+						console.log (this.identifier + " project deleted!") ;
+					}.bind ({ identifier: identifier }))
+					.catch (function (err) {
+						console.log (err) ;
+					})
+				;
+			}
+			res.end () ;
+		})
+		.catch (function (err) {
+			res.status (500).send () ;
+		})
+	;
+} ;
 
 // Report status
 router.get ('/results/status', function (req, res) {
@@ -439,15 +516,16 @@ router.get ('/results/status', function (req, res) {
 		.then (function (ps) {
 			for ( var i =0 ; i < ps.length ; i++ ) {
 				if ( ps [i].status === 'failed' ) {
-					utils.unlink (utils.path ('data/' + ps [i].id + '.resultdb.json')) ;
-					utils.unlink (utils.path ('www/extracted/' + ps [i].id + '.png')) ;
+					utils.unlink (utils.data (ps [i].id + '.resultdb')) ;
+					utils.unlink (utils.data (ps [i].id + '.job')) ;
+					utils.unlink (utils.extracted (ps [i].id + '.png')) ;
 				}
 			}
 			res.json (ps) ;
 		})
 		.catch (function (error) {
 			console.error (error) ;
-			res,status (500).end () ;
+			res.status (500).end () ;
 		})
 	;
 	//res.end () ;

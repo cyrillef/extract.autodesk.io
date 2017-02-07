@@ -32,6 +32,10 @@ var utils ={
 		return (path.normalize (__dirname + '/../data/' + name + '.json')) ;
 	},
 
+	extracted: function (name) {
+		return (path.normalize (__dirname + '/../www/extracted/' + name)) ;
+	},
+
 	readFile: function (filename, enc) {
 		return (new Promise (function (fulfill, reject) {
 			fs.readFile (filename, enc, function (err, res) {

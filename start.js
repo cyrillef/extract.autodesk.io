@@ -25,6 +25,7 @@ process.env.TMPDIR ='tmp' ;
 var app =require ('./server/server') ;
 
 var server =app.listen (app.get ('port'), function () {
+    console.log ('API key ' + process.env.FORGE_CLIENT_ID) ;
     console.log ('Server listening on port ' + server.address ().port) ;
 }) ;
 

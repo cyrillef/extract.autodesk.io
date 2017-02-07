@@ -263,7 +263,7 @@ function loadersInitialize (dropboxElt, boxElt, gdriveElt) {
         gapi.client.setApiKey (this.apiKey) ;
         gapi.client.load ('drive', 'v2', this._driveApiLoaded.bind (this)) ;
         google.load ('picker', '1', { callback: this._pickerApiLoaded.bind (this) }) ;
-    }
+    } ;
 
     FilePicker.prototype = {
         // Open the file picker.

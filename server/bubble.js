@@ -382,7 +382,7 @@ function bubble (progress) {
 
 	this.getManifest =function (urn) {
 		// Verify the required parameter 'urn' is set
-		if ( urn == undefined || urn == null )
+		if ( urn === undefined || urn === null )
 			return (Promise.reject ("Missing the required parameter 'urn' when calling getManifest")) ;
 		var ModelDerivative =new ForgeSDK.DerivativesApi () ;
 		return (ModelDerivative.apiClient.callApi (
@@ -396,7 +396,7 @@ function bubble (progress) {
 
 	this.downloadItem =function (urn) {
 		// Verify the required parameter 'urn' is set
-		if ( urn == undefined || urn == null )
+		if ( urn === undefined || urn === null )
 			return (Promise.reject ("Missing the required parameter 'urn' when calling downloadItem")) ;
 		var ModelDerivative =new ForgeSDK.DerivativesApi () ;
 		return (ModelDerivative.apiClient.callApi (
@@ -469,12 +469,11 @@ function bubble (progress) {
 		//		callback (error, null) ;
 		//	})
 		//;
-		if ( urn == undefined || urn == null )
+		if ( urn === undefined || urn === null )
 			return (Promise.reject ("Missing the required parameter 'urn' when calling getThumbnail")) ;
 		var queryParams ={ width: sz, height: sz, role: 'rendered' } ;
 		if ( guid )
 			queryParams.guid =guid ;
-		var ModelDerivative =new ForgeSDK.DerivativesApi () ;
 		ModelDerivative.apiClient.callApi (
 			'/derivativeservice/v2/thumbnails/{urn}', 'GET',
 			{ 'urn': urn }, queryParams, {},
@@ -562,7 +561,7 @@ function bubble (progress) {
 	//	}
 	//} ;
 
-} ;
+}
 
 module.exports =bubble ;
 // function Ds(endpoint, auth, oss) {

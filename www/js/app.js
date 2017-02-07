@@ -43,10 +43,10 @@ $(document).ready (function () {
 	$('#submit-project').click (function (evt) {
 		evt.stopPropagation () ;
 		var elts =$('div.alert-info[id^=flow-file-]') ;
-		if ( elts.length != 0 )
+		if ( elts.length !== 0 )
 			return (alert ('You need to wait for the upload to complete!')) ;
 		elts =$('div.alert-success[id^=flow-file-]') ;
-		if ( elts.length == 0 )
+		if ( elts.length === 0 )
 			return (alert ('No files were uploaded successfully!')) ;
 
 		var main =$('#fileUploadArea div.list-group')
@@ -201,12 +201,12 @@ function projectProgress (root, nb) {
 		$(name + ' div p').text ('Failed!') ;
 		$(name + ' img').attr ('src', '/images/failed.png') ;
 	}) ;
-} ;
+}
 
 function scrollTo (identifier) {
 	var name ='#vignette-' + identifier ;
 	// Calculate destination place
-	if ( $(name).length == 0 )
+	if ( $(name).length === 0 )
 		return ;
 	var dest =$(name).offset ().top ;
 	if ( $(name).offset ().top > $(document).height () - $(window).height () )
@@ -242,7 +242,7 @@ var fileUploadItem ={
 		$('#flow-file-' + identifier + ' div.flow-file-progress progress')
 			.prop ('value', 100) ;
 		var test =$('#fileUploadArea div.glyphicon-home') ;
-		var glyph =test == undefined || test.length == 0 ? 'glyphicon-home' : 'glyphicon-ok' ;
+		var glyph =test === undefined || test.length === 0 ? 'glyphicon-home' : 'glyphicon-ok' ;
 		$('#flow-file-' + identifier + ' .glyphicon')
 			.removeClass ('glyphicon-cloud-upload')
 			.addClass (glyph)
@@ -255,7 +255,7 @@ var fileUploadItem ={
 				message ={} ;
 			}
 		}
-		if ( message.entries != undefined && message.entries.length > 0 ) {
+		if ( message.entries !== undefined && message.entries.length > 0 ) {
 			$('#flow-file-' + identifier + ' .glyphicon')
 				.removeClass (glyph)
 				.addClass ('glyphicon-ok')
