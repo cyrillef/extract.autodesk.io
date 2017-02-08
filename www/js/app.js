@@ -94,7 +94,7 @@ function listProjects () {
 }
 
 function createProjectVignette (identifier, data) {
-	if ( identifier === undefiend )
+	if ( identifier === undefined )
 		return ;
 	data.hasThumbnail =data.hasThumbnail || 'false' ;
 	data.progress =data.progress || 'complete' ;
