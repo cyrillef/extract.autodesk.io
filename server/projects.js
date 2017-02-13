@@ -166,8 +166,8 @@ router.get ('/projects/:identifier/progress', function (req, res) {
 		})
 		.then (function (manifest) {
 			//console.log(JSON.stringify(manifest, null, 2)) ;
-			manifest.name =utils.safeBase64decode (manifest.body.urn).replace (/^.*\//, '') ;
-			manifest.key =identifier ;
+			manifest.body.name =utils.safeBase64decode (manifest.body.urn).replace (/^.*\//, '') ;
+			manifest.body.key =identifier ;
 			utils.writeFile (utils.data (identifier + '.resultdb'), manifest.body) ;
 			res.json ({
 				status: manifest.body.status,
