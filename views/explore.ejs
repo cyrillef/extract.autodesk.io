@@ -42,7 +42,7 @@
 	<!-- Autodesk Forge Viewer -->
 	<link href="https://developer.api.autodesk.com/viewingservice/v1/viewers/style.min.css?v=v2.13.1" rel="stylesheet" />
 	<script src="https://developer.api.autodesk.com/viewingservice/v1/viewers/three.min.js?v=v2.13.1"></script>
-	<script src="https://developer.api.autodesk.com/viewingservice/v1/viewers/viewer3D.min.js?v=v2.13.1"></script>
+	<script src="https://developer.api.autodesk.com/viewingservice/v1/viewers/viewer3D.js?v=v2.13.1"></script>
 
 	<!-- Our scripts -->
 	<style>
@@ -74,77 +74,95 @@
 		div.modal .panel-heading { border-top-left-radius: inherit; border-top-right-radius: inherit; }
 	</style>
 	<script>
+		$(document).ready (function () {
+			showHideUsage () ;
+			initializeAutodeskViewer () ;
+		}) ;
+
+		// https://developer.autodesk.com/en/docs/viewer/v2/tutorials/basic-viewer/
         var oExtracted =<%= extracted %> ;
-        var oDocument =null, oViewer =null ;
-        var oViewables =null, oViews3D =null, oViews2D =null, oViewsCtrl =null, oViewsPanel =null ;
-        var oExtractPanel =null ;
-        $(document).ready (function () {
-
-            $('#usage-control').click (function (evt) {
-                evt.stopPropagation () ;
-                var hidden =!($('#usage').hasClass ('noshow')) ;
-                $('#usage').toggleClass ('noshow') ;
-                $('#usage-control').text (hidden ? 'Show About' : 'Hide About') ;
-                $.cookie ('usage', hidden ? 'hidden' : 'visible', { expires: 365 }) ;
-            }) ;
-            var hidden =$.cookie ("usage") ;
-            if ( hidden ) {
-                $('#usage').addClass ('noshow') ;
-                $('#usage-control').text ('Show About') ;
-            }
-
-            var options ={ 'document': '<%= urn %>', 'accessToken': '<%= accessToken %>', 'env': 'AutodeskProduction' } ;
-            //oViewer =new Autodesk.Viewing.Viewer3D ($("#viewer") [0], {}) ; // No toolbar
-            oViewer =new Autodesk.Viewing.Private.GuiViewer3D ($("#viewer") [0], {}) ; // With toolbar
-            oViewer.addEventListener (Autodesk.Viewing.TOOLBAR_CREATED_EVENT, onViewerToolbarCreated) ;
-            Autodesk.Viewing.Initializer (options, function () {
-                oViewer.initialize () ;
-                loadDocument (oViewer, options) ;
-            }) ;
-        }) ;
-
-        function loadDocument (viewer, options) {
-            if ( options.document.substring (0, 4) === 'urn:' )
-                options.document =options.document.substring (4) ;
-
-            Autodesk.Viewing.Document.load ('urn:' + options.document, //options.accessToken,
-                function (doc) { // onLoadCallback
-                    oDocument =doc ;
-                    // Get all the 3D and 2D views (but keep in separate arrays so we can differentiate in the UI)
-                    oViews3D =Autodesk.Viewing.Document.getSubItemsWithProperties (doc.getRootItem (), { 'type': 'geometry', 'role': '3d' }, true) ;
-                    oViews2D =Autodesk.Viewing.Document.getSubItemsWithProperties (doc.getRootItem (), { 'type': 'geometry', 'role': '2d' }, true) ;
-
-                    // Load up first a 3D view by default
-                    if ( oViews3D.length > 0 )
-                        oViewer.load (doc.getViewablePath (oViews3D [0])) ;
-                    else if ( oViews2D.length > 0 )
-                        oViewer.load (doc.getViewablePath (oViews2D [0])) ;
-                    else
-                        return (alert ('ERROR: No 3D or 2D views found in this document!')) ;
-
-                    oViewer.addEventListener (Autodesk.Viewing.GEOMETRY_LOADED_EVENT, function (event) {
-                        //oViewer.removeEventListener (Autodesk.Viewing.GEOMETRY_LOADED_EVENT, arguments.callee) ;
-                        oViewer.fitToView (true) ;
-                        setTimeout (function () { oViewer.autocam.setHomeViewFrom (oViewer.navigation.getCamera ()) ; }, 1000) ;
-                    }) ;
-
-					fillViewsList () ;
-                    oExtractPanel =createExtractPanel (true) ;
-                },
-                function (errorCode, errorMsg, messages) { // onErrorCallback
-                    //alert ('Loading Error #' + errorCode + ': ' + errorMsg + ' (' + messages [0 ].message + ')') ;
-                    var elt =$('#LoadingError div.modal-body') ;
-                    elt.text ('Loading Error #' + errorCode + ': ' + errorMsg) ;
-                    var ul =$(document.createElement ('ul')).appendTo (elt) ;
-                    $.each (messages, function (index, item) {
-                        $(document.createElement ('li'))
-                            .text (item.message)
-                            .appendTo (ul) ;
-                    }) ;
-                    $('#LoadingError').modal () ;
-                }
-            ) ;
+        var urn ='<%= urn %>' ;
+        function getAccessToken (onGetAccessToken) {
+            onGetAccessToken ('<%= accessToken %>', 83000) ;
         }
+
+		var oDocument =null, oViewer =null ;
+		var oViewables =null, oViews3D =null, oViews2D =null, oViewsCtrl =null, oViewsPanel =null ;
+		var oExtractPanel =null ;
+
+		function initializeAutodeskViewer () {
+			var options ={ 'getAccessToken': getAccessToken, 'env': 'AutodeskProduction' /*, 'accessToken': '' */ } ;
+			Autodesk.Viewing.Initializer (options, loadModel) ;
+		}
+
+		function loadModel () {
+			var pattern =/^(urn|https?):.*$/g ;
+			if ( !pattern.test (urn) )
+				urn ='urn:' + urn ;
+			pattern =/^(urn):.*$/g ;
+			if ( pattern.test (urn) )
+				Autodesk.Viewing.Document.load (urn, onDocumentLoaded, onError) ;
+			else
+				startViewer (urn, urn.replace (/[^\/]*$/, '')) ;
+		}
+
+        function onDocumentLoaded (doc) {
+			oDocument =doc ;
+			// Get all the 3D and 2D views (but keep in separate arrays so we can differentiate in the UI)
+			oViews3D =Autodesk.Viewing.Document.getSubItemsWithProperties (doc.getRootItem (), { 'type': 'geometry', 'role': '3d' }, true) ;
+			oViews2D =Autodesk.Viewing.Document.getSubItemsWithProperties (doc.getRootItem (), { 'type': 'geometry', 'role': '2d' }, true) ;
+			// Load up first a 3D view by default
+			var viewable =null ;
+			if ( oViews3D.length > 0 )
+				viewable =oViews3D [0] ;
+			else if ( oViews2D.length > 0 )
+				viewable =oViews2D [0] ;
+			else
+				return (alert ('ERROR: No 3D or 2D views found in this document!')) ;
+
+			startViewer (doc.getViewablePath (viewable), doc.getPropertyDbPath ()) ;
+        }
+
+		function startViewer (svfUrl, sharedPropertyDbPath) {
+			if ( oViewer )
+				return (loadModelInViewer (svfUrl, sharedPropertyDbPath)) ;
+
+			var modelOptions ={ sharedPropertyDbPath: sharedPropertyDbPath } ;
+			oViewer =new Autodesk.Viewing.Private.GuiViewer3D ($("#viewer") [0]) ;
+			//var pattern =/^(urn):.*$/g ;
+			//if ( pattern.test (urn) ) {
+				oViewer.start (svfUrl, modelOptions, onModelLoaded, onError) ;
+			//} else {
+			//    oViewer.initialize () ;
+			//    oViewer.loadModel (svfUrl, modelOptions, onModelLoaded, onError) ;
+			//}
+			oViewer.addEventListener (Autodesk.Viewing.TOOLBAR_CREATED_EVENT, onViewerToolbarCreated) ;
+			oViewer.addEventListener (Autodesk.Viewing.GEOMETRY_LOADED_EVENT, onViewerGeometryLoaded) ;
+		}
+
+		function loadModelInViewer (svfUrl, sharedPropertyDbPath) {
+			oViewer.tearDown () ;
+			oViewer.setUp (oViewer.config) ;
+			var modelOptions ={ sharedPropertyDbPath: sharedPropertyDbPath } ;
+			oViewer.loadModel (svfUrl, modelOptions, onModelLoaded, onError) ;
+		}
+
+		function onModelLoaded (model) {
+			fillViewsList () ;
+			oExtractPanel =createExtractPanel (true) ;
+		}
+
+		function onError (viewerErrorCode) {
+			var elt =$('#LoadingError div.modal-body') ;
+			elt.text ('Viewer Error #' + viewerErrorCode) ;
+			var ul =$(document.createElement ('ul')).appendTo (elt) ;
+			$.each (messages, function (index, item) {
+				$(document.createElement ('li'))
+					.text (item.message)
+					.appendTo (ul) ;
+			}) ;
+			$('#LoadingError').modal () ;
+		}
 
         function onViewerToolbarCreated () {
             oViewer.removeEventListener (Autodesk.Viewing.TOOLBAR_CREATED_EVENT, onViewerToolbarCreated) ;
@@ -179,6 +197,12 @@
 	        fillViewsList () ;
         }
 
+        function onViewerGeometryLoaded () {
+            oViewer.removeEventListener (Autodesk.Viewing.GEOMETRY_LOADED_EVENT, onViewerGeometryLoaded) ;
+            oViewer.fitToView (true) ;
+            setTimeout (function () { oViewer.autocam.setHomeViewFrom (oViewer.navigation.getCamera ()) ; }, 1000) ;
+        }
+
         function fillViewsList () {
             if ( oViewsCtrl == null || oViewsCtrl.initialized || oViews2D == null || oViews3D == null )
                 return ;
@@ -207,7 +231,6 @@
 		        ctrl.button.view =view ;
 	        }) ;
         }
-
 
         function onLoadSubViews (evt) {
             evt.stopPropagation () ;
@@ -401,6 +424,21 @@
 
         Panel.prototype =Object.create (Autodesk.Viewing.UI.DockingPanel.prototype) ;
         Panel.prototype.constructor =Panel ;
+
+        function showHideUsage () {
+			$('#usage-control').click (function (evt) {
+				evt.stopPropagation () ;
+				var hidden =!($('#usage').hasClass ('noshow')) ;
+				$('#usage').toggleClass ('noshow') ;
+				$('#usage-control').text (hidden ? 'Show About' : 'Hide About') ;
+				$.cookie ('usage', hidden ? 'hidden' : 'visible', { expires: 365 }) ;
+			}) ;
+			var hidden =$.cookie ("usage") ;
+			if ( hidden ) {
+				$('#usage').addClass ('noshow') ;
+				$('#usage-control').text ('Show About') ;
+			}
+        }
 
     </script>
 </head>
