@@ -19,6 +19,8 @@
 // by Cyrille Fauvel - Autodesk Developer Network (ADN)
 //
 */
+header { position: static; }
+
 .center { text-align: center; }
 .noshow { display: none; }
 .modeless { top:10%; left:50%; bottom:auto; right:auto; margin-left:-300px; }

@@ -412,14 +412,14 @@ router.delete ('/results/:identifier', function (req, res) {
 			getLocalManifest (identifier)
 				.then (function (content) {
 					var ModelDerivative =new ForgeSDK.DerivativesApi () ;
-					//ModelDerivative.deleteManifest (content.urn, forgeToken.RW, forgeToken.RW.getCredentials ()) ;
+					ModelDerivative.deleteManifest (content.urn, forgeToken.RW, forgeToken.RW.getCredentials ()) ;
 					utils.unlink (utils.data (this.identifier + '.resultdb')) ;
 					utils.unlink (utils.data (this.identifier + '.job')) ;
 					return (getLocalFileDescriptor (this.identifier)) ;
 				}.bind ({ identifier: identifier }))
 				.then (function (desc) {	
 					var ObjectsApi =new ForgeSDK.ObjectsApi () ;
-					//ObjectsApi.deleteObject (bucket, content.name, forgeToken.RW, forgeToken.RW.getCredentials ()) ;
+					ObjectsApi.deleteObject (bucket, content.name, forgeToken.RW, forgeToken.RW.getCredentials ()) ;
 					utils.unlink (utils.data (this.identifier)) ;
 					console.log (this.identifier + " project deleted!") ;
 				}.bind ({ identifier: identifier }))
