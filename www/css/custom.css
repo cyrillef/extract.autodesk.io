@@ -19,7 +19,13 @@
 // by Cyrille Fauvel - Autodesk Developer Network (ADN)
 //
 */
-header { position: static; }
+header { /* maria-base-theme.css reset */
+    position: static;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    -ms-box-shadow: none;
+    box-shadow: none;
+}
 
 .center { text-align: center; }
 .noshow { display: none; }

@@ -21,10 +21,11 @@ var express =require ('express') ;
 var bodyParser =require ('body-parser') ;
 var favicon =require ('serve-favicon') ;
 var ejs =require ('./ejs') ;
-var forgeToken =require ('./forge-token') ;
+var forgeToken =require ('./forge-token') ; // Force loading
 var fileUpload =require ('./upload-flow') ;
 var projects =require ('./projects') ;
 var results =require ('./results') ;
+var forgeProxy =require ('./forge-proxy') ;
 
 var app =express () ;
 //app.use (bodyParser.urlencoded ({ extended: true })) ; // Support encoded bodies
@@ -36,6 +37,7 @@ app.use ('/explore', ejs) ;
 app.use ('/api', fileUpload) ;
 app.use ('/api', projects) ;
 app.use ('/api', results) ;
+app.get ('/forge-proxy/*', forgeProxy.get) ;
 
 app.set ('port', process.env.PORT || 80) ;
 

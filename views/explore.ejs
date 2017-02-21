@@ -82,16 +82,16 @@
 		// https://developer.autodesk.com/en/docs/viewer/v2/tutorials/basic-viewer/
         var oExtracted =<%= extracted %> ;
         var urn ='<%= urn %>' ;
-        function getAccessToken (onGetAccessToken) {
-            onGetAccessToken ('<%= accessToken %>', 83000) ;
-        }
+        //function getAccessToken (onGetAccessToken) {
+        //    onGetAccessToken ('your access token', 83000) ;
+        //}
 
 		var oDocument =null, oViewer =null ;
 		var oViewables =null, oViews3D =null, oViews2D =null, oViewsCtrl =null, oViewsPanel =null ;
 		var oExtractPanel =null ;
 
 		function initializeAutodeskViewer () {
-			var options ={ 'getAccessToken': getAccessToken, 'env': 'AutodeskProduction' /*, 'accessToken': '' */ } ;
+			var options ={ /*'getAccessToken': getAccessToken,*/ 'env': 'AutodeskProduction' /*, 'accessToken': '' */ } ;
 			Autodesk.Viewing.Initializer (options, loadModel) ;
 		}
 
@@ -100,6 +100,12 @@
 			if ( !pattern.test (urn) )
 				urn ='urn:' + urn ;
 			pattern =/^(urn):.*$/g ;
+
+			if ( Autodesk.Viewing.setApiEndpoint )
+				Autodesk.Viewing.setApiEndpoint (window.location.origin + '/forge-proxy') ;
+			else
+				Autodesk.Viewing.setEndpointAndApi (window.location.origin + '/forge-proxy', 'modelDerivativeV2') ;
+
 			if ( pattern.test (urn) )
 				Autodesk.Viewing.Document.load (urn, onDocumentLoaded, onError) ;
 			else
@@ -152,15 +158,15 @@
 			oExtractPanel =createExtractPanel (true) ;
 		}
 
-		function onError (viewerErrorCode) {
+		function onError (viewerErrorCode, message) {
 			var elt =$('#LoadingError div.modal-body') ;
 			elt.text ('Viewer Error #' + viewerErrorCode) ;
 			var ul =$(document.createElement ('ul')).appendTo (elt) ;
-			$.each (messages, function (index, item) {
+			//$.each (messages, function (index, item) {
 				$(document.createElement ('li'))
-					.text (item.message)
+					.text (message)
 					.appendTo (ul) ;
-			}) ;
+			//}) ;
 			$('#LoadingError').modal () ;
 		}
 
@@ -582,7 +588,7 @@
             <div class="col-lg-12">
                 <div class="page-footer">
                     <div class="container app-container">
-                        <p>&#169; Copyright 2015 Autodesk. All rights reserved. </p>
+                        <p>&#169; Copyright Autodesk. All rights reserved.</p>
                     </div>
                 </div>
 

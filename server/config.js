@@ -28,6 +28,7 @@ var config ={
 		grant_type: 'client_credentials',
 		scope: [ 'data:read', 'data:write', 'bucket:read', 'bucket:create' ]
 	},
+	apiEndpoint: 'developer.api.autodesk.com',
 
 	bucket: 'extract-autodesk-io-2017',
 	mailTo: '',
