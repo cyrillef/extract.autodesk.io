@@ -177,7 +177,7 @@
                 'url(/images/delete.24x24.png)', 'DANGER ZONE - Delete this project',
                 function (evt) {
                     evt.stopPropagation () ;
-                    /*if ( confirm ('Are you sure you want to delete that project?') ) {
+                    if ( confirm ('Are you sure you want to delete that project?') ) {
                         $.ajax ({
                             url: '/api/results/<%= root %>',
                             type: 'delete',
@@ -188,48 +188,7 @@
                         }).fail (function (error) {
 							console.error (error) ;
 						}) ;
-                    }*/
-
-					var up = oViewer.navigation.getCameraUpVector() ;
-					var q1 = new THREE.Quaternion() ;
-					q1.setFromAxisAngle(new THREE.Vector3(0, 1, 0), Math.PI * 45 /180) ; // you rotate around Y which is the camera view axis
-					var q2 = new THREE.Quaternion() ;
-					q2.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI * 45 /180) ; // you rotate around the X which is the horz camera axis
-
-					var up1 =up.clone () ;
-					up1.applyQuaternion(q1) ;
-					oViewer.navigation.setCameraUpVector(up1) ;
-
-					console.log ('Y axis') ;
-					console.log(up1) ;
-					console.log(oViewer.navigation.getCameraUpVector()) ;
-
-					var up2 =up.clone () ;
-					up2.applyQuaternion(q2) ;
-					oViewer.navigation.setCameraUpVector(up2) ;
-
-					console.log ('X axis') ;
-					console.log(up2) ;
-					console.log(oViewer.navigation.getCameraUpVector()) ;
-
-					// correct way to keep the up vector as it is
-	                var target =oViewer.navigation.getTarget () ;
-	                var pos =oViewer.navigation.getPosition () ;
-					//up = oViewer.navigation.getCameraUpVector() ;
-					q2.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI * 5 /180) ;
-					var up3 =up.clone () ;
-					up3.applyQuaternion(q2) ;
-					var v =target.sub (pos) ;
-					v.applyQuaternion(q2) ;
-					var w =v.add (pos) ;
-					oViewer.navigation.setView (pos, target) ;
-					oViewer.navigation.setCameraUpVector(up3) ;
-
-					console.log ('test') ;
-					console.log(up3) ;
-					console.log(oViewer.navigation.getCameraUpVector()) ;
-
-
+                    }
 				}
             ) ;
             createButton (
