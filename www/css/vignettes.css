@@ -22,9 +22,10 @@
 */
 .view { width: 207px; height: 146px; margin: 4px; float: left; border: 10px solid #fff; overflow: hidden; position: relative;
 	text-align: center; box-shadow: 1px 1px 2px #e6e6e6; cursor: default;
-	background: #aaa url(/images/bgimg.jpg) no-repeat center center; }
+	background: #aaa url(/images/bgimg.jpg) no-repeat center center;
+}
 .view .mask, .view .content { width: 215px; height: 146px; position: absolute; overflow: hidden; top: 0; left: 0; }
-.view img { display: block; position: relative; height: 146px; display: block; margin-left: auto; margin-right: auto; }
+.view img.thumbnail { display: block; position: relative; height: 146px; display: block; margin-left: auto; margin-right: auto; }
 .view h2 { text-transform: uppercase; color: #fff; text-align: center; position: relative; font-size: 12px; padding: 8px;
 	background: rgba(0, 0, 0, 0.8); margin: 15px 0 0 0; }
 .view p { font-family: Georgia, serif; font-style: italic; font-size: 10px; position: relative; color: #fff;
@@ -50,3 +51,11 @@
 #project-progress-bar { height: 7px; width: 450px; background: #cd3a86; position: relative; top: 13px; left: 0px; margin-right: 10px; }
 #project-progress-indicator { width: 25px; position: relative; top: 10px; left: 0px; margin-right: 10px; text-align: center; }
 .project-progress-bar { height: 7px; width: 100%; background: #cd3a86; position: absolute; bottom: 0; left: 0; }
+
+.view img.deleteButton {
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    top: 0px;
+    left: 170px;
+}

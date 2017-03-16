@@ -77,7 +77,25 @@ $(document).ready (function () {
 		$("#projectProgressDialog").draggable ({ handle: ".modal-header" }) ;
 	}) ;
 
+	$('#searchText').on ('keyup', function (evt) {
+		searchProject (evt) ;
+	}) ;
+	$('#searchText').on ('search', function (evt) {
+		searchProject (evt) ;
+	}) ;
 }) ;
+
+function searchProject (evt) {
+	evt.stopPropagation () ;
+	if ( evt.target.value == '' ) {
+		$('div[id^=vignette-]').show () ;
+		return ;
+	}
+	var ll =$('div[id*=' + evt.target.value + ' i].view') ;
+	$('div[id^=vignette-]').hide () ;
+	if ( ll.length > 0 )
+		ll.show () ;
+}
 
 // List existing project results
 function listProjects () {
@@ -110,12 +128,13 @@ function createProjectVignette (identifier, data) {
 	$('#project-results').append (
 		'<div class="view view-first flex-item" id="vignette-' + identifier + '">'
 			//+	'<a href="#' + identifier + '" />'
-		+	'<img src="' + imageui + '" />'
+		+	'<img src="' + imageui + '" class="thumbnail" />'
 		+ 	'<div class="mask">'
 		+		'<h2>' + data.name + '</h2>'
 		+		'<p>' + data.progress + ' (' + data.success + ')</p>'
 		//+		'<a href="' + url + '" class="info" target="' + identifier + '">Explore</a>'
 		+		'<a href="javascript:void(0)" data="' + url + '" class="info" target="' + identifier + '">Please Wait</a>'
+		+ '<a href="/api/results/' + identifier + '/delete"><img src="/images/delete.24x24.png" class="deleteButton" title="Delete project"/></a>'
 		+	'</div>'
 		+	progressui
 		+ '</div>'

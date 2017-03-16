@@ -402,7 +402,15 @@ router.get ('/results/:identifier/project/progress', function (req, res) {
 }) ;
 
 // Delete the project from the website
+router.get ('/results/:identifier/delete', function (req, res) {
+	DeleteData (req, res) ;
+}) ;
+
 router.delete ('/results/:identifier', function (req, res) {
+	DeleteData (req, res) ;
+}) ;
+
+function DeleteData (req, res) {
 	var bucket =config.bucket ;
 	var identifier =req.params.identifier ;
 	if ( identifier === 'all' )
@@ -443,7 +451,7 @@ router.delete ('/results/:identifier', function (req, res) {
 			res.status (404).end () ;
 		})
 	;
-}) ;
+}
 
 // Delete all project from the website
 var deleteAll =function (res) {
