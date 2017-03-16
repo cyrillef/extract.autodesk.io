@@ -242,6 +242,8 @@ router.get ('/results/:identifier/project', function (req, res) {
 
 function GenerateStartupFiles (bubble, identifier) {
 	return (new Promise (function (fulfill, reject) {
+		fs.createReadStream (utils.path ('views/readme.txt'))
+			.pipe (fs.createWriteStream (utils.path ('data/' + identifier + '/readme.txt'))) ;
 		fs.createReadStream (utils.path ('views/bat.ejs'))
 			.pipe (fs.createWriteStream (utils.path ('data/' + identifier + '/index.bat'))) ;
 		var ws =fs.createWriteStream (utils.path ('data/' + identifier + '/index')) ;

@@ -227,6 +227,11 @@ http-server [path] [options]
 This sample is licensed under the terms of the [MIT License](http://opensource.org/licenses/MIT).
 Please see the [LICENSE](LICENSE) file for full details.
 
+While the sample is licensed under the terms of the MIT license, the content people post on this site and the bubbles you
+can extract remain the property of their owner. For a good customer experience the resulting ZIP file includes
+the current version of the viewer, but the intellectual property of this component remains Autodesk's.
+You can freely use it for offline viewing on your device, and/or use it on you website, but you cannot claim
+it to be yours.
 
 ## Written by
 
