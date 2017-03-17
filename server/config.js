@@ -32,6 +32,7 @@ var config ={
 
 	bucket: 'extract-autodesk-io-2017',
 	mailTo: '',
+	domain: process.env.NODE_ENV === 'production' ? 'https://extract.autodesk.io/' : 'http://localhost:3000/',
 
 	MJ_APIKEY_PUBLIC: process.env.MJ_APIKEY_PUBLIC || '<replace with your mailjet public key>',
 	MJ_APIKEY_PRIVATE: process.env.MJ_APIKEY_PRIVATE || '<replace with your mailjet private key>',

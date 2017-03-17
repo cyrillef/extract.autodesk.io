@@ -37,6 +37,10 @@ router.use (bodyParser.json ()) ;
 
 // List translated projects
 router.get ('/results', function (req, res) {
+	// Protect the endpoint from external usage.
+	if ( !utils.checkHost (req, config.domain) )
+		return (res.status (500). end ()) ;
+
 	utils.readdir (utils.path ('data'))
 		.then (function (files) {
 			files =filterProject (files, '(.*)\\.resultdb\\.json') ;
@@ -98,6 +102,10 @@ var getLocalManifest =function (identifier) {
 
 // Download the thumbnail
 router.get ('/results/:identifier/thumbnail', function (req, res) {
+	// Protect the endpoint from external usage.
+	if ( !utils.checkHost (req, config.domain) )
+		return (res.status (500). end ()) ;
+
 	var identifier =req.params.identifier ;
 	var png =utils.extracted (identifier + '.png') ;
 	utils.filesize (png)
@@ -162,6 +170,10 @@ var downloadThumbnail =function (identifier) {
 var _locks ={} ;
 var _progress ={} ;
 router.get ('/results/:identifier/project', function (req, res) {
+	// Protect the endpoint from external usage.
+	if ( !utils.checkHost (req, config.domain) )
+		return (res.status (500). end ()) ;
+
 	var identifier =req.params.identifier ;
 	var urn ='', manifest ='' ;
 	utils.fileexists (utils.extracted (identifier + '.zip'))
@@ -403,10 +415,18 @@ router.get ('/results/:identifier/project/progress', function (req, res) {
 
 // Delete the project from the website
 router.get ('/results/:identifier/delete', function (req, res) {
+	// Protect the endpoint from external usage.
+	if ( !utils.checkHost (req, config.domain) )
+		return (res.status (500). end ()) ;
+
 	DeleteData (req, res) ;
 }) ;
 
 router.delete ('/results/:identifier', function (req, res) {
+	// Protect the endpoint from external usage.
+	if ( !utils.checkHost (req, config.domain) )
+		return (res.status (500). end ()) ;
+
 	DeleteData (req, res) ;
 }) ;
 
@@ -497,6 +517,10 @@ var deleteAll =function (res) {
 
 // Report status
 router.get ('/results/status', function (req, res) {
+	// Protect the endpoint from external usage.
+	if ( !utils.checkHost (req, config.domain) )
+		return (res.status (500). end ()) ;
+
 	utils.readdir (utils.path ('data'))
 		.then (function (files) {
 			files =files.filter (function (f) { return (/.*\.resultdb\.json$/.test (f)) ; }) ;

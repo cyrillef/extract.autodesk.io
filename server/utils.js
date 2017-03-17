@@ -178,6 +178,10 @@ var utils ={
 		})) ;
 	},
 
+	checkHost: function (req, domain) {
+		return ( domain === '' || req.headers.referer === domain ) ;
+	}
+
 } ;
 
 module.exports =utils ;

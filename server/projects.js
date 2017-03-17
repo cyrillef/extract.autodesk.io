@@ -49,6 +49,10 @@ var uploadToOSS =function (identifier) {
 
 // Post files to OSS and request translation
 router.post ('/projects', function (req, res) {
+	// Protect the endpoint from external usage.
+	if ( !utils.checkHost (req, config.domain) )
+		return (res.status (500). end ()) ;
+
 	var bucket =config.bucket ;
 	var regex =new RegExp ('^[-_.a-z0-9]{3,128}$') ;
 	if (!regex.test (bucket))
@@ -151,6 +155,11 @@ var uploadProgress =function (req, res) {
 } ;
 
 router.get ('/projects/:identifier/progress', function (req, res) {
+	// Protect the endpoint from external usage.
+	console.log ('/projects/:identifier/progress' + req.headers.referer) ;
+	if ( !utils.checkHost (req, config.domain) )
+		return (res.status (500). end ()) ;
+
 	var bucket =config.bucket ;
 	var identifier =req.params.identifier ;
 
