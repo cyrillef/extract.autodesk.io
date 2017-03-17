@@ -134,7 +134,7 @@ function createProjectVignette (identifier, data) {
 		+		'<p>' + data.progress + ' (' + data.success + ')</p>'
 		//+		'<a href="' + url + '" class="info" target="' + identifier + '">Explore</a>'
 		+		'<a href="javascript:void(0)" data="' + url + '" class="info" target="' + identifier + '">Please Wait</a>'
-		+ '<a href="/api/results/' + identifier + '/delete"><img src="/images/delete.24x24.png" class="deleteButton" title="Delete project"/></a>'
+		+ '<a href="javascript:void(0)" onclick="deleteProject (\'' + identifier + '\')"><img src="/images/delete.24x24.png" class="deleteButton" title="Delete project"/></a>'
 		+	'</div>'
 		+	progressui
 		+ '</div>'
@@ -145,6 +145,21 @@ function createProjectVignette (identifier, data) {
 	}
 	if ( data.progress == 'complete' )
 		$('#vignette-' + identifier + ' div a.info').unbind ('click').text ('Explore').attr ('href', '/explore/' + identifier) ;
+}
+
+function deleteProject (identifier) {
+	if ( confirm ('Are you sure you want to delete that project?') ) {
+		$.ajax ({
+			url: '/api/results/' + identifier,
+			type: 'delete',
+			complete: null
+		}).done (function (results) {
+			$('#vignette-' + identifier).remove () ;
+		}).fail (function (error) {
+			alert ('Failed to delete the project') ;
+			console.error (error) ;
+		}) ;
+	}
 }
 
 function submitProject (data) {
