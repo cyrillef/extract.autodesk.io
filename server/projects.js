@@ -156,7 +156,6 @@ var uploadProgress =function (req, res) {
 
 router.get ('/projects/:identifier/progress', function (req, res) {
 	// Protect the endpoint from external usage.
-	console.log ('/projects/:identifier/progress' + req.headers.referer) ;
 	if ( !utils.checkHost (req, config.domain) )
 		return (res.status (500). end ()) ;
 
