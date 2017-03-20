@@ -31,6 +31,7 @@ var config ={
 	apiEndpoint: 'developer.api.autodesk.com',
 
 	bucket: 'extract-autodesk-io-2017',
+	chunkSizeLimit: 3 * 1024 * 1024,
 	mailTo: '',
 	domain: process.env.NODE_ENV === 'production' ? 'https://extract.autodesk.io/' : 'http://localhost:3000/',
 

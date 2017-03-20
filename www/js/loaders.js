@@ -360,10 +360,15 @@ String.prototype.hashCode =function () {
 	var hash =0, i, chr, len ;
 	if ( this.length === 0 )
 		return (hash) ;
-	for ( i =0, len =this.length ; i < len; i++ ) {
+	for ( i =0, len =this.length ; i < len ; i++ ) {
 		chr =this.charCodeAt (i) ;
 		hash =((hash << 5) - hash) + chr ;
 		hash |=0 ; // Convert to 32bit integer
 	}
-	return (hash) ;
+	//return (hash) ;
+
+	// JavaScript does bitwise operations (like XOR, above) on 32-bit signed
+	//integers. Since we want the results to be always positive, convert the
+	// signed int to an unsigned by doing an unsigned bit shift.
+	return (hash >>> 0) ;
 } ;

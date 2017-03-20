@@ -28,26 +28,7 @@ var forgeToken =require ('./forge-token') ;
 var router =express.Router () ;
 router.use (bodyParser.json ()) ;
 
-var uploadToOSS =function (identifier) {
-	var bucket =config.bucket ;
-	return (utils.json (identifier)
-		.then (function (json) {
-			var stream =fs.createReadStream (utils.path ('tmp/' + json.name))
-				.on ('data', function (chunk) {
-					json.bytesPosted +=chunk.length ;
-					fs.writeFile (utils.data (identifier), JSON.stringify (json)) ;
-				}) ;
-			var ObjectsApi =new ForgeSDK.ObjectsApi () ;
-			return (ObjectsApi.uploadObject (bucket, json.name, json.bytesRead, stream, {}, forgeToken.RW, forgeToken.RW.getCredentials ())) ;
-		})
-		.then (function (response) {
-			response.body.key =identifier ;
-			return (utils.writeFile (utils.data (identifier), response.body)) ;
-		})
-	) ;
-} ;
-
-// Post files to OSS and request translation
+// Request translation
 router.post ('/projects', function (req, res) {
 	// Protect the endpoint from external usage.
 	if ( !utils.checkHost (req, config.domain) )
@@ -59,16 +40,7 @@ router.post ('/projects', function (req, res) {
 		return (res.status (403).send ('Bucket name invalid!')) ;
 
 	utils.writeFile (utils.data (req.body.uniqueIdentifier + '.job'), req.body.children) ;
-	var uploadPromises =req.body.children.map (uploadToOSS) ;
-	Promise.all (uploadPromises)
-		.then (function (files) {
-			//console.log (JSON.stringify (files, null, 2)) ;
-			for ( var i =0 ; i < files.length ; i++ ) {
-				console.log (files [i].objectKey + ' uploaded to OSS') ;
-				utils.unlink (utils.path ('tmp/' + files [i].objectKey)) ;
-			}
-			return (utils.json (req.body.uniqueIdentifier)) ;
-		})
+	utils.json (req.body.uniqueIdentifier)
 		.then (function (mainFile) {
 			var urn =utils.safeBase64encode (mainFile.objectId) ;
 			var job ={
@@ -115,45 +87,7 @@ router.post ('/projects', function (req, res) {
 		.json (req.body) ;
 }) ;
 
-// Get the uploading/translation progress
-var uploadedBytes =function (identifier) {
-	return (utils.json (identifier)
-		.then (function (json) {
-			if ( json.hasOwnProperty ('bytesPosted') )
-				return ({ bytesRead: json.bytesRead, bytesPosted: json.bytesPosted }) ;
-			else
-				return ({ bytesRead: json.size, bytesPosted: json.size }) ;
-		})
-	) ;
-} ;
-
-var uploadProgress =function (req, res) {
-	var identifier =req.params.identifier ;
-	utils.json (identifier +'.job')
-		.then (function (list) {
-			var uploadPromises =list.map (uploadedBytes) ;
-			return (Promise.all (uploadPromises)) ;
-		})
-		.then (function (results) {
-			var bytesRead = 0, bytesPosted =0 ;
-			for ( var i =0 ; i < results.length ; i++ ) {
-				bytesRead += results [i].bytesRead ;
-				bytesPosted += results [i].bytesPosted ;
-			}
-			res.json ({
-				//bytesRead: bytesRead,
-				//bytesPosted: bytesPosted,
-				status: 'requested',
-				progress: 'uploading to oss',
-				oss: (Math.floor (100 * bytesPosted / bytesRead) + '%'),
-			}) ;
-		})
-		.catch (function (error) {
-			res.status (404).end ('No information found!') ;
-		})
-	;
-} ;
-
+// Get the translation progress
 router.get ('/projects/:identifier/progress', function (req, res) {
 	// Protect the endpoint from external usage.
 	if ( !utils.checkHost (req, config.domain) )
@@ -184,8 +118,12 @@ router.get ('/projects/:identifier/progress', function (req, res) {
 			}) ;
 		})
 		.catch (function (error) {
-			// No .resultdb file, we are still uploading files
-			uploadProgress (req, res) ;
+			// No .resultdb file, but everything should be uploaded already
+			res.json ({
+				status: 'requested',
+				progress: 'uploading to oss',
+				oss: '100%'
+			}) ;
 		})
 	;
 }) ;

@@ -20,28 +20,22 @@
 var fs =require ('fs') ;
 var path =require ('path') ;
 var util =require ('util') ;
-var Stream =require ('stream').Stream ;
+var moment =require ('moment') ;
+var AdmZip =require ('adm-zip') ;
+var utils =require ('./utils') ;
+var ForgeSDK =require ('forge-apis') ;
+var config =require ('./config') ;
+var forgeToken =require ('./forge-token') ;
 
-module.exports =flow =function (temporaryFolder) {
+module.exports =flow =function () {
     var $ =this ;
-    $.temporaryFolder =temporaryFolder ;
     $.maxFileSize =null ;
-    $.fileParameterName ='file' ;
-
-    try {
-        fs.mkdirSync ($.temporaryFolder) ;
-    } catch ( e ) {
-    }
+    $.files ={} ;
+    $.times ={} ;
+	$.sessionsId ={} ;
 
     function cleanIdentifier (identifier) {
         return (identifier.replace (/[^0-9A-Za-z_-]/g, '')) ;
-    }
-
-    function getChunkFilename (chunkNumber, identifier) {
-        // Clean up the identifier
-        identifier =cleanIdentifier (identifier) ;
-        // What would the file name be?
-        return (path.resolve ($.temporaryFolder, './flow-' + identifier + '.' + chunkNumber)) ;
     }
 
     function validateRequest (chunkNumber, chunkSize, totalSize, identifier, filename, fileSize) {
@@ -49,7 +43,7 @@ module.exports =flow =function (temporaryFolder) {
         // Check if the request is sane
         if ( chunkNumber === 0 || chunkSize === 0 || totalSize === 0 || identifier.length === 0 || filename.length === 0 )
             return ('non_flow_request') ;
-        var numberOfChunks =Math.max (Math.floor (totalSize / (chunkSize * 1.0)), 1) ;
+        var numberOfChunks =Math.max (Math.ceil (totalSize / (chunkSize * 1.0)), 1) ;
         if ( chunkNumber > numberOfChunks )
             return ('invalid_flow_request1') ;
         if ( $.maxFileSize && totalSize > $.maxFileSize )
@@ -57,34 +51,47 @@ module.exports =flow =function (temporaryFolder) {
         if ( typeof (fileSize) != 'undefined' ) {
             if ( chunkNumber < numberOfChunks && fileSize != chunkSize )
                 return ('invalid_flow_request3') ; // The chunk in the POST request isn't the correct size
-            if ( numberOfChunks > 1 && chunkNumber == numberOfChunks && fileSize != ((totalSize % chunkSize) + parseInt(chunkSize)) )
-                return ('invalid_flow_request4') ; // The chunks in the POST is the last one, and the fil is not the correct size
+            if ( numberOfChunks > 1 && chunkNumber == numberOfChunks && fileSize != (totalSize % chunkSize) )
+                return ('invalid_flow_request4') ; // The chunks in the POST is the last one, and the file is not the correct size
             if ( numberOfChunks == 1 && fileSize != totalSize )
                 return ('invalid_flow_request5') ; // The file is only a single chunk, and the data size does not fit
         }
         return ('valid') ;
     }
 
-    // 'found', filename, original_filename, identifier, totalSize
-    // 'not_found', null, null, null, null
-    $.get =function (req, callback) {
-        var chunkNumber =req.param ('flowChunkNumber', 0) ;
-        var chunkSize =req.param ('flowChunkSize', 0) ;
-        var totalSize =req.param ('flowTotalSize', 0) ;
-        var identifier =req.param ('flowIdentifier', "") ;
-        var filename =req.param ('flowFilename', "") ;
-        if ( validateRequest (chunkNumber, chunkSize, totalSize, identifier, filename) == 'valid' ) {
-            var chunkFilename =getChunkFilename (chunkNumber, identifier) ;
-            fs.exists (chunkFilename, function (exists) {
-                if ( exists )
-                    callback ('found', chunkFilename, filename, identifier, totalSize) ;
-                else
-                    callback ('not_found', null, null, null, null) ;
-            }) ;
-        } else {
-            callback ('not_found', null, null, null, null) ;
-        }
-    } ;
+	function objectToOSS (identifier, fnname, buffer) {
+		return (new Promise (function (fulfill, reject) {
+			var ObjectsApi =new ForgeSDK.ObjectsApi () ;
+			ObjectsApi.uploadObject (config.bucket, fnname, buffer.length, buffer, {}, forgeToken.RW, forgeToken.RW.getCredentials ())
+				.then (function (response) {
+					response.body.key =identifier ;
+					return (utils.writeFile (utils.data (identifier), response.body)) ;
+				})
+				.then (function (content) {
+					fulfill (content) ;
+				})
+				.catch (function (error) {
+					reject (error) ;
+				}) ;
+		})) ;
+	} ;
+
+	function resumableToOSS (identifier, fnname, buffer, contentRange, sessionId) {
+		return (new Promise (function (fulfill, reject) {
+			var ObjectsApi =new ForgeSDK.ObjectsApi () ;
+			ObjectsApi.uploadChunk (config.bucket, fnname, buffer.length, contentRange, sessionId, buffer, {}, forgeToken.RW, forgeToken.RW.getCredentials ())
+				.then (function (response) {
+					response.body.key =identifier ;
+					return (utils.writeFile (utils.data (identifier), response.body)) ;
+				})
+				.then (function (content) {
+					fulfill (content) ;
+				})
+				.catch (function (error) {
+					reject (error) ;
+				}) ;
+		})) ;
+	} ;
 
     // 'partly_done', filename, original_filename, identifier, totalSize
     // 'done', filename, original_filename, identifier, totalSize
@@ -92,105 +99,135 @@ module.exports =flow =function (temporaryFolder) {
     // 'non_flow_request', null, null, null, null
     $.post =function (req, callback) {
         var fields =req.body ;
-        var files =req.files ;
-        var chunkNumber =fields.flowChunkNumber ;
-        var chunkSize =fields.flowChunkSize ;
-        var totalSize =fields.flowTotalSize ;
+        var chunkNumber =parseInt (fields.flowChunkNumber) ;
+        var chunkSize =parseInt (fields.flowChunkSize) ;
+        var totalSize =parseInt (fields.flowTotalSize) ;
         var identifier =cleanIdentifier (fields.flowIdentifier) ;
         var filename =fields.flowFilename ;
-        if ( !files [$.fileParameterName] || !files [$.fileParameterName].size ) {
-            callback ('invalid_flow_request', null, null, null, null) ;
-            return ;
-        }
+		var files =req.file ;
+        if ( !files || !files.size || !files.originalname )
+            return (callback ('invalid_flow_request', null, null, null, null)) ;
 
-        var original_filename =files [$.fileParameterName].originalFilename ;
-        var validation =validateRequest (chunkNumber, chunkSize, totalSize, identifier, filename, files [$.fileParameterName].size) ;
-        if ( validation == 'valid' ) {
-            var chunkFilename =getChunkFilename (chunkNumber, identifier) ;
-            // Save the chunk (TODO: OVERWRITE)
-            fs.rename (files [$.fileParameterName].path, chunkFilename, function () {
-                // Do we have all the chunks?
-                var currentTestChunk =1 ;
-                var numberOfChunks =Math.max (Math.floor (totalSize / (chunkSize * 1.0)), 1) ;
-                var testChunkExists =function () {
-                    fs.exists (getChunkFilename (currentTestChunk, identifier), function (exists) {
-                        if ( exists ) {
-                            currentTestChunk++ ;
-                            if ( currentTestChunk > numberOfChunks )
-                                callback ('done', filename, original_filename, identifier, totalSize);
-                            else // Recursion
-                                testChunkExists () ;
-                        } else {
-                            callback ('partly_done', filename, original_filename, identifier, totalSize) ;
-                        }
-                    }) ;
-                } ;
-                testChunkExists () ;
-            }) ;
-        } else {
-            callback (validation, filename, original_filename, identifier, totalSize) ;
-        }
-    } ;
+        var original_filename =files.originalname ;
+        var validation =validateRequest (chunkNumber, chunkSize, totalSize, identifier, filename, files.size) ;
+        if ( validation !== 'valid' )
+        	return (callback (validation, filename, original_filename, identifier, totalSize)) ;
 
-    // Pipe chunks directly in to an existsing WritableStream
-    //   r.write(identifier, response);
-    //   r.write(identifier, response, {end:false});
-    //
-    //   var stream = fs.createWriteStream(filename);
-    //   r.write(identifier, stream);
-    //   stream.on('data', function(data){...});
-    //   stream.on('finish', function(){...});
-    $.write =function (identifier, writableStream, options) {
-        options =options || {} ;
-        options.end =(typeof options.end === 'undefined' ? true : options.end) ;
-        // Iterate over each chunk
-        var pipeChunk =function (number) {
-            var chunkFilename =getChunkFilename (number, identifier) ;
-            fs.exists (chunkFilename, function (exists) {
-                if ( exists ) {
-                    // If the chunk with the current number exists,
-                    // then create a ReadStream from the file
-                    // and pipe it to the specified writableStream.
-                    var sourceStream =fs.createReadStream (chunkFilename) ;
-                    sourceStream.pipe (writableStream, { end: false }) ;
-                    sourceStream.on ('end', function () {
-                        // When the chunk is fully streamed, jump to the next one
-                        pipeChunk (number + 1) ;
-                    }) ;
-                } else {
-                    // When all the chunks have been piped, end the stream
-                    if ( options.end )
-                        writableStream.end () ;
-                    if ( options.onDone )
-                        options.onDone () ;
-                }
-            }) ;
-        } ;
-        pipeChunk (1) ;
-    } ;
+		var numberOfChunks =Math.max (Math.ceil (totalSize / (chunkSize * 1.0)), 1) ;
+		$.storeFile (identifier, original_filename, chunkNumber, numberOfChunks) ; //, files.buffer) ;
 
-    $.clean =function (identifier, options) {
-        options =options || {} ;
-        // Iterate over each chunk
-        var pipeChunkRm =function (number) {
-            var chunkFilename =getChunkFilename (number, identifier) ;
-            //console.log('removing pipeChunkRm ', number, 'chunkFilename', chunkFilename);
-            fs.exists (chunkFilename, function (exists) {
-                if ( exists ) {
-                    //console.log('exist removing ', chunkFilename);
-                    fs.unlink (chunkFilename, function (err) {
-                        if ( err && options.onError )
-                            options.onError (err) ;
-                    }) ;
-                    pipeChunkRm (number + 1) ;
-                } else {
-                    if ( options.onDone )
-                        options.onDone () ;
-                }
-            }) ;
-        } ;
-        pipeChunkRm (1) ;
-    } ;
+		if ( numberOfChunks === 1 ) {
+			objectToOSS (identifier, original_filename, files.buffer)
+				.then (function (response) {
+					$.files [identifier] [0] =files.buffer ;
+					var entries =$.exploreZip (identifier, original_filename) ;
+					callback ('done', filename, original_filename, identifier, totalSize, entries, response) ;
+				})
+				.catch (function (error) {
+					console.error (error) ;
+					callback ('invalid_flow_request', null, null, null, null) ;
+				}) ;
+		} else {
+			var start =(chunkNumber - 1) * chunkSize ;
+			var end =start + parseInt (fields.flowCurrentChunkSize) - 1 ;
+			var contentRange ='bytes ' + start + '-' + end + '/' + totalSize ;
+			//console.log ($.sessionsId [identifier], contentRange, files.buffer.length) ;
+			resumableToOSS (identifier, original_filename, files.buffer, contentRange, $.sessionsId [identifier])
+			 	.then (function (response) {
+					$.files [identifier] [chunkNumber - 1] =files.buffer ;
+					if ( chunkNumber === numberOfChunks ) {
+						function waitForAllChunkUpload () {
+							var bComplete =$.isFileComplete (identifier, numberOfChunks) ;
+							if ( !bComplete )
+								//return (process.nextTick (waitForAllChunkUpload)) ;
+								return (setTimeout (waitForAllChunkUpload, 500)) ;
+							var entries =$.exploreZip (identifier, original_filename) ;
+							callback ('done', filename, original_filename, identifier, totalSize, entries, response) ;
+						}
+						waitForAllChunkUpload () ;
+					} else {
+						callback ('partly_done', filename, original_filename, identifier, totalSize) ;
+					}
+			 	})
+			 	.catch (function (error) {
+			 		console.error (error) ;
+					callback ('invalid_flow_request', null, null, null, null) ;
+			 	}) ;
+		}
+	} ;
+
+	// 'found', original_filename, identifier, totalSize
+	// 'not_found', null, null, null
+	$.get =function (req, callback) {
+		var chunkNumber =req.param ('flowChunkNumber', 0) ;
+		var chunkSize =req.param ('flowChunkSize', 0) ;
+		var totalSize =req.param ('flowTotalSize', 0) ;
+		var identifier =req.param ('flowIdentifier', '') ;
+		var filename =req.param ('flowFilename', '') ;
+		if ( validateRequest (chunkNumber, chunkSize, totalSize, identifier, filename) === 'valid' ) {
+			if ( $.files.hasOwnProperty (identifier) && $.files [identifier] [chunkNumber] !== undefined )
+				callback ('found', filename, identifier, totalSize) ;
+			else
+				callback ('not_found', null, null, null) ;
+		} else {
+			callback ('not_found', null, null, null) ;
+		}
+	} ;
+
+	$.storeFile =function (identifier, original_filename, chunkNumber, numberOfChunks, chunk) {
+		if ( !$.files.hasOwnProperty (identifier) ) {
+			$.files [identifier] =new Array (numberOfChunks) ;
+			$.times [identifier] =moment () ;
+			$.sessionsId [identifier] =/*identifier +*/ utils.symbol () ;
+		}
+		if ( !utils.isCompressed (original_filename) && chunk !== undefined )
+			$.files [identifier] [chunkNumber - 1] =true ; // If this is not a zip, we do not need to store the chunk
+		else if ( chunk !== undefined )
+		 	$.files [identifier] [chunkNumber - 1] =chunk ;
+	} ;
+
+	$.isFileComplete =function (identifier, numberOfChunks) {
+		if ( !$.files.hasOwnProperty (identifier) )
+			return (false) ;
+		for ( var i =0 ; i < numberOfChunks && $.files [identifier] [i] !== undefined ; i++ ) ;
+		return (i === numberOfChunks) ;
+	} ;
+
+    $.exploreZip =function (identifier, original_filename) {
+		var entries =[] ;
+		if ( utils.isCompressed (original_filename) && $.files.hasOwnProperty (identifier) ) {
+			$.files [identifier] =Buffer.concat ($.files [identifier]) ;
+			var zip =new AdmZip ($.files [identifier]) ;
+			zip.getEntries ().forEach (function (zipEntry) {
+				//console.log (zipEntry.toString ()) ;
+				if ( zipEntry.isDirectory === false )
+					entries.push (zipEntry.entryName) ;
+			}) ;
+		}
+		$.clean (identifier) ;
+		return (entries) ;
+	} ;
+
+    $.clean =function (identifier) {
+    	if ( $.files.hasOwnProperty (identifier) )
+    		delete $.files [identifier] ;
+		if ( $.times.hasOwnProperty (identifier) )
+			delete $.times [identifier] ;
+		if ( $.sessionsId.hasOwnProperty (identifier) )
+			delete $.sessionsId [identifier] ;
+	} ;
+
+    $.autoClean =function () {
+		for ( var key in $.times ) {
+			if ( !$.times.hasOwnProperty (key) )
+				continue ;
+			if ( moment.duration (moment ().diff ($.times [key])).asHours () > 1.0 || !$.files.hasOwnProperty (key) )
+				$.clean (key) ;
+		}
+	}
+
+	// Start auto-cleaning
+	setInterval (function () { $.autoClean () ; }, 20 * 60 * 1000) ; // every 20 minutes
 
     return ($) ;
 } ;

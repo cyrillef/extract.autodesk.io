@@ -64,7 +64,7 @@ var utils ={
 	},
 
 	json: function (name) {
-		var filename =path.normalize (__dirname + '/../data/' + name + '.json') ;
+		var filename =utils.data (name) ;
 		return (new Promise (function (fulfill, reject) {
 			utils.readFile (filename, 'utf8')
 				.then (function (res) {
@@ -180,6 +180,15 @@ var utils ={
 
 	checkHost: function (req, domain) {
 		return ( domain === '' || req.headers.referer === domain ) ;
+	},
+
+	symbol: function (length) {
+		length =length || 8 ;
+		var text ='' ;
+		var possible ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789' ;
+		for ( var i =0 ; i < length ; i++ )
+			text +=possible.charAt (Math.floor (Math.random () * possible.length)) ;
+		return (text) ;
 	}
 
 } ;

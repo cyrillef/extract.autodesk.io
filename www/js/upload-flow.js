@@ -20,8 +20,8 @@
 $(document).ready (function () {
 	var r =new Flow ({
 		target: '/api/file',
-		chunkSize: 1024 * 1024,
-		/*forceChunkSize: true,*/
+		chunkSize: 3 * 1024 * 1024, // 3 Mb minimum chunk to please Autodesk OSS resumable endpoint
+		forceChunkSize: true,
 		testChunks: false
 	}) ;
 	// Flow.js isn't supported, fall back on a different method
