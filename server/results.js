@@ -172,7 +172,8 @@ var _progress ={} ;
 router.get ('/results/:identifier/project', function (req, res) {
 	// Protect the endpoint from external usage.
 	if ( !utils.checkHost (req, config.domain) )
-		return (res.status (500). end ({ error: req.headers.referer })) ;
+		//return (res.status (500). end ()) ;
+		return (res.json ({ error: req.headers.referer })) ;
 
 	var identifier =req.params.identifier ;
 	var urn ='', manifest ='' ;
