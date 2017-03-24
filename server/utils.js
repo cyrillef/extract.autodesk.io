@@ -179,7 +179,8 @@ var utils ={
 	},
 
 	checkHost: function (req, domain) {
-		return ( domain === '' || req.headers.referer === domain ) ;
+		//return ( domain === '' || req.headers.referer === domain ) ;
+		return (true) ;
 	},
 
 	symbol: function (length) {
