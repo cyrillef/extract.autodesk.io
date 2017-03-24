@@ -35,6 +35,10 @@ var sendMail =require ('./sendMail') ;
 var router =express.Router () ;
 router.use (bodyParser.json ()) ;
 
+router.get ('/test', function (req, res) {
+	res.json (req.headers) ;
+}) ;
+
 // List translated projects
 router.get ('/results', function (req, res) {
 	// Protect the endpoint from external usage.
