@@ -35,7 +35,7 @@ var sendMail =require ('./sendMail') ;
 var router =express.Router () ;
 router.use (bodyParser.json ()) ;
 
-reouter.get ('test', function (req, res) {
+reouter.get ('/test', function (req, res) {
 	res.json (req.headers) ;
 }) ;
 
