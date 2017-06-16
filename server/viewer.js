@@ -24,6 +24,7 @@ var viewer =[
 	'style.css',
 	'three.min.js',
 	'lmvworker.min.js',
+	'wgs.min.js',
 ] ;
 
 // res/environments/
