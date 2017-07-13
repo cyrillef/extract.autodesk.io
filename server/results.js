@@ -309,6 +309,7 @@ function AddViewerFiles (bubble, identifier) {
 }
 
 function DownloadViewerItem  (uri, outPath, item) {
+	uri +='?v=v2.15' ; // Temporary fix for viewer versioning issue on developer.api.autodesk.com
 	return (new Promise (function (fulfill, reject) {
 		var ModelDerivative =new ForgeSDK.DerivativesApi () ;
 		ModelDerivative.apiClient.callApi (
