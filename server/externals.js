@@ -92,7 +92,7 @@ router.get ('/externals/:urn/extract/:token', function (req, res) {
 		})
 		.then (function (pathname) {
 			var b =new bubble (_progress [identifier]) ;
-			return (b.downloadBubble (urn, pathname + '/')) ;
+			return (b.downloadBubble (urn, pathname + '/', token)) ;
 		})
 		.then (function (bubble) {
 			// Generate local html, and bat/sh files

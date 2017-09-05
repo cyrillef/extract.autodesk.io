@@ -29,6 +29,7 @@ var forgeToken =require ('./forge-token') ;
 
 function bubble (progress) {
 	this._outPath ='./' ;
+	this._token =null ;
 	this._progress =progress ;
 	//this._filesToFetch =0 ;
 	//this._estimatedSize =0 ;
@@ -36,8 +37,18 @@ function bubble (progress) {
 	this._viewables =[] ; // { path: '', name: '' }
 	this._errors =[] ; // ''
 
-	this.downloadBubble =function (urn, outPath) {
+	this.downloadBubble =function (urn, outPath, token) {
 		var self =this ;
+		if ( token ) {
+			self._token =new ForgeSDK.AuthClientTwoLegged ('__', '__', [ 'data:read' ]) ;
+			self._token.setCredentials ({
+				'token_type': 'Bearer',
+				'expires_in': 1799,
+				'access_token': token
+			}) ;
+		} else {
+			self._token =forgeToken.RW ;
+		}
 		self._outPath =outPath ;
 		return (new Promise (function (fulfill, reject) {
 			self._progress.msg ='Downloading manifest' ;
@@ -390,7 +401,7 @@ function bubble (progress) {
 			{ 'urn': urn }, {}, { /*'Accept-Encoding': 'gzip, deflate'*/ },
 			{}, null,
 			[], [ 'application/vnd.api+json', 'application/json' ], null,
-			forgeToken.RW, forgeToken.RW.getCredentials ()
+			this._token, this._token.getCredentials ()
 		)) ;
 	} ;
 
@@ -404,7 +415,7 @@ function bubble (progress) {
 			{ 'urn': urn }, {}, { 'Accept-Encoding': 'gzip, deflate' },
 			{}, null,
 			[], [], null,
-			forgeToken.RW, forgeToken.RW.getCredentials ()
+			this._token, this._token.getCredentials ()
 		)) ;
 	} ;
 
@@ -451,7 +462,7 @@ function bubble (progress) {
 		var self =this ;
 		var ModelDerivative =new ForgeSDK.DerivativesApi () ;
 		//console.log ('Thumbnail URN: ', urn, 'GUID: ', guid) ;
-		//ModelDerivative.getThumbnail (urn, { width: sz, height: sz }, forgeToken.RW, forgeToken.RW.getCredentials ())
+		//ModelDerivative.getThumbnail (urn, { width: sz, height: sz }, this._token, this._token.getCredentials ())
 		//	.then (function (thumbnail) {
 		//		//fs.writeFile (outFile, thumbnail.body) ;
 		//		var wstream =self.openWriteStream (outFile) ;
@@ -479,7 +490,7 @@ function bubble (progress) {
 			{ 'urn': urn }, queryParams, {},
 			{}, null,
 			[], [ 'application/octet-stream' ], null,
-			forgeToken.RW, forgeToken.RW.getCredentials ()
+			this._token, this._token.getCredentials ()
 		)
 			.then (function (thumbnail) {
 				//fs.writeFile (outFile, thumbnail.body) ;
