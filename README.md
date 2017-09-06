@@ -19,7 +19,7 @@
 Visit this [page](https://developer.autodesk.com) for instructions to get on-board.
 
 
-## Live demo at
+## Live demo from teh 'service' branch at
 http://extract.autodesk.io/
 
 [![](www/images/app.png)](http://extract.autodesk.io/)
