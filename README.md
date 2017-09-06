@@ -19,7 +19,10 @@
 Visit this [page](https://developer.autodesk.com) for instructions to get on-board.
 
 
-## Live demo at
+<b>Note:</b> This branch is an example of streaming the file upload as chunk on the Autodesk server.
+
+
+## Live demo from 'service' branch at
 http://extract.autodesk.io/
 
 [![](www/images/app.png)](http://extract.autodesk.io/)
