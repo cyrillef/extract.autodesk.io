@@ -21,6 +21,10 @@
 	"MJ_APIKEY_SECRET": {
 	  "description": "(Optional) Replace with your MailJET SECRET KEY",
 	  "value": ""
+	},
+	"MJ_ACCOUNT": {
+	  "description": "(Optional) Replace with your mailjet account name",
+	  "value": ""
 	}
   }
 }
