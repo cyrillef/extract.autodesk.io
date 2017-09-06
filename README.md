@@ -12,7 +12,10 @@
 Visit this [page](https://developer.autodesk.com) for instructions to get on-board.
 
 
-## Live demo at
+<b>Note:</b> This branch is not maintained anymore,
+
+
+## Live demo from the 'service' branch at
 http://extract.autodesk.io/
 
 [![](www/images/app.png)](http://extract.autodesk.io/)
