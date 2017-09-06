@@ -612,7 +612,7 @@ var bubbleUtils ={
 	AddViewerFiles: function (bubble, identifier) {
 		return (new Promise (function (fulfill, reject) {
 			var urns =viewerFileList.map (function (item) {
-				return (bubbleUtils.DownloadViewerItem ('/viewingservice/v1/viewers/' + item, bubble._outPath, item)) ;
+				return (bubbleUtils.DownloadViewerItem ('/derivativeservice/v2/viewers/' + item, bubble._outPath, item)) ;
 			}) ;
 			Promise.all (urns)
 				.then (function (urns) {
