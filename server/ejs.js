@@ -40,6 +40,7 @@ router.get ('/:identifier', function (req, res) {
 		})
 		.then (function (data) {
 			var obj ={
+				version: config.viewerVersion,
 				urn: data.urn,
 				bucket: bucket,
 				root: identifier,

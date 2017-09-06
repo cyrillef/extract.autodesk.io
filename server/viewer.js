@@ -18,6 +18,8 @@
 // by Cyrille Fauvel - Autodesk Developer Network (ADN)
 //
 
+var version ='2.17' ; // Set it in config.js
+
 // config.BaseEndPoint
 var viewer =[
 	'viewer3D.min.js',

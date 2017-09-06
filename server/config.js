@@ -36,8 +36,9 @@ var config ={
 
 	MJ_APIKEY_PUBLIC: process.env.MJ_APIKEY_PUBLIC || '<replace with your mailjet public key>',
 	MJ_APIKEY_PRIVATE: process.env.MJ_APIKEY_PRIVATE || '<replace with your mailjet private key>',
-	MJ_ACCOUNT : process.env.MJ_ACCOUNT || '<replace with your mailjet account name>'
+	MJ_ACCOUNT : process.env.MJ_ACCOUNT || '<replace with your mailjet account name>',
 
+	viewerVersion: '2.17' // must match version in viewer.js
 } ;
 
 

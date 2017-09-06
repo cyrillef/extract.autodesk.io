@@ -21,16 +21,12 @@ var express =require ('express') ;
 var bodyParser =require ('body-parser') ;
 var fs =require ('fs') ;
 var path =require ('path') ;
-var ejs =require ('ejs') ;
-//var AdmZip =require ('adm-zip') ;
-var archiver =require ('archiver') ;
+
 var ForgeSDK =require ('forge-apis') ;
 var config =require ('./config') ;
 var utils =require ('./utils') ;
-var bubble =require ('./bubble') ;
+var Bubble =require ('./bubble') ;
 var forgeToken =require ('./forge-token') ;
-var viewerFileList =require ('./viewer') ;
-var sendMail =require ('./sendMail') ;
 
 var router =express.Router () ;
 router.use (bodyParser.json ()) ;
@@ -211,29 +207,29 @@ router.get ('/results/:identifier/project', function (req, res) {
 			return (utils.rimraf (utils.path ('data/' + identifier))) ; // Just to make sure
 		})
 		.then (function (pathname) {
-			var b =new bubble (_progress [identifier]) ;
+			var b =new Bubble.bubble (_progress [identifier]) ;
 			return (b.downloadBubble (urn, pathname + '/')) ;
 		})
 		.then (function (bubble) {
 			// Generate local html, and bat/sh files
 			_progress [identifier].msg ='Generating local html, and bat/sh files' ;
-			return (GenerateStartupFiles (bubble, identifier)) ;
+			return (Bubble.utils.GenerateStartupFiles (bubble, identifier)) ;
 		})
 		.then (function (bubble) {
 			// Get Viewer files and dependencies
 			_progress [identifier].msg ='Downloading latest Forge Viewer version (core and dependencies)' ;
-			return (AddViewerFiles (bubble, identifier)) ;
+			return (Bubble.utils.AddViewerFiles (bubble, identifier)) ;
 		})
 		.then (function (bubble) {
 			// Generate zip file
 			_progress [identifier].msg ='Preparing ZIP file' ;
 			var inDir =utils.path ('data/' + identifier + '/') ;
 			var outZip =utils.extracted (identifier + '.zip') ;
-			return (PackBubble (inDir, outZip)) ;
+			return (Bubble.utils.PackBubble (inDir, outZip)) ;
 		})
 		.then (function (outZipFilename) {
 			_progress [identifier].msg ='Cleaning workspace and notifying listeners' ;
-			NotifyPeopleOfSuccess (identifier, _locks [identifier])
+			Bubble.utils.NotifyPeopleOfSuccess (identifier, _locks [identifier])
 				.then (function () {
 					delete _locks [identifier] ;
 					delete _progress [identifier] ;
@@ -246,7 +242,7 @@ router.get ('/results/:identifier/project', function (req, res) {
 			if ( error.message == 'Bubble already extracted!' || error.message == 'Bubble already being extracted!' )
 				return (res.status (200).end (error.message)) ;
 			utils.rimraf (utils.path ('data/' + identifier)) ;
-			NotifyPeopleOfFailure (identifier, _locks [identifier], error)
+			Bubble.utils.NotifyPeopleOfFailure (identifier, _locks [identifier], error)
 				.then (function () {
 					delete _locks [identifier] ;
 					delete _progress [identifier] ;
@@ -255,162 +251,6 @@ router.get ('/results/:identifier/project', function (req, res) {
 		})
 	;
 }) ;
-
-function GenerateStartupFiles (bubble, identifier) {
-	return (new Promise (function (fulfill, reject) {
-		fs.createReadStream (utils.path ('views/readme.txt'))
-			.pipe (fs.createWriteStream (utils.path ('data/' + identifier + '/readme.txt'))) ;
-		fs.createReadStream (utils.path ('views/bat.ejs'))
-			.pipe (fs.createWriteStream (utils.path ('data/' + identifier + '/index.bat'))) ;
-		var ws =fs.createWriteStream (utils.path ('data/' + identifier + '/index')) ;
-		fs.createReadStream (utils.path ('views/bash.ejs'))
-			.pipe (ws) ;
-		ws.on ('finish', function () {
-			if ( /^win/.test (process.platform) === false )
-				fs.chmodSync (utils.path ('data/' + identifier + '/index'), 0777) ;
-		}) ;
-		utils.readFile (utils.path ('views/view.ejs'), 'utf-8')
-			.then (function (st) {
-				var data =ejs.render (st, { docs: bubble._viewables }) ;
-				var fullnameHtml =utils.path ('data/' + identifier + '/index.html') ;
-				return (utils.writeFile (fullnameHtml, data, 'utf-8')) ;
-			})
-			.then (function (st) {
-				fulfill (bubble) ;
-			})
-			.catch (function (error) {
-				reject (error) ;
-			})
-		;
-	})) ;
-}
-
-function AddViewerFiles (bubble, identifier) {
-	return (new Promise (function (fulfill, reject) {
-		var urns =viewerFileList.map (function (item) {
-			return (DownloadViewerItem ('/viewingservice/v1/viewers/' + item, bubble._outPath, item)) ;
-		}) ;
-		Promise.all (urns)
-			.then (function (urns) {
-				var bower =utils.path ('www/bower_components') ;
-				var data =utils.path ('data/' + identifier) ;
-				fs.createReadStream (bower + '/jquery/dist/jquery.min.js')
-					.pipe (fs.createWriteStream (data + '/jquery.min.js')) ;
-				fs.createReadStream (bower + '/jquery-ui/jquery-ui.min.js')
-					.pipe (fs.createWriteStream (data + '/jquery-ui.min.js')) ;
-				fulfill (bubble) ;
-			})
-			.catch (function (error) {
-				console.error ('Something wrong happened during viewer files download') ;
-				reject (error) ;
-			})
-		;
-	})) ;
-}
-
-function DownloadViewerItem  (uri, outPath, item) {
-	uri +='?v=v2.15' ; // Temporary fix for viewer versioning issue on developer.api.autodesk.com
-	return (new Promise (function (fulfill, reject) {
-		var ModelDerivative =new ForgeSDK.DerivativesApi () ;
-		ModelDerivative.apiClient.callApi (
-				uri, 'GET',
-				{}, {}, {},
-				{}, null,
-				[], [ 'application/octet-stream', 'image/png', 'text/html', 'text/css', 'text/javascript', 'application/json' ], null,
-				forgeToken.RW, forgeToken.RW.getCredentials ()
-			)
-			.then (function (response) {
-				//console.log (response.headers ['content-type'], item) ;
-				var body =response.body ;
-				if (   response.headers ['content-type'] == 'text/javascript'
-					|| response.headers ['content-type'] == 'text/css'
-				)
-					body =response.body.toString ('utf8') ;
-				if (   response.headers ['content-type'] == 'application/json'
-					|| response.headers ['content-type'] == 'application/json; charset=utf-8'
-				)
-					body =JSON.stringify (response.body) ;
-				console.log ('Downloaded:', outPath + item) ;
-				return (utils.writeFile (outPath + item, body, null, true)) ;
-			})
-			.then (function (response) {
-				fulfill (item) ;
-			})
-			.catch (function (error) {
-				console.error (error) ;
-				reject (error) ;
-			})
-		;
-	})) ;
-}
-
-function PackBubble (inDir, outZip) {
-	return (new Promise (function (fulfill, reject) {
-		try {
-			//var zip =new AdmZip () ;
-			//zip.addLocalFolder (inDir) ;
-			//zip.writeZip (outZip, function (error, result) {
-			//	if ( error )
-			//		reject (error) ;
-			//	else
-			//		fulfill (outZip) ;
-			//}) ;
-
-			var archive =archiver ('zip') ;
-			archive.on ('error', function (err) {
-				console.error ('PackBubble: ' + err) ;
-				//reject (err) ;
-			}) ;
-			archive.on ('finish', function (err) {
-				if ( err ) {
-					console.error ('PackBubble: ' + err) ;
-					reject (err) ;
-				} else {
-					console.log ('PackBubble ended successfully.') ;
-					fulfill (outZip) ;
-				}
-			}) ;
-
-			var output =fs.createWriteStream (outZip) ;
-			archive.pipe (output) ;
-			archive.directory (inDir, '') ;
-			archive.finalize () ;
-		} catch ( ex ) {
-			reject (ex) ;
-		}
-	})) ;
-}
-
-function NotifyPeopleOfSuccess (identifier, locks) {
-	return (NotifyPeople (identifier, locks, utils.path ('views/email-extract-succeeded.ejs'), 'Autodesk Forge Viewer Extractor notification')) ;
-}
-
-function NotifyPeopleOfFailure (identifier, locks, error) {
-	return (NotifyPeople (identifier, locks, utils.path ('views/email-extract-failed.ejs'), 'Autodesk Forge Viewer Extractor failure')) ;
-}
-
-function NotifyPeople (identifier, locks, template, subject) {
-	return (new Promise (function (fulfill, reject) {
-		utils.readFile (template, 'utf-8')
-			.then (function (st) {
-				var data =ejs.render (st, { ID: identifier }) ;
-				sendMail ({
-					'from': 'ADN Sparks <adn.sparks@autodesk.com>',
-					'replyTo': 'adn.sparks@autodesk.com',
-					'to': locks,
-					'subject': subject,
-					'html': data,
-					'forceEmbeddedImages': true
-				}) ;
-				fulfill () ;
-			})
-			.catch (function (error) {
-				console.error (error) ;
-				reject (error) ;
-			})
-		;
-	})) ;
-}
 
 // Get viewable data extraction progress
 router.get ('/results/:identifier/project/progress', function (req, res) {

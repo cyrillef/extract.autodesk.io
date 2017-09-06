@@ -22,10 +22,15 @@ var fs =require ('fs') ;
 var zlib =require ('zlib') ;
 var mkdirp =require ('mkdirp') ;
 var path =require ('path') ;
+var archiver =require ('archiver') ;
+var ejs =require ('ejs') ;
+
 var ForgeSDK =require ('forge-apis') ;
 var config =require ('./config') ;
 var forgeToken =require ('./forge-token') ;
-//var utils =require ('./utils') ;
+var utils =require ('./utils') ;
+var sendMail =require ('./sendMail') ;
+var viewerFileList =require ('./viewer') ;
 
 function bubble (progress) {
 	this._outPath ='./' ;
@@ -574,6 +579,168 @@ function bubble (progress) {
 
 }
 
-module.exports =bubble ;
+var bubbleUtils ={
+	GenerateStartupFiles: function (bubble, identifier) {
+		return (new Promise (function (fulfill, reject) {
+			fs.createReadStream (utils.path ('views/readme.txt'))
+				.pipe (fs.createWriteStream (utils.path ('data/' + identifier + '/readme.txt'))) ;
+			fs.createReadStream (utils.path ('views/bat.ejs'))
+				.pipe (fs.createWriteStream (utils.path ('data/' + identifier + '/index.bat'))) ;
+			var ws =fs.createWriteStream (utils.path ('data/' + identifier + '/index')) ;
+			fs.createReadStream (utils.path ('views/bash.ejs'))
+				.pipe (ws) ;
+			ws.on ('finish', function () {
+				if ( /^win/.test (process.platform) === false )
+					fs.chmodSync (utils.path ('data/' + identifier + '/index'), 0777) ;
+			}) ;
+			utils.readFile (utils.path ('views/view.ejs'), 'utf-8')
+				.then (function (st) {
+					var data =ejs.render (st, { docs: bubble._viewables }) ;
+					var fullnameHtml =utils.path ('data/' + identifier + '/index.html') ;
+					return (utils.writeFile (fullnameHtml, data, 'utf-8')) ;
+				})
+				.then (function (st) {
+					fulfill (bubble) ;
+				})
+				.catch (function (error) {
+					reject (error) ;
+				})
+			;
+		})) ;
+	},
+
+	AddViewerFiles: function (bubble, identifier) {
+		return (new Promise (function (fulfill, reject) {
+			var urns =viewerFileList.map (function (item) {
+				return (bubbleUtils.DownloadViewerItem ('/viewingservice/v1/viewers/' + item, bubble._outPath, item)) ;
+			}) ;
+			Promise.all (urns)
+				.then (function (urns) {
+					var bower =utils.path ('www/bower_components') ;
+					var data =utils.path ('data/' + identifier) ;
+					fs.createReadStream (bower + '/jquery/dist/jquery.min.js')
+						.pipe (fs.createWriteStream (data + '/jquery.min.js')) ;
+					fs.createReadStream (bower + '/jquery-ui/jquery-ui.min.js')
+						.pipe (fs.createWriteStream (data + '/jquery-ui.min.js')) ;
+					fulfill (bubble) ;
+				})
+				.catch (function (error) {
+					console.error ('Something wrong happened during viewer files download') ;
+					reject (error) ;
+				})
+			;
+		})) ;
+	},
+
+	DownloadViewerItem: function (uri, outPath, item) {
+		uri +='?v=v' + config.viewerVersion ;
+		return (new Promise (function (fulfill, reject) {
+			var ModelDerivative =new ForgeSDK.DerivativesApi () ;
+			ModelDerivative.apiClient.callApi (
+				uri, 'GET',
+				{}, {}, {},
+				{}, null,
+				[], [ 'application/octet-stream', 'image/png', 'text/html', 'text/css', 'text/javascript', 'application/json' ], null,
+				forgeToken.RW, forgeToken.RW.getCredentials ()
+			)
+				.then (function (response) {
+					//console.log (response.headers ['content-type'], item) ;
+					var body =response.body ;
+					if (   response.headers ['content-type'] == 'text/javascript'
+						|| response.headers ['content-type'] == 'text/css'
+					)
+						body =response.body.toString ('utf8') ;
+					if (   response.headers ['content-type'] == 'application/json'
+						|| response.headers ['content-type'] == 'application/json; charset=utf-8'
+					)
+						body =JSON.stringify (response.body) ;
+					console.log ('Downloaded:', outPath + item) ;
+					return (utils.writeFile (outPath + item, body, null, true)) ;
+				})
+				.then (function (response) {
+					fulfill (item) ;
+				})
+				.catch (function (error) {
+					console.error (error) ;
+					reject (error) ;
+				})
+			;
+		})) ;
+	},
+
+	PackBubble: function (inDir, outZip) {
+		return (new Promise (function (fulfill, reject) {
+			try {
+				//var zip =new AdmZip () ;
+				//zip.addLocalFolder (inDir) ;
+				//zip.writeZip (outZip, function (error, result) {
+				//	if ( error )
+				//		reject (error) ;
+				//	else
+				//		fulfill (outZip) ;
+				//}) ;
+
+				var archive =archiver ('zip') ;
+				archive.on ('error', function (err) {
+					console.error ('PackBubble: ' + err) ;
+					//reject (err) ;
+				}) ;
+				archive.on ('finish', function (err) {
+					if ( err ) {
+						console.error ('PackBubble: ' + err) ;
+						reject (err) ;
+					} else {
+						console.log ('PackBubble ended successfully.') ;
+						fulfill (outZip) ;
+					}
+				}) ;
+
+				var output =fs.createWriteStream (outZip) ;
+				archive.pipe (output) ;
+				archive.directory (inDir, '') ;
+				archive.finalize () ;
+			} catch ( ex ) {
+				reject (ex) ;
+			}
+		})) ;
+	},
+
+	NotifyPeopleOfSuccess: function (identifier, locks) {
+		return (bubbleUtils.NotifyPeople (identifier, locks, utils.path ('views/email-extract-succeeded.ejs'), 'Autodesk Forge Viewer Extractor notification')) ;
+	},
+
+	NotifyPeopleOfFailure: function (identifier, locks, error) {
+		return (bubbleUtils.NotifyPeople (identifier, locks, utils.path ('views/email-extract-failed.ejs'), 'Autodesk Forge Viewer Extractor failure')) ;
+	},
+
+	NotifyPeople: function (identifier, locks, template, subject) {
+		return (new Promise (function (fulfill, reject) {
+			utils.readFile (template, 'utf-8')
+				.then (function (st) {
+					var data =ejs.render (st, { ID: identifier }) ;
+					sendMail ({
+						'from': 'ADN Sparks <adn.sparks@autodesk.com>',
+						'replyTo': 'adn.sparks@autodesk.com',
+						'to': locks,
+						'subject': subject,
+						'html': data,
+						'forceEmbeddedImages': true
+					}) ;
+					fulfill () ;
+				})
+				.catch (function (error) {
+					console.error (error) ;
+					reject (error) ;
+				})
+			;
+		})) ;
+	}
+
+} ;
+
+module.exports ={
+	bubble: bubble,
+	utils: bubbleUtils
+} ;
 // function Ds(endpoint, auth, oss) {
 // bubble-leech / index
