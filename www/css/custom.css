@@ -133,3 +133,12 @@ div.list-group div.alert .jquery::-moz-progress-bar {
 .nav-tabs > li.dropdown .dropdown-menu > .active > a:focus {
 	background-color: #4a9fe9;
 }
+
+#MaintenanceMsg {
+    position: absolute;
+    top: calc(50vw - 35%);
+    left: calc(50vw - 25%);
+    /*margin-top: -25px;
+    margin-left: -200px;
+    padding: 20px;*/
+}

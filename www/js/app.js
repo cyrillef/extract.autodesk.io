@@ -17,7 +17,11 @@
 // Forge Extractor
 // by Cyrille Fauvel - Autodesk Developer Network (ADN)
 //
+var inMaintenance =true ;
+
 $(document).ready (function () {
+	if ( inMaintenance )
+		showMainteanceMsg () ;
 
 	$('#tabs').tab () ;
 	listProjects () ;
@@ -41,6 +45,10 @@ $(document).ready (function () {
 	}) ;
 
 	$('#submit-project').click (function (evt) {
+		if ( inMaintenance ) {
+			showMainteanceMsg () ;
+			return ;
+		}
 		evt.stopPropagation () ;
 		var elts =$('div.alert-info[id^=flow-file-]') ;
 		if ( elts.length !== 0 )
@@ -163,6 +171,10 @@ function deleteProject (identifier) {
 }
 
 function submitProject (data) {
+	if ( inMaintenance ) {
+		showMainteanceMsg () ;
+		return ;
+	}
 	$.ajax ({
 		url: '/api/projects',
 		type: 'post',
@@ -187,6 +199,9 @@ function submitProject (data) {
 }
 
 function projectProgress (root, nb) {
+	if ( inMaintenance )
+		return ;
+
 	nb =nb || 0 ;
 	$.ajax ({
 		url: '/api/projects/' + root + '/progress',
@@ -338,3 +353,8 @@ var fileUploadItem ={
 	}
 
 } ;
+
+function showMainteanceMsg () {
+	//var elt =$('#MaintenanceMsg div.modal-body') ;
+	$('#MaintenanceMsg').modal () ;
+}
