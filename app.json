@@ -8,7 +8,7 @@
   "env": {
 	"FORGE_CLIENT_ID": {
 	  "description": "Replace with your FORGE CLIENT ID KEY",
-	  "generator": "public"
+	  "value": "public"
 	},
 	"FORGE_CLIENT_SECRET": {
 	  "description": "Replace with your FORGE CLIENT SECRET KEY",
@@ -16,15 +16,18 @@
 	},
 	"MJ_APIKEY_PUBLIC": {
 	  "description": "(Optional) Replace with your MailJET PUBLIC KEY",
-	  "value": ""
+	  "value": "",
+	  "required": false
 	},
 	"MJ_APIKEY_SECRET": {
 	  "description": "(Optional) Replace with your MailJET SECRET KEY",
-	  "value": ""
+	  "value": "",
+	  "required": false
 	},
 	"MJ_ACCOUNT": {
 	  "description": "(Optional) Replace with your mailjet account name",
-	  "value": ""
+	  "value": "",
+	  "required": false
 	}
   }
 }
