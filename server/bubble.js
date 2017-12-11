@@ -36,6 +36,7 @@ function bubble (progress) {
 	this._outPath ='./' ;
 	this._token =null ;
 	this._progress =progress ;
+	//this.sqllite ='false' ;
 	//this._filesToFetch =0 ;
 	//this._estimatedSize =0 ;
 	//this._progress =0 ;
@@ -111,7 +112,10 @@ function bubble (progress) {
 				// Optionally replace the path in the source bubble by the local path
 				// for use as local bubbles in the viewer
 				node.urn ='$file$/' + item.localPath + item.rootFileName ;
-				res.push (item) ;
+				if (   node.role !== 'Autodesk.CloudPlatform.PropertyDatabase'
+					|| (self.sqllite && self.sqllite === 'true' )
+				)
+					res.push (item) ;
 				if (   node.mime == 'application/autodesk-svf'
 					|| node.mime == 'application/autodesk-f2d'
 				) {
@@ -580,6 +584,7 @@ function bubble (progress) {
 }
 
 var bubbleUtils ={
+
 	GenerateStartupFiles: function (bubble, identifier) {
 		return (new Promise (function (fulfill, reject) {
 			fs.createReadStream (utils.path ('views/readme.txt'))
@@ -662,8 +667,9 @@ var bubbleUtils ={
 				})
 				.catch (function (error) {
 					console.error (error) ;
+					console.error ('with: ' + this.uri) ;
 					reject (error) ;
-				})
+				}.bind ({ uri : uri }))
 			;
 		})) ;
 	},

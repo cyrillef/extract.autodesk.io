@@ -36,8 +36,8 @@ app.use (favicon (__dirname + '/../www/favicon.ico')) ;
 app.set ('view engine', 'ejs') ;
 app.use ('/explore', ejs) ;
 app.use ('/api', fileUpload) ;
-//app.use ('/api', projects) ;
-//app.use ('/api', results) ;
+app.use ('/api', projects) ;
+app.use ('/api', results) ;
 app.use ('/api', resultsExternals) ;
 app.get ('/forge-proxy/*', forgeProxy.get) ;
 

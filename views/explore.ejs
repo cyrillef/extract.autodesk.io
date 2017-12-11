@@ -53,10 +53,12 @@
 		div.docking-panel { top: 0px; left: 0px; width: 305px; height: 250px; resize: none; }
 		div.docking-panel-minimized { height: 34px; min-height: 34px }
 
-		div#extract\.autodesk\.io-extract-panel.docking-panel { top: 0px; left: 0px; width: 550px; height: 220px; resize: none; }
-		div#extract\.autodesk\.io-extract-panel.docking-panel input { width: 100%; }
+		div#extract\.autodesk\.io-extract-panel.docking-panel { top: 0px; left: 0px; width: 550px; height: 325px; resize: none; }
+		div#extract\.autodesk\.io-extract-panel.docking-panel input#bubbles-email { width: 100%; }
 		div#extract\.autodesk\.io-extract-panel.docking-panel progress { width: 100%; }
 		div#extract\.autodesk\.io-extract-panel.docking-panel #bubbles-uri { color: white; }
+		div#extract\.autodesk\.io-extract-panel.docking-panel h6,
+		div#extract\.autodesk\.io-extract-panel.docking-panel div { color: white; }
 		input:required:invalid,
 		input:focus:invalid {
 			background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAeVJREFUeNqkU01oE1EQ/mazSTdRmqSxLVSJVKU9RYoHD8WfHr16kh5EFA8eSy6hXrwUPBSKZ6E9V1CU4tGf0DZWDEQrGkhprRDbCvlpavan3ezu+LLSUnADLZnHwHvzmJlvvpkhZkY7IqFNaTuAfPhhP/8Uo87SGSaDsP27hgYM/lUpy6lHdqsAtM+BPfvqKp3ufYKwcgmWCug6oKmrrG3PoaqngWjdd/922hOBs5C/jJA6x7AiUt8VYVUAVQXXShfIqCYRMZO8/N1N+B8H1sOUwivpSUSVCJ2MAjtVwBAIdv+AQkHQqbOgc+fBvorjyQENDcch16/BtkQdAlC4E6jrYHGgGU18Io3gmhzJuwub6/fQJYNi/YBpCifhbDaAPXFvCBVxXbvfbNGFeN8DkjogWAd8DljV3KRutcEAeHMN/HXZ4p9bhncJHCyhNx52R0Kv/XNuQvYBnM+CP7xddXL5KaJw0TMAF8qjnMvegeK/SLHubhpKDKIrJDlvXoMX3y9xcSMZyBQ+tpyk5hzsa2Ns7LGdfWdbL6fZvHn92d7dgROH/730YBLtiZmEdGPkFnhX4kxmjVe2xgPfCtrRd6GHRtEh9zsL8xVe+pwSzj+OtwvletZZ/wLeKD71L+ZeHHWZ/gowABkp7AwwnEjFAAAAAElFTkSuQmCC);
@@ -73,11 +75,35 @@
 		label { color: white; }
 
 		div.modal .panel-heading { border-top-left-radius: inherit; border-top-right-radius: inherit; }
+
+		/* http://jsfiddle.net/rensdenobel/sRmLV/13/ */
+		.vertical-alignment-helper {
+			display:table;
+			height: 100%;
+			width: 100%;
+		}
+		.vertical-align-center {
+			/* To center vertically */
+			display: table-cell;
+			vertical-align: middle;
+		}
+		.modal-content {
+			/* Bootstrap sets the size of the modal in the modal-dialog class, we need to inherit it */
+			width:inherit;
+			height:inherit;
+			/* To center horizontally */
+			margin: 0 auto;
+		}
+
 	</style>
 	<script>
 		$(document).ready (function () {
-			showHideUsage () ;
 			initializeAutodeskViewer () ;
+
+			$('#help-information').click (function (evt) {
+				evt.stopPropagation () ;
+				$('#HelpMsg').modal () ;
+			}) ;
 		}) ;
 
 		// https://developer.autodesk.com/en/docs/viewer/v2/tutorials/basic-viewer/
@@ -102,9 +128,11 @@
 				urn ='urn:' + urn ;
 			pattern =/^(urn):.*$/g ;
 
-			if ( Autodesk.Viewing.setApiEndpoint )
+			if ( Autodesk.Viewing.endpoint && Autodesk.Viewing.endpoint.setEndpointAndApi )
+				Autodesk.Viewing.endpoint.setEndpointAndApi (window.location.origin + '/forge-proxy', 'modelDerivativeV2') ;
+			else if ( Autodesk.Viewing.setApiEndpoint )
 				Autodesk.Viewing.setApiEndpoint (window.location.origin + '/forge-proxy') ;
-			else
+			else if ( Autodesk.Viewing.setEndpointAndApi )
 				Autodesk.Viewing.setEndpointAndApi (window.location.origin + '/forge-proxy', 'modelDerivativeV2') ;
 
 			if ( pattern.test (urn) )
@@ -319,11 +347,17 @@
             var html =[
                 '<div class="modal-body">',
                 '<div class="control-group list-group">',
-                    '<label class="control-label" for="bubbles-email">Notify me at this email address when the bubbles are ready</label>',
+                    '<label class="control-label" for="bubbles-email">Notify me at this email address when the bubbles are ready (optional)</label>',
                     '<div class="controls">',
                         '<input type="email" id="bubbles-email" name="bubbles-email" required placeholder="Enter a valid email address">',
                     '</div>',
                     '<div id="bubbles-uri">if you prefer to wait, the url to download the bubbles will appear here when ready</div>',
+
+		            '<br />',
+		            '<div><h6>Options</h6></div>',
+					'<div><input id="opts_sqllite" type="checkbox" /> Include SQLite DB (could be large)</div>',
+					'<div><input id="opts_viewer_files" type="checkbox" /> Include Viewer files</div>',
+
                     '<br />',
                     '<div class="controls">',
                         '<button type="button" id="bubbles-proceed" class="btn btn-info">Proceed</button>',
@@ -341,10 +375,12 @@
 
             $('#bubbles-proceed').click (function (evt) {
                 var email =$('#bubbles-email').val ().trim () ;
+				var opts_sqllite =$('#opts_sqllite').prop ('checked') ;
+				var opts_viewer_files =$('#opts_viewer_files').prop ('checked') ;
                 $.ajax ({
                     url: '/api/results/<%= root %>/project',
                     type: 'get',
-                    data: { email: email },
+                    data: { email: email, sqllite: opts_sqllite, viewer_files: opts_viewer_files },
                     complete: null
                 }).done (function (results) {
                     setTimeout (function () { extractionProgress () ; }, 1000) ;
@@ -435,21 +471,6 @@
         Panel.prototype =Object.create (Autodesk.Viewing.UI.DockingPanel.prototype) ;
         Panel.prototype.constructor =Panel ;
 
-        function showHideUsage () {
-			$('#usage-control').click (function (evt) {
-				evt.stopPropagation () ;
-				var hidden =!($('#usage').hasClass ('noshow')) ;
-				$('#usage').toggleClass ('noshow') ;
-				$('#usage-control').text (hidden ? 'Show About' : 'Hide About') ;
-				$.cookie ('usage', hidden ? 'hidden' : 'visible', { expires: 365 }) ;
-			}) ;
-			var hidden =$.cookie ("usage") ;
-			if ( hidden ) {
-				$('#usage').addClass ('noshow') ;
-				$('#usage-control').text ('Show About') ;
-			}
-        }
-
     </script>
 </head>
 
@@ -516,62 +537,6 @@
                             <div class="panel-body app-panel-body app-api-doc">
                                 <div class="app-api-section">
                                     <div class="app-api-section-heading">
-                                        <h2 class="app-api-section-title first-child">How to download the bubbles?</h2>
-                                    </div>
-
-                                    <div id="usage">
-                                        <p>This sample is to demonstrate how to extract the viewables (aka 'bubbles') after translation
-                                            from the Autodesk server. It is possible for you to download each individual fragment
-                                            from the server using the RESTful API. This sample simply extracts all fragments and
-                                            create a zip file for you to download.</p>
-                                        <p>There is no guarantee your file will be kept on this sample forever. However, you got
-                                            full control on the time life of your design file and 'bubbles' on this server and
-                                            Autodesk server.</p>
-                                        <p>How to use the sample: (<a href="https://github.com/cyrillef/extract.autodesk.io/blob/master/README.md#UseOfTheSample">more instructions</a>)
-                                            <ol>
-			                                    <li>Upload one design file (and it dependencies) you want to process <br />
-				                                    Files can be uploaded as a ZIP file or multiple files. The application will
-				                                    assemble all files together automatically for you</li>
-			                                    <li>If your model depends on multiple files, make sure to point to the master
-				                                    file by assign the <span class="glyphicon glyphicon-home"> </span> icon to it</li>
-			                                    <li>Launch the translation process by clicking on the 'Submit my project' button</li>
-			                                    <li>... wait ...</li>
-			                                    <li>View and verify the results</li>
-			                                    <li>Request the extraction zip file</li>
-			                                    <li>Optionally delete the project (this can be done at any time)</li>
-                                            </ol>
-                                        </p>
-                                        <p>After extraction:</p>
-                                        <ol>
-                                            <li>Unzip the file on your hardrive</li>
-                                            <li>If you have node.js and node.js http-server already installed on your computer,
-                                                launch the local viewer by running the index.bat (Windows) or ./index (OSX/Linux)</li>
-                                            <li>If you do not have have node.js http-server installed,
-                                                read instructions <a href="https://github.com/cyrillef/extract.autodesk.io/blob/master/README.md#node">here</a></li>
-                                            <li>If you prefer using Python, Apache/PHP, or other WEB technologies,
-                                                read instructions <a href="https://github.com/cyrillef/extract.autodesk.io/blob/master/README.md#others">here</a></li>
-                                        </ol>
-	                                    <p>Reporting issues:</p>
-	                                    <ol>
-		                                    <li><a href="https://github.com/cyrillef/extract.autodesk.io/issues" target="GitHub">Report on GitHub</a></li>
-		                                    <li><a href="mailto:forge.help@autodesk.com?Subject=extract.autodesk.io%20problem">Email us</a></li>
-		                                </ol>
-                                    </div>
-                                    <div><button id="usage-control" type="button" class="btn btn-info">Hide About</button></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                    <div class="page-header">
-                        <div class="panel panel-default app-panel-default">
-                            <div class="panel-body app-panel-body app-api-doc">
-                                <div class="app-api-section">
-                                    <div class="app-api-section-heading">
                                         <h2 class="app-api-section-title first-child">Preview your model</h2>
                                     </div>
 
@@ -581,8 +546,15 @@
                         </div>
                     </div>
                 </div>
-            </div>
 
+	            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 center-block">
+		            <br />
+		            <button id="help-information" type="button" class="btn btn-info center-block">Help</button>
+		            <br />
+		            <br />
+
+	            </div>
+            </div>
         </div>
     </div>
 
@@ -591,8 +563,8 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="page-footer">
-                    <div class="container app-container">
-                        <p>&#169; Copyright Autodesk. All rights reserved.</p>
+                    <div class="container app-container center-block" style="text-align: center;">
+                        &#169; Copyright Autodesk. All rights reserved.
                     </div>
                 </div>
 
@@ -616,6 +588,63 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Bootstrap's modal dialog-->
+    <div id="HelpMsg" class="modal fade modal-lg">
+	    <div class="vertical-alignment-helper">
+		    <div class="modal-dialog modal-lg vertical-align-center">
+			    <div class="modal-content panel-info">
+				    <div class="modal-header panel-heading">
+					    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+					    <h4 class="modal-title">How to download the bubbles?</h4>
+				    </div>
+				    <div class="modal-body">
+					    <div id="usage">
+						    <p>This sample is to demonstrate how to extract the viewables (aka 'bubbles') after translation
+							    from the Autodesk server. It is possible for you to download each individual fragment
+							    from the server using the RESTful API. This sample simply extracts all fragments and
+							    create a zip file for you to download.</p>
+						    <p>There is no guarantee your file will be kept on this sample forever. However, you got
+							    full control on the time life of your design file and 'bubbles' on this server and
+							    Autodesk server.</p>
+						    <p>How to use the sample: (<a href="https://github.com/cyrillef/extract.autodesk.io/blob/master/README.md#UseOfTheSample">more instructions</a>)
+						    <ol>
+							    <li>Upload one design file (and it dependencies) you want to process <br />
+								    Files can be uploaded as a ZIP file or multiple files. The application will
+								    assemble all files together automatically for you</li>
+							    <li>If your model depends on multiple files, make sure to point to the master
+								    file by assign the <span class="glyphicon glyphicon-home"> </span> icon to it</li>
+							    <li>Launch the translation process by clicking on the 'Submit my project' button</li>
+							    <li>... wait ...</li>
+							    <li>View and verify the results</li>
+							    <li>Request the extraction zip file</li>
+							    <li>Optionally delete the project (this can be done at any time)</li>
+						    </ol>
+						    </p>
+						    <p>After extraction:</p>
+						    <ol>
+							    <li>Unzip the file on your hardrive</li>
+							    <li>If you have node.js and node.js http-server already installed on your computer,
+								    launch the local viewer by running the index.bat (Windows) or ./index (OSX/Linux)</li>
+							    <li>If you do not have have node.js http-server installed,
+								    read instructions <a href="https://github.com/cyrillef/extract.autodesk.io/blob/master/README.md#node">here</a></li>
+							    <li>If you prefer using Python, Apache/PHP, or other WEB technologies,
+								    read instructions <a href="https://github.com/cyrillef/extract.autodesk.io/blob/master/README.md#others">here</a></li>
+						    </ol>
+						    <p>Reporting issues:</p>
+						    <ol>
+							    <li><a href="https://github.com/cyrillef/extract.autodesk.io/issues" target="GitHub">Report on GitHub</a></li>
+							    <li><a href="mailto:forge.help@autodesk.com?Subject=extract.autodesk.io%20problem">Email us</a></li>
+						    </ol>
+					    </div>
+				    </div>
+				    <div class="modal-footer">
+					    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				    </div>
+			    </div>
+		    </div>
+	    </div>
     </div>
 
     <script>

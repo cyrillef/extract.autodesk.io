@@ -14,6 +14,10 @@
 	  "description": "Replace with your FORGE CLIENT SECRET KEY",
 	  "value": "secret"
 	},
+	"RECAPTCHA_SECRET": {
+	  "description": "Replace with your Google RECAPTCHA SECRET KEY",
+	  "value": "secret"
+	},
 	"MJ_APIKEY_PUBLIC": {
 	  "description": "(Optional) Replace with your MailJET PUBLIC KEY",
 	  "value": "",

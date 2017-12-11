@@ -17,38 +17,35 @@
 // Forge Extractor
 // by Cyrille Fauvel - Autodesk Developer Network (ADN)
 //
-var inMaintenance =true ;
+var inMaintenance =false ;
 
 $(document).ready (function () {
 	if ( inMaintenance )
-		showMainteanceMsg () ;
+		$('#MaintenanceMsg').modal () ;
 
 	$('#tabs').tab () ;
 	listProjects () ;
 
-	$('#usage-control').click (function (evt) {
+	$('#help-information').click (function (evt) {
 		evt.stopPropagation () ;
-		var hidden =!($('#usage').hasClass ('noshow')) ;
-		$('#usage').toggleClass ('noshow') ;
-		$('#usage-control').text ((hidden ? 'Show' : 'Hide') + ' Description & Information') ;
-		$.cookie ('usage', hidden ? 'hidden' : 'visible', { expires: 365 }) ;
+		$('#HelpMsg').modal () ;
 	}) ;
-	var hidden =$.cookie ("usage") ;
-	if ( hidden ) {
-		$('#usage').addClass ('noshow') ;
-		$('#usage-control').text ('Show Description & Information') ;
-	}
 
 	$('#clear-workspace').click (function (evt) {
 		evt.stopPropagation () ;
 		location.reload () ;
 	}) ;
 
+	$('#submit-project').attr ('disabled', 'disabled') ;
 	$('#submit-project').click (function (evt) {
 		if ( inMaintenance ) {
-			showMainteanceMsg () ;
+			$('#MaintenanceMsg').modal () ;
 			return ;
 		}
+		var recaptcha =grecaptcha.getResponse () ;
+		if ( recaptcha == '' )
+			return ;
+
 		evt.stopPropagation () ;
 		var elts =$('div.alert-info[id^=flow-file-]') ;
 		if ( elts.length !== 0 )
@@ -78,7 +75,7 @@ $(document).ready (function () {
 				data.children.push (name) ;
 		}
 		//console.log (JSON.stringify (data)) ;
-		submitProject (data) ;
+		submitProject (data, recaptcha) ;
 	}) ;
 
 	$('#projectProgressDialog').on ('shown.bs.modal', function () {
@@ -119,6 +116,14 @@ function listProjects () {
 	}) ;
 }
 
+// htmlentities
+var htmlentities =function (st) {
+	var result =st.replace (/[\u00A0-\u9999<>\&]/gim, function (i) {
+		return ('&#' + i.charCodeAt (0) + ';') ;
+	}) ;
+	return (result) ;
+} ;
+
 function createProjectVignette (identifier, data) {
 	if ( identifier === undefined )
 		return ;
@@ -134,11 +139,11 @@ function createProjectVignette (identifier, data) {
 	var url =(data.progress != 'failed' ? '/explore/' + identifier : '#') ;
 	$('#vignette-' + identifier).remove () ;
 	$('#project-results').append (
-		'<div class="view view-first flex-item" id="vignette-' + identifier + '">'
+		'<div class="view view-first flex-item" id="vignette-' + identifier + '" title="' + htmlentities (decodeURIComponent (data.name)) + '">'
 			//+	'<a href="#' + identifier + '" />'
 		+	'<img src="' + imageui + '" class="thumbnail" />'
 		+ 	'<div class="mask">'
-		+		'<h2>' + data.name + '</h2>'
+		+		'<h2>' + htmlentities (decodeURIComponent (data.name)) + '</h2>'
 		+		'<p>' + data.progress + ' (' + data.success + ')</p>'
 		//+		'<a href="' + url + '" class="info" target="' + identifier + '">Explore</a>'
 		+		'<a href="javascript:void(0)" data="' + url + '" class="info" target="' + identifier + '">Please Wait</a>'
@@ -170,11 +175,14 @@ function deleteProject (identifier) {
 	}
 }
 
-function submitProject (data) {
+function submitProject (data, recaptcha) {
 	if ( inMaintenance ) {
-		showMainteanceMsg () ;
+		$('#MaintenanceMsg').modal () ;
 		return ;
 	}
+	if ( recaptcha === undefined || recaptcha == '' )
+		return ;
+	data.recaptcha =recaptcha ;
 	$.ajax ({
 		url: '/api/projects',
 		type: 'post',
@@ -354,7 +362,12 @@ var fileUploadItem ={
 
 } ;
 
-function showMainteanceMsg () {
-	//var elt =$('#MaintenanceMsg div.modal-body') ;
-	$('#MaintenanceMsg').modal () ;
+// reCAPTCHA
+function imNotARobot (val) {
+	if ( val !== undefined && val !== null && val !== '' )
+		$('#submit-project').attr ('disabled', null) ;
+}
+
+function imARobot () {
+	$('#submit-project').attr ('disabled', 'disabled') ;
 }

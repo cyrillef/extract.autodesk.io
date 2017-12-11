@@ -134,11 +134,26 @@ div.list-group div.alert .jquery::-moz-progress-bar {
 	background-color: #4a9fe9;
 }
 
-#MaintenanceMsg {
-    position: absolute;
-    top: calc(50vw - 35%);
-    left: calc(50vw - 25%);
-    /*margin-top: -25px;
-    margin-left: -200px;
-    padding: 20px;*/
+/* http://jsfiddle.net/rensdenobel/sRmLV/13/ */
+#MaintenanceMsg, #HelpMsg {
+    width: 50%;
+    margin: 0 auto;
+}
+
+.vertical-alignment-helper {
+    display:table;
+    height: 100%;
+    width: 100%;
+}
+.vertical-align-center {
+    /* To center vertically */
+    display: table-cell;
+    vertical-align: middle;
+}
+.modal-content {
+    /* Bootstrap sets the size of the modal in the modal-dialog class, we need to inherit it */
+    width:inherit;
+    height:inherit;
+    /* To center horizontally */
+    margin: 0 auto;
 }

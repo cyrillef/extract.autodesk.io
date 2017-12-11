@@ -52,7 +52,8 @@
 		"rimraf": "*",
 		"bower": "*",
 		"forge-apis": "*",
-		"mailjet-sendemail": "*"
+		"mailjet-sendemail": "*",
+	    "unirest": "*"
 	},
 	"devDependencies": {
 		"mocha": "*",
