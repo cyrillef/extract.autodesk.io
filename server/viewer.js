@@ -18,15 +18,56 @@
 // by Cyrille Fauvel - Autodesk Developer Network (ADN)
 //
 
-var version ='2.17' ; // Set it in config.js
+var version ='3.3' ; // Set it in config.js
 
 // config.BaseEndPoint
 var viewer =[
 	'viewer3D.min.js',
-	'style.css',
+	'style.min.css',
 	'three.min.js',
 	'lmvworker.min.js',
 	'wgs.min.js',
+] ;
+
+// extensions
+var extensions =[
+	// From viewer3d #57374
+	'extensions/FirstPerson/FirstPerson.min.js',
+
+	/* Autodesk.Viewing.Wireframes */		'extensions/Wireframes/Wireframes.min.js',
+	/* Autodesk.RaaS*/ 						'extensions/RaaS/RaaS.min.js',
+	/* Autodesk.Viewing.MarkupsCore */		'extensions/Markups/Markups.min.js',
+	/* Autodesk.Viewing.MarkupsGui */		'extensions/Markups/MarkupsGui.min.js',
+											'extensions/Markups/MarkupsGui.css',
+	/* Autodesk.Billboard */				'extensions/Billboard/Billboard.min.js',
+	/* Autodesk.BillboardGui */				'extensions/Billboard/Billboard.min.js',
+	/* Autodesk.Viewing.Comments */			'extensions/Comments/Comments.min.js',
+	/* Autodesk.InViewerSearch */			'extensions/InViewerSearch/InViewerSearch.min.js',
+											'extensions/InViewerSearch/InViewerSearch.min.css',
+	/* Autodesk.Viewing.WebVR */			'extensions/WebVR/WebVR.min.js',
+											'extensions/WebVR/WebVR.min.css',
+	/* Autodesk.Viewing.MemoryManager */	'extensions/MemoryManager/MemoryManager.min.js',
+											'extensions/MemoryManager/MemoryManagerUI.min.css',
+	/* Autodesk.Beeline */					'extensions/Beeline/Beeline.js', // no min
+	/* Autodesk.FirstPerson */				'extensions/FirstPerson/FirstPerson.min.js',
+	/* Autodesk.BimWalk */					'extensions/BimWalk/BimWalk.min.js',
+	/* Autodesk.Debug */					'extensions/Debug/Debug.min.js',
+											'extensions/Debug/Debug.min.css',
+	/* Autodesk.InitialVisibility */		'extensions/InitialVisibility/InitialVisibility.min.js',
+
+	// These are already included in viewer3D
+	// Autodesk.Viewing.Extensions.CAM360
+	// Autodesk.Viewing.Extensions.Fusion360
+	// Autodesk.Viewing.Extensions.Fusion360Sim
+	// Autodesk.Viewing.Extensions.FusionOrbit
+	// Autodesk.Viewing.Extensions.Collaboration
+	// Autodesk.Viewing.Extensions.DefaultTools
+	// Autodesk.Viewing.Extensions.GamepadModule
+	// Autodesk.Viewing.Extensions.Hyperlink
+	// Autodesk.Viewing.Extensions.Measure
+	// Autodesk.Viewing.Extensions.Section
+	// Autodesk.Viewing.Extensions.ZoomWindow
+
 ] ;
 
 // res/environments/
@@ -115,6 +156,7 @@ locales =locales.reduce (
 
 //-
 module.exports =viewer
+	.concat (extensions)
 	.concat (environments)
 	.concat (textures)
 	.concat (locales) ;

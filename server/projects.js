@@ -24,6 +24,7 @@ var ForgeSDK =require ('forge-apis') ;
 var config =require ('./config') ;
 var utils =require ('./utils') ;
 var forgeToken =require ('./forge-token') ;
+var reCAPTCHA =require ('./recaptcha') ;
 
 var router =express.Router () ;
 router.use (bodyParser.json ()) ;
@@ -48,14 +49,10 @@ var uploadToOSS =function (identifier) {
 } ;
 
 // Post files to OSS and request translation
-router.post ('/projects', function (req, res) {
-	// Protect the endpoint from external usage.
-	if ( !utils.checkHost (req, config.domain) )
-		return (res.status (500). end ()) ;
-
+var submitProject =function (req, res) {
 	var bucket =config.bucket ;
 	var regex =new RegExp ('^[-_.a-z0-9]{3,128}$') ;
-	if (!regex.test (bucket))
+	if ( !regex.test (bucket) )
 		return (res.status (403).send ('Bucket name invalid!')) ;
 
 	utils.writeFile (utils.data (req.body.uniqueIdentifier + '.job'), req.body.children) ;
@@ -113,6 +110,19 @@ router.post ('/projects', function (req, res) {
 	// no clue at this stage if they were successful or not
 	res
 		.json (req.body) ;
+}
+
+router.post ('/projects', function (req, res) {
+	// Protect the endpoint from external usage.
+	if ( !utils.checkHost (req, config.domain) )
+		return (res.status (403). end ()) ;
+
+	reCAPTCHA (req.body.recaptcha, function (success) {
+		if ( success != true )
+			return (res.status (401). end ()) ;
+
+		submitProject (req, res) ;
+	}) ;
 }) ;
 
 // Get the uploading/translation progress
@@ -157,7 +167,7 @@ var uploadProgress =function (req, res) {
 router.get ('/projects/:identifier/progress', function (req, res) {
 	// Protect the endpoint from external usage.
 	if ( !utils.checkHost (req, config.domain) )
-		return (res.status (500). end ()) ;
+		return (res.status (403). end ()) ;
 
 	var bucket =config.bucket ;
 	var identifier =req.params.identifier ;

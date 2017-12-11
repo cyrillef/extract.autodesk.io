@@ -1,0 +1,7 @@
+#!/bin/bash
+
+FORGEBUILD="`dirname \"$0\"`" # Relative
+export FORGEBUILD="`( cd \"$FORGEBUILD\" && pwd )`" # Absolutized and normalized
+pushd $FORGEBUILD
+
+for f in */; do rm -Rf $f; done

@@ -39,7 +39,7 @@ router.get ('/test', function (req, res) {
 router.get ('/results', function (req, res) {
 	// Protect the endpoint from external usage.
 	if ( !utils.checkHost (req, config.domain) )
-		return (res.status (500). end ()) ;
+		return (res.status (403). end ()) ;
 
 	utils.readdir (utils.path ('data'))
 		.then (function (files) {
@@ -104,7 +104,7 @@ var getLocalManifest =function (identifier) {
 router.get ('/results/:identifier/thumbnail', function (req, res) {
 	// Protect the endpoint from external usage.
 	if ( !utils.checkHost (req, config.domain) )
-		return (res.status (500). end ()) ;
+		return (res.status (403). end ()) ;
 
 	var identifier =req.params.identifier ;
 	var png =utils.extracted (identifier + '.png') ;
@@ -172,7 +172,7 @@ var _progress ={} ;
 router.get ('/results/:identifier/project', function (req, res) {
 	// Protect the endpoint from external usage.
 	if ( !utils.checkHost (req, config.domain) )
-		return (res.status (500). end ()) ;
+		return (res.status (403). end ()) ;
 
 	var identifier =req.params.identifier ;
 	var urn ='', manifest ='' ;
@@ -208,14 +208,19 @@ router.get ('/results/:identifier/project', function (req, res) {
 		})
 		.then (function (pathname) {
 			var b =new Bubble.bubble (_progress [identifier]) ;
+			b.sqllite =req.query.sqllite ;
 			return (b.downloadBubble (urn, pathname + '/')) ;
 		})
 		.then (function (bubble) {
+			if ( req.query.viewer_files != 'true' )
+				return (bubble) ;
 			// Generate local html, and bat/sh files
 			_progress [identifier].msg ='Generating local html, and bat/sh files' ;
 			return (Bubble.utils.GenerateStartupFiles (bubble, identifier)) ;
 		})
 		.then (function (bubble) {
+			if ( req.query.viewer_files != 'true' )
+				return (bubble) ;
 			// Get Viewer files and dependencies
 			_progress [identifier].msg ='Downloading latest Forge Viewer version (core and dependencies)' ;
 			return (Bubble.utils.AddViewerFiles (bubble, identifier)) ;
@@ -262,7 +267,7 @@ router.get ('/results/:identifier/project/progress', function (req, res) {
 router.get ('/results/:identifier/delete', function (req, res) {
 	// Protect the endpoint from external usage.
 	if ( !utils.checkHost (req, config.domain) )
-		return (res.status (500). end ()) ;
+		return (res.status (403). end ()) ;
 
 	DeleteData (req, res) ;
 }) ;
@@ -270,7 +275,7 @@ router.get ('/results/:identifier/delete', function (req, res) {
 router.delete ('/results/:identifier', function (req, res) {
 	// Protect the endpoint from external usage.
 	if ( !utils.checkHost (req, config.domain) )
-		return (res.status (500). end ()) ;
+		return (res.status (403). end ()) ;
 
 	DeleteData (req, res) ;
 }) ;
@@ -364,7 +369,7 @@ var deleteAll =function (res) {
 router.get ('/results/status', function (req, res) {
 	// Protect the endpoint from external usage.
 	if ( !utils.checkHost (req, config.domain) )
-		return (res.status (500). end ()) ;
+		return (res.status (403). end ()) ;
 
 	utils.readdir (utils.path ('data'))
 		.then (function (files) {
