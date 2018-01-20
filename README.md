@@ -14,7 +14,7 @@
 [![Model-Derivative](https://img.shields.io/badge/Model%20Derivative-v2-green.svg)](http://developer-autodesk.github.io/)
 [![Viewer](https://img.shields.io/badge/Forge%20Viewer-v2.17-green.svg)](http://developer-autodesk.github.io/)
 
-<b>Important: What is demonstrated here is not officially supported by Autodesk, and may break in future. This is why this sample is posted on my private github repo. You should be using this 'oofline' approach only when you are developing an application, for backups, or when you application does not have access to the internet.</b>
+<b>Important: What is demonstrated here, is not officially supported by Autodesk, and may break in future. This is why this sample is posted on my private github repo. You should be using this 'offline' approach only when you are developing an applicationile in development, for backup reasons, or when your application does not have access to the internet.</b>
 
 <b>Note:</b> For using this sample, you need a valid oAuth credential for the translation / extraction portion.
 Visit this [page](https://developer.autodesk.com) for instructions to get on-board.
