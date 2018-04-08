@@ -2,7 +2,7 @@
 	"name": "extract.autodesk.io",
 	"description": "A Node.js server to extract Autodesk Forge Viewer bubbles",
 	"homepage": "http://around-the-corner.typepad.com/",
-  	"version": "4.1.0",
+	"version": "4.1.0",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/cyrillef/extract.autodesk.io.git"
@@ -40,20 +40,22 @@
 	],
 	"dependencies": {
 		"adm-zip": "*",
-		"node-zip": "*",
 		"archiver": "*",
 		"body-parser": "*",
-		"connect-multiparty": "*",
-		"express": "*",
-	  	"request": "*",
-		"serve-favicon": "*",
-		"ejs": "*",
-		"mkdirp": "*",
-		"rimraf": "*",
 		"bower": "*",
+		"connect-multiparty": "*",
+		"decompress-response": "^3.3.0",
+		"ejs": "*",
+		"express": "*",
 		"forge-apis": "*",
+		"jszip": "^3.1.5",
 		"mailjet-sendemail": "*",
-	    "unirest": "*"
+		"mkdirp": "*",
+		"node-zip": "*",
+		"request": "*",
+		"rimraf": "*",
+		"serve-favicon": "*",
+		"unirest": "*"
 	},
 	"devDependencies": {
 		"mocha": "*",

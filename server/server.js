@@ -25,7 +25,8 @@ var forgeToken =require ('./forge-token') ; // Force loading
 var fileUpload =require ('./upload-flow') ;
 var projects =require ('./projects') ;
 var results =require ('./results') ;
-var resultsExternals =require ('./externals') ;
+var zipsDownloads =require ('./zips-downloads') ;
+//var resultsExternals =require ('./externals') ;
 var forgeProxy =require ('./forge-proxy') ;
 
 var app =express () ;
@@ -38,7 +39,8 @@ app.use ('/explore', ejs) ;
 app.use ('/api', fileUpload) ;
 app.use ('/api', projects) ;
 app.use ('/api', results) ;
-app.use ('/api', resultsExternals) ;
+app.use ('/extracted/zips', zipsDownloads) ;
+//app.use ('/api', resultsExternals) ;
 app.get ('/forge-proxy/*', forgeProxy.get) ;
 
 app.set ('port', process.env.PORT || 80) ;

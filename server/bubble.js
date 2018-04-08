@@ -24,6 +24,7 @@ var mkdirp =require ('mkdirp') ;
 var path =require ('path') ;
 var archiver =require ('archiver') ;
 var ejs =require ('ejs') ;
+var decompressResponse =require ('decompress-response') ;
 
 var ForgeSDK =require ('forge-apis') ;
 var config =require ('./config') ;
@@ -36,7 +37,7 @@ function bubble (progress) {
 	this._outPath ='./' ;
 	this._token =null ;
 	this._progress =progress ;
-	//this.sqllite ='false' ;
+	this._sqllite ='true' ;
 	//this._filesToFetch =0 ;
 	//this._estimatedSize =0 ;
 	//this._progress =0 ;
@@ -113,7 +114,7 @@ function bubble (progress) {
 				// for use as local bubbles in the viewer
 				node.urn ='$file$/' + item.localPath + item.rootFileName ;
 				if (   node.role !== 'Autodesk.CloudPlatform.PropertyDatabase'
-					|| (self.sqllite && self.sqllite === 'true' )
+					|| (self._sqllite && self._sqllite === 'true' )
 				)
 					res.push (item) ;
 				if (   node.mime == 'application/autodesk-svf'
@@ -206,6 +207,7 @@ function bubble (progress) {
 			var rootItem =res [current++] ;
 			var basePath ;
 			var files =rootItem.files =[] ;
+			console.log (rootItem.mime + ': ' + rootItem.rootFileName) ;
 			if ( rootItem.mime !== 'thumbnail' )
 				basePath =rootItem.basePath ;
 			if ( rootItem.mime === 'application/autodesk-db' ) {
@@ -637,28 +639,55 @@ var bubbleUtils ={
 		})) ;
 	},
 
+	GetViewerFiles: function (identifier) {
+		var data =utils.path ('data/' + identifier) ;
+		return (new Promise (function (fulfill, reject) {
+			var urns =viewerFileList.map (function (item) {
+				return (bubbleUtils.DownloadViewerItem ('/derivativeservice/v2/viewers/' + item, data, item)) ;
+			}) ;
+			Promise.all (urns)
+				.then (function (urns) {
+					var bower =utils.path ('www/bower_components') ;
+					fs.createReadStream (bower + '/jquery/dist/jquery.min.js')
+						.pipe (fs.createWriteStream (data + '/jquery.min.js')) ;
+					fs.createReadStream (bower + '/jquery-ui/jquery-ui.min.js')
+						.pipe (fs.createWriteStream (data + '/jquery-ui.min.js')) ;
+					fulfill (data) ;
+				})
+				.catch (function (error) {
+					console.error ('Something wrong happened during viewer files download') ;
+					reject (error) ;
+				})
+			;
+		})) ;
+	},
+
 	DownloadViewerItem: function (uri, outPath, item) {
 		uri +='?v=v' + config.viewerVersion ;
 		return (new Promise (function (fulfill, reject) {
+			var accepted = [ 'application/octet-stream', 'image/png', 'text/html', 'text/css', 'text/javascript', 'application/json' ] ;
 			var ModelDerivative =new ForgeSDK.DerivativesApi () ;
 			ModelDerivative.apiClient.callApi (
 				uri, 'GET',
 				{}, {}, {},
 				{}, null,
-				[], [ 'application/octet-stream', 'image/png', 'text/html', 'text/css', 'text/javascript', 'application/json' ], null,
+				[], accepted, null,
 				forgeToken.RW, forgeToken.RW.getCredentials ()
 			)
+				//.pipe (zlib.createGunzip ())
 				.then (function (response) {
-					//console.log (response.headers ['content-type'], item) ;
 					var body =response.body ;
-					if (   response.headers ['content-type'] == 'text/javascript'
-						|| response.headers ['content-type'] == 'text/css'
+					if ( ['gzip', 'deflate'].indexOf (response.headers ['content-encoding']) !== -1 )
+						body =zlib.gunzipSync (response.body) ;
+
+					if (   response.headers ['content-type'] === 'text/javascript'
+						|| response.headers ['content-type'] === 'text/css'
 					)
-						body =response.body.toString ('utf8') ;
-					if (   response.headers ['content-type'] == 'application/json'
-						|| response.headers ['content-type'] == 'application/json; charset=utf-8'
+						body =body.toString ('utf8') ;
+					if (   response.headers ['content-type'] === 'application/json'
+						|| response.headers ['content-type'] === 'application/json; charset=utf-8'
 					)
-						body =JSON.stringify (response.body) ;
+						body =JSON.stringify (body) ;
 					console.log ('Downloaded:', outPath + item) ;
 					return (utils.writeFile (outPath + item, body, null, true)) ;
 				})
@@ -671,6 +700,63 @@ var bubbleUtils ={
 					reject (error) ;
 				}.bind ({ uri : uri }))
 			;
+		})) ;
+	},
+
+	PackViewer: function (inDir, outZip) {
+		return (new Promise (function (fulfill, reject) {
+			try {
+				var archive =archiver ('zip') ;
+				archive.on ('error', function (err) {
+					console.error ('PackViewer: ' + err) ;
+					//reject (err) ;
+				}) ;
+				archive.on ('finish', function (err) {
+					if ( err ) {
+						console.error ('PackViewer: ' + err) ;
+						reject (err) ;
+					} else {
+						console.log ('PackViewer ended successfully.') ;
+						fulfill (outZip) ;
+					}
+				}) ;
+
+				var output =fs.createWriteStream (outZip) ;
+				archive.pipe (output) ;
+				archive.directory (inDir, '') ;
+				archive.finalize () ;
+			} catch ( ex ) {
+				reject (ex) ;
+			}
+		})) ;
+	},
+
+	PackSqllite: function (inDir, outZip) {
+		return (new Promise (function (fulfill, reject) {
+			try {
+				var archive =archiver ('zip') ;
+				archive.on ('error', function (err) {
+					console.error ('PackSqllite: ' + err) ;
+					//reject (err) ;
+				}) ;
+				archive.on ('finish', function (err) {
+					if ( err ) {
+						console.error ('PackSqllite: ' + err) ;
+						reject (err) ;
+					} else {
+						console.log ('PackSqllite ended successfully.') ;
+						fulfill (outZip) ;
+					}
+				}) ;
+
+				var output =fs.createWriteStream (outZip) ;
+				archive.pipe (output) ;
+				archive.glob ('**/*.db', { cwd: inDir }) ;
+				archive.glob ('**/*.sdb', { cwd: inDir }) ;
+				archive.finalize () ;
+			} catch ( ex ) {
+				reject (ex) ;
+			}
 		})) ;
 	},
 
@@ -703,7 +789,8 @@ var bubbleUtils ={
 
 				var output =fs.createWriteStream (outZip) ;
 				archive.pipe (output) ;
-				archive.directory (inDir, '') ;
+				//archive.directory (inDir, '') ;
+				archive.glob ('**/*', { cwd: inDir, ignore: [ '**/*.sdb', '**/*.db' ] }) ;
 				archive.finalize () ;
 			} catch ( ex ) {
 				reject (ex) ;
@@ -711,12 +798,35 @@ var bubbleUtils ={
 		})) ;
 	},
 
-	NotifyPeopleOfSuccess: function (identifier, locks) {
-		return (bubbleUtils.NotifyPeople (identifier, locks, utils.path ('views/email-extract-succeeded.ejs'), 'Autodesk Forge Viewer Extractor notification')) ;
+	MakeZipUrl: function (identifier, sqllite, viewer_files) {
+		var params =[] ;
+		if ( sqllite === 'true' )
+			params.push ('db=true') ;
+		if ( viewer_files === 'true' )
+			params.push ('viewer=true') ;
+		var ref =identifier ;
+		if ( params.length > 0 )
+			ref +='?' + params.join ('&') ;
+		return (ref) ;
+	},
+
+	NotifyPeopleOfSuccess: function (identifier, sqllite, viewer_files, locks) {
+		var ref =bubbleUtils.MakeZipUrl (identifier, sqllite, viewer_files) ;
+		return (bubbleUtils.NotifyPeople (
+			ref,
+			locks,
+			utils.path ('views/email-extract-succeeded.ejs'),
+			'Autodesk Forge Viewer Extractor notification')
+		) ;
 	},
 
 	NotifyPeopleOfFailure: function (identifier, locks, error) {
-		return (bubbleUtils.NotifyPeople (identifier, locks, utils.path ('views/email-extract-failed.ejs'), 'Autodesk Forge Viewer Extractor failure')) ;
+		return (bubbleUtils.NotifyPeople (
+			identifier,
+			locks,
+			utils.path ('views/email-extract-failed.ejs'),
+			'Autodesk Forge Viewer Extractor failure')
+		) ;
 	},
 
 	NotifyPeople: function (identifier, locks, template, subject) {
@@ -743,6 +853,20 @@ var bubbleUtils ={
 	}
 
 } ;
+
+// Get Viewer files and dependencies as ZIP to avoid downloading the viewer each time
+function PackViewer () {
+	var identifier ='viewer-' + config.viewerVersion ;
+	bubbleUtils.GetViewerFiles (identifier + '/')
+		.then (function (location) {
+			var outZip =utils.extracted (identifier + '.zip') ;
+			return (bubbleUtils.PackViewer (location, outZip)) ;
+		})
+		.then (function (result) {
+			return (utils.rimraf (utils.path ('data/' + identifier))) ;
+		}) ;
+}
+//PackViewer () ;
 
 module.exports ={
 	bubble: bubble,

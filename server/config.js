@@ -43,7 +43,6 @@ var config ={
 	viewerVersion: '3.3' // must match version in viewer.js
 } ;
 
-
 // Make sure it is a unique bucket name by using the public key
 var md5sum =crypto.createHash ('md5').update (config.credentials.client_id).digest ('hex') ;
 if ( md5sum !== 'e2d2cb3afdf3050238f0315c47a22be8' )

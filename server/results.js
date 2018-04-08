@@ -153,7 +153,7 @@ var downloadThumbnail =function (identifier) {
 					return (ModelDerivative.getThumbnail (json.urn, { width: 200, height: 200 }, forgeToken.RW, forgeToken.RW.getCredentials ())) ;
 				})
 				.then (function (thumbnail) {
-					fs.writeFile (png, thumbnail.body) ;
+					fs.writeFile (png, thumbnail.body, function (err) {}) ;
 					console.log ('written to disk', png) ;
 				})
 				.catch (function (error) {
@@ -175,8 +175,12 @@ router.get ('/results/:identifier/project', function (req, res) {
 		return (res.status (403). end ()) ;
 
 	var identifier =req.params.identifier ;
+	var sqllite =req.query.sqllite ;
+	var viewer_files =req.query.viewer_files ;
+	var zip_filename =identifier + '.zip' ;
+	var zip_sqllite = identifier + '-db.zip';
 	var urn ='', manifest ='' ;
-	utils.fileexists (utils.extracted (identifier + '.zip'))
+	utils.fileexists (utils.extracted (zip_filename))
 		.then (function (bExists) {
 			if ( bExists )
 				throw new Error ('Bubble already extracted!') ;
@@ -196,7 +200,7 @@ router.get ('/results/:identifier/project', function (req, res) {
 			if ( !json.hasOwnProperty ('urn') )
 				throw new Error ('No URN') ;
 			// Ok, we return a 200 HTTP code to the browser and we continue the extraction
-			res.end () ;
+			res.status (200).end () ;
 			for ( var i =0 ; i < json.derivatives.length ; i++ ) {
 				if ( json.derivatives [i].outputType === 'svf' ) {
 					manifest =json.derivatives [i] ;
@@ -208,33 +212,37 @@ router.get ('/results/:identifier/project', function (req, res) {
 		})
 		.then (function (pathname) {
 			var b =new Bubble.bubble (_progress [identifier]) ;
-			b.sqllite =req.query.sqllite ;
 			return (b.downloadBubble (urn, pathname + '/')) ;
 		})
 		.then (function (bubble) {
-			if ( req.query.viewer_files != 'true' )
-				return (bubble) ;
+			//if ( viewer_files != 'true' )
+			//	return (bubble) ;
 			// Generate local html, and bat/sh files
 			_progress [identifier].msg ='Generating local html, and bat/sh files' ;
 			return (Bubble.utils.GenerateStartupFiles (bubble, identifier)) ;
 		})
+		// .then (function (bubble) {
+		// 	if ( viewer_files != 'true' )
+		// 		return (bubble) ;
+		// 	// Get Viewer files and dependencies
+		// 	_progress [identifier].msg ='Downloading latest Forge Viewer version (core and dependencies)' ;
+		// 	return (Bubble.utils.AddViewerFiles (bubble, identifier)) ;
+		// })
 		.then (function (bubble) {
-			if ( req.query.viewer_files != 'true' )
-				return (bubble) ;
-			// Get Viewer files and dependencies
-			_progress [identifier].msg ='Downloading latest Forge Viewer version (core and dependencies)' ;
-			return (Bubble.utils.AddViewerFiles (bubble, identifier)) ;
+			_progress [identifier].msg ='Preparing sqllite db ZIP file' ;
+			var inDir =utils.path ('data/' + identifier + '/') ;
+			var outZip =utils.extracted (zip_sqllite) ;
+			return (Bubble.utils.PackSqllite (inDir, outZip)) ;
 		})
 		.then (function (bubble) {
-			// Generate zip file
-			_progress [identifier].msg ='Preparing ZIP file' ;
+			_progress [identifier].msg ='Preparing bubble ZIP file' ;
 			var inDir =utils.path ('data/' + identifier + '/') ;
-			var outZip =utils.extracted (identifier + '.zip') ;
+			var outZip =utils.extracted (zip_filename) ;
 			return (Bubble.utils.PackBubble (inDir, outZip)) ;
 		})
 		.then (function (outZipFilename) {
 			_progress [identifier].msg ='Cleaning workspace and notifying listeners' ;
-			Bubble.utils.NotifyPeopleOfSuccess (identifier, _locks [identifier])
+			Bubble.utils.NotifyPeopleOfSuccess (identifier, sqllite, viewer_files, _locks [identifier])
 				.then (function () {
 					delete _locks [identifier] ;
 					delete _progress [identifier] ;
@@ -300,7 +308,7 @@ function DeleteData (req, res) {
 					utils.unlink (utils.data (this.identifier + '.job')) ;
 					return (getLocalFileDescriptor (this.identifier)) ;
 				}.bind ({ identifier: identifier }))
-				.then (function (desc) {	
+				.then (function (desc) {
 					var ObjectsApi =new ForgeSDK.ObjectsApi () ;
 					ObjectsApi.deleteObject (bucket, desc.objectKey, forgeToken.RW, forgeToken.RW.getCredentials ())
 						.catch (function (error) {
@@ -323,7 +331,7 @@ function DeleteData (req, res) {
 	;
 }
 
-// Delete all project from the website
+// Delete all projects from the website
 var deleteAll =function (res) {
 	var bucket =config.bucket ;
 	utils.readdir (utils.path ('data'))

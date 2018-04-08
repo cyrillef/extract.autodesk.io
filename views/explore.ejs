@@ -373,6 +373,17 @@
             panel.addHtmlElement (elt) ;
             $(panel.container).css ('resize', 'none') ;
 
+            $('#opts_sqllite').click (function (evt) {
+                $('#bubbles-uri').empty () ;
+                $('#bubbles-uri').text ('if you prefer to wait, the url to download the bubbles will appear here when ready') ;
+                $('#bubbles-progress').val (0) ;
+            }) ;
+            $('#opts_viewer_files').click (function (evt) {
+                $('#bubbles-uri').empty () ;
+                $('#bubbles-uri').text ('if you prefer to wait, the url to download the bubbles will appear here when ready') ;
+                $('#bubbles-progress').val (0) ;
+            }) ;
+
             $('#bubbles-proceed').click (function (evt) {
                 var email =$('#bubbles-email').val ().trim () ;
 				var opts_sqllite =$('#opts_sqllite').prop ('checked') ;
@@ -404,8 +415,18 @@
 	                setTimeout (function () { extractionProgress () ; }, 1000) ;
                 } else {
                     $('#bubbles-uri').empty () ;
+                    var ref ='/extracted/zips/<%= root %>' ;
+                    var params =[] ;
+                    var opts_sqllite =$('#opts_sqllite').prop ('checked') ;
+                    if ( opts_sqllite === true )
+                        params.push ('db=true') ;
+				    var opts_viewer_files =$('#opts_viewer_files').prop ('checked') ;
+                    if  ( opts_viewer_files === true )
+                        params.push ('viewer=true') ;
+                    if ( params.length > 0 )
+                        ref +='?' + params.join ('&') ;
                     $(document.createElement ('a'))
-                        .prop ('href', '/extracted/<%= root %>.zip')
+                        .prop ('href', ref)
                         .text ('<%= root %>.zip')
                         .appendTo ($('#bubbles-uri')) ;
                 }

@@ -26,6 +26,7 @@ var unirest =require ('unirest') ;
 // router.use (bodyParser.json ()) ;
 
 var reCAPTCHA =function (response, cb) {
+	//return (cb (true)) ;
 	unirest.post ('https://www.google.com/recaptcha/api/siteverify')
 		.header ('Accept', 'application/json')
 		.send ({
