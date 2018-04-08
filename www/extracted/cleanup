@@ -4,4 +4,10 @@ FORGEBUILD="`dirname \"$0\"`" # Relative
 export FORGEBUILD="`( cd \"$FORGEBUILD\" && pwd )`" # Absolutized and normalized
 pushd $FORGEBUILD
 
-rm -f *.zip
+#rm -f *.zip
+for f in */; do rm -Rf "$f"; done
+for f in *; do
+	if [ "$f" != "cleanup" ]; then
+		rm -f "$f"
+	fi
+done
