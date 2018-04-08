@@ -866,7 +866,7 @@ function PackViewer () {
 			return (utils.rimraf (utils.path ('data/' + identifier))) ;
 		}) ;
 }
-//PackViewer () ;
+PackViewer () ;
 
 module.exports ={
 	bubble: bubble,

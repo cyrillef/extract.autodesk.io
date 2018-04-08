@@ -118,7 +118,7 @@ router.post ('/projects', function (req, res) {
 		return (res.status (403). end ()) ;
 
 	reCAPTCHA (req.body.recaptcha, function (success) {
-		if ( success != true )
+		if ( success !== true )
 			return (res.status (401). end ()) ;
 
 		submitProject (req, res) ;
