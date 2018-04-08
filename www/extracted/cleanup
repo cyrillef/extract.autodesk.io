@@ -8,6 +8,6 @@ pushd $FORGEBUILD
 for f in */; do rm -Rf "$f"; done
 for f in *; do
 	if [ "$f" != "cleanup" ]; then
-		rm -f "$f"
+		rm -f "./$f"
 	fi
 done
