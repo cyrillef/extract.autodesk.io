@@ -100,6 +100,8 @@ which would update/install automatically via 'bower':
    application (like Skype, or IIS, or Apache, ...), you can use any other free port such as 8000, 3000, etc...
    But in the next section you would need to specify the port to use, i.e. http://localhost[:port]/
 
+5. Recapcha setup<br/>
+   Add your own site key and secret key respectively in /www/index.html#L257 and /server/config.js#L41.
 
 <a name="UseOfTheSample"></a>
 ### Use of the sample
