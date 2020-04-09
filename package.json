@@ -21,9 +21,7 @@
 	},
 	"scripts": {
 		"start": "node start.js",
-		"debug": "node --debug-brk=5858 --nolazy start.js",
-		"test": "node_modules/.bin/mocha --require test/support/env --reporter spec --bail --check-leaks test/",
-		"postinstall": "bower install"
+		"debug": "node --debug-brk=5858 --nolazy start.js"
 	},
 	"keywords": [
 		"express",
@@ -39,30 +37,10 @@
 		"api"
 	],
 	"dependencies": {
-		"adm-zip": "*",
-		"archiver": "*",
 		"body-parser": "*",
-		"bower": "*",
-		"connect-multiparty": "*",
-		"decompress-response": "^3.3.0",
-		"ejs": "*",
 		"express": "*",
-		"forge-apis": "*",
-		"jszip": "^3.1.5",
-		"mailjet-sendemail": "*",
-		"mkdirp": "*",
-		"node-zip": "*",
-		"request": "*",
-		"rimraf": "*",
-		"serve-favicon": "*",
-		"unirest": "*"
+		"serve-favicon": "*"
 	},
-	"devDependencies": {
-		"mocha": "*",
-		"should": "*",
-		"supertest": "*",
-		"chai": "*",
-		"expect.js": "*"
-	},
+	"devDependencies": {},
 	"optionalDependencies": {}
 }
